@@ -179,11 +179,11 @@
                 <h2>Foco do Treinamento Semanal</h2>
                 <p style="color: var(--text-muted); margin-bottom: 15px;">Defina a área de foco para o elenco nesta semana. Os efeitos de evolução e fadiga consolidam-se ao final de cada rodada simulada.</p>
                 <select id="training-focus-select" onchange="updateTrainingFocus()">
-                    <option value="physio">⚡ Recuperação Física Intensiva (+25 Stamina global)</option>
-                    <option value="tactical">🧠 Tático Coesivo (+1 Ataque, +1 Defesa geral equilibrado)</option>
-                    <option value="offensive">🎯 Calibração Ofensiva (+2 Ataque para Meias e Atacantes)</option>
-                    <option value="defensive">🛡️ Barreira Defensiva (+2 Defesa para Defensores e Goleiros)</option>
-                    <option value="youth">🌱 Lapidação da Base (Evolução duplicada para atletas menores de 23 anos)</option>
+                    <option value="physio">⚡ Recuperação Física Intensiva (+10 Stamina global)</option>
+                    <option value="tactical">🧠 Tático Coesivo (25% de chance +1 Ataque, +1 Defesa geral equilibrado)</option>
+                    <option value="offensive">🎯 Calibração Ofensiva (30% de chance +2 Ataque para Meias e Atacantes)</option>
+                    <option value="defensive">🛡️ Barreira Defensiva (30% de chance +2 Defesa para Defensores e Goleiros)</option>
+                    <option value="youth">🌱 Lapidação da Base (30% de chance de Evolução duplicada para atletas menores de 23 anos)</option>
                 </select>
                 <div style="margin-top: 15px; padding: 15px; background: var(--bg-main); border-radius: 8px;" id="training-focus-desc"></div>
             </div>
@@ -658,27 +658,38 @@
         }
     }
 
-    function applyWeeklyTrainingEffects(myTeam) {
-        let mult = 1 + (trainingLevel - 1) * 0.5;
-        myTeam.players.forEach(p => {
-            if(trainingFocus === 'physio') {
-                p.stamina = Math.min(100, p.stamina + Math.round(25 * mult));
-            } else if(trainingFocus === 'tactical') {
-                if(Math.random() < 0.6) p.attack = Math.min(99, p.attack + Math.round(1 * mult));
-                if(Math.random() < 0.6) p.defense = Math.min(99, p.defense + Math.round(1 * mult));
-            } else if(trainingFocus === 'offensive') {
-                if(p.position === 'ATA' || p.position === 'MEI') p.attack = Math.min(99, p.attack + Math.round(2 * mult));
-            } else if(trainingFocus === 'defensive') {
-                if(p.position === 'DEF' || p.position === 'GOL') p.defense = Math.min(99, p.defense + Math.round(2 * mult));
-            } else if(trainingFocus === 'youth') {
-                if(p.age < 23) {
+   function applyWeeklyTrainingEffects(myTeam) {
+    let mult = 1 + (trainingLevel - 1) * 0.5;
+    myTeam.players.forEach(p => {
+        if(trainingFocus === 'physio') {
+            // Nerf: 25 Stamina base -> 10 Stamina base
+            p.stamina = Math.min(100, p.stamina + Math.round(10 * mult));
+        } else if(trainingFocus === 'tactical') {
+            // Nerf: 60% de probabilidade -> 25% de probabilidade
+            if(Math.random() < 0.25) p.attack = Math.min(99, p.attack + Math.round(1 * mult));
+            if(Math.random() < 0.25) p.defense = Math.min(99, p.defense + Math.round(1 * mult));
+        } else if(trainingFocus === 'offensive') {
+            // Nerf: Mantém +2, mas com apenas 30% de chance por jogador alvo
+            if(p.position === 'ATA' || p.position === 'MEI') {
+                if(Math.random() < 0.30) p.attack = Math.min(99, p.attack + Math.round(2 * mult));
+            }
+        } else if(trainingFocus === 'defensive') {
+            // Nerf: Mantém +2, mas com apenas 30% de chance por jogador alvo
+            if(p.position === 'DEF' || p.position === 'GOL') {
+                if(Math.random() < 0.30) p.defense = Math.min(99, p.defense + Math.round(2 * mult));
+            }
+        } else if(trainingFocus === 'youth') {
+            // Nerf: Mantém +2/+2, mas com apenas 30% de chance por jogador menor de 23 anos
+            if(p.age < 23) {
+                if(Math.random() < 0.30) {
                     p.attack = Math.min(99, p.attack + Math.round(2 * mult));
                     p.defense = Math.min(99, p.defense + Math.round(2 * mult));
                 }
             }
-        });
-        logGame(`🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [${trainingFocus}].`);
-    }
+        }
+    });
+    logGame(`🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [${trainingFocus}].`);
+}
 
     function checkSeasonEnd() {
         let sorted = [...teams].sort((a,b) => b.p - a.p);
