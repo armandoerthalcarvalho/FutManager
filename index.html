@@ -5,7 +5,981 @@ Temporada 4
 Rodada 34 / 38
 Escritório
 Gerenciar Elenco
-Centro de Treinamento
+Centro de Treinamento<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutManager Ultra PRO v3 - Advanced Championship Ecosystem</title>
+    <style>
+        :root {
+            --bg-main: #090d16;
+            --bg-card: #111827;
+            --bg-input: #1f2937;
+            --accent: #10b981;
+            --accent-blue: #2563eb;
+            --text: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border: #374151;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text); padding: 20px; font-size: 14px; }
+        
+        .container { max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+        
+        header { background: linear-gradient(135deg, #1e3a8a, #111827); padding: 20px; border-radius: 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        
+        .welcome-panel { text-align: center; padding: 40px; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border); }
+        
+        .nav-tabs { display: flex; gap: 10px; border-bottom: 2px solid var(--border); padding-bottom: 10px; overflow-x: auto; }
+        .tab-btn { background: none; border: none; color: var(--text-muted); padding: 10px 20px; font-weight: 600; cursor: pointer; border-radius: 6px; transition: all 0.2s; white-space: nowrap; }
+        .tab-btn.active { background: var(--accent-blue); color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .manager-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        @media (max-width: 900px) { .manager-grid { grid-template-columns: 1fr; } }
+        .card { background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); height: fit-content; margin-bottom: 20px; }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-box { background: var(--bg-main); padding: 15px; border-radius: 8px; border: 1px solid var(--border); text-align: center; }
+        .stat-val { font-size: 18px; font-weight: bold; color: var(--accent-blue); margin-top: 5px; }
+
+        button.btn { background: var(--accent-blue); color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; display: inline-flex; align-items: center; gap: 5px; }
+        button.btn:hover { background: #1d4ed8; }
+        button.btn-success { background: var(--accent); }
+        button.btn-success:hover { background: #059669; }
+        button.btn-danger { background: var(--danger); }
+        button.btn-danger:hover { background: #b91c1c; }
+        select, input { background: var(--bg-input); border: 1px solid var(--border); color: white; padding: 10px; border-radius: 6px; width: 100%; margin-top: 5px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; }
+        th { color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+        tr.user-team-row { background: #1e3a8a33; border-left: 4px solid var(--accent-blue); }
+        
+        .stamina-bar-bg { background: #374151; width: 100%; height: 6px; border-radius: 3px; margin-top: 4px; overflow: hidden; }
+        .stamina-bar-fill { height: 100%; background: var(--accent); transition: width 0.3s; }
+
+        .fixture-item { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; text-align: center; padding: 10px; background: var(--bg-main); border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--border); }
+        .score-badge { background: var(--border); padding: 4px 10px; border-radius: 4px; font-weight: bold; min-width: 45px; display: inline-block; }
+
+        .console { background: #020617; padding: 15px; border-radius: 8px; font-family: monospace; height: 320px; overflow-y: auto; color: #34d399; font-size: 12px; border: 1px solid var(--border); line-height: 1.6; }
+        
+        .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-box { background: var(--bg-card); padding: 30px; border-radius: 12px; max-width: 520px; width: 90%; border: 1px solid var(--border); text-align: center; }
+
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .badge { padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .badge-pos { background: #4b5563; color: white; }
+        .badge-starter { background: #065f46; color: #a7f3d0; }
+        .badge-bench { background: #9a3412; color: #ffedd5; }
+    </style>
+</head>
+<body>
+
+<div class="modal-overlay" id="tutorial-modal" style="display: none;">
+    <div class="modal-box">
+        <h2 style="color: var(--accent-blue); margin-bottom: 15px;" id="tut-title">📖 Guia do Manager</h2>
+        <p style="margin-bottom: 20px; line-height: 1.6; text-align: left;" id="tut-text"></p>
+        <button class="btn" onclick="nextTutorialStep()">Entendido / Avançar</button>
+    </div>
+</div>
+
+<div class="container" id="setup-screen">
+    <div class="welcome-panel">
+        <h1 style="color: var(--accent-blue); margin-bottom: 10px; font-size: 32px;">⚽ FutManager Ultra PRO v3</h1>
+        <p style="color: var(--text-muted); margin-bottom: 25px;">Gerenciamento tático profundo, economia perfeitamente balanceada e 20 clubes reais.</p>
+        
+        <div style="max-width: 480px; margin: 0 auto; text-align: left;">
+            <label style="font-weight: bold; display: block; margin-bottom: 5px;">Selecione o nível de desafio de carreira:</label>
+            <select id="select-team-tier" style="margin-bottom: 20px; font-size: 15px;">
+                <option value="elite">👑 Perfil Elite (Brigue pelo título com alto capital inicial)</option>
+                <option value="forte">💪 Perfil Forte (Candidato ao G4 com boa infraestrutura)</option>
+                <option value="moderado">⚖️ Perfil Moderado (Estável no meio da tabela, finanças equilibradas)</option>
+                <option value="fraco">⚠️ Perfil Fraco (Luta árdua contra o rebaixamento, caixa apertado)</option>
+                <option value="crise">📉 Em Crise Extrema (Orçamento quebrado e moral em baixa. Desafio Master!)</option>
+            </select>
+            <button class="btn btn-success" style="width: 100%; padding: 14px; justify-content: center;" onclick="startGameFromTier()">Iniciar Novo Campeonato</button>
+            <button class="btn" id="btn-load-save" style="width: 100%; padding: 14px; margin-top: 10px; background-color: #4b5563; justify-content: center; display: none;" onclick="startGame(true)">Carregar Jogo Salvo</button>
+        </div>
+    </div>
+</div>
+
+<div class="container" id="main-game" style="display: none;">
+    <header>
+        <div>
+            <h1 id="header-manager-title">Manager Dashboard</h1>
+            <p id="header-team-status" style="color: var(--text-muted); margin-top: 4px;">Time: -</p>
+        </div>
+        <div style="text-align: right;">
+            <div style="font-weight: bold; font-size: 16px; color: var(--accent);" id="display-season">Temporada 1</div>
+            <div id="display-round" style="color: var(--text-muted);">Rodada 1 / 38</div>
+        </div>
+    </header>
+
+    <nav class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('tab-dashboard')">Escritório</button>
+        <button class="tab-btn" onclick="switchTab('tab-squad')">Gerenciar Elenco</button>
+        <button class="tab-btn" onclick="switchTab('tab-training')">Centro de Treinamento</button>
+        <button class="tab-btn" onclick="switchTab('tab-market')">Mercado de Transferências</button>
+        <button class="tab-btn" onclick="switchTab('tab-table')">Classificação & Tabela</button>
+        <button class="tab-btn" onclick="switchTab('tab-tactics')">Estádio & Táticas</button>
+        <button class="tab-btn" onclick="switchTab('tab-custom')">Editor de Clubes</button>
+    </nav>
+
+    <div id="tab-dashboard" class="tab-content active">
+        <div class="manager-grid">
+            <div class="card">
+                <h2 style="margin-bottom: 15px;">Confrontos Planejados</h2>
+                <div id="next-match-preview" style="margin-bottom: 20px;"></div>
+                <button class="btn btn-success" style="width:100%; padding: 12px; justify-content: center; font-size: 15px;" onclick="playFullRoundDetailed()">Simular Rodada Atual (Todos os Jogos)</button>
+                
+                <h3 style="margin: 25px 0 10px 0;">Painel de Transmissão & Minuto a Minuto</h3>
+                <div class="console" id="game-console"></div>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 15px;">Resumo Financeiro e Técnico</h2>
+                <div class="stats-row" style="grid-template-columns: 1fr 1fr;">
+                    <div class="stat-box">Conta Bancária <div class="stat-val" id="card-finances">Cr$ 0</div></div>
+                    <div class="stat-box">Força ELO <div class="stat-val" id="card-elo">1500</div></div>
+                </div>
+                <div class="stat-box" style="margin-bottom: 10px;">Posição Atual: <span id="card-position" style="font-weight: bold;">-</span></div>
+                <div class="stat-box" style="margin-bottom: 10px; color: var(--danger);">Custos Operacionais/Rodada: <span id="card-expenses" style="font-weight: bold;">-</span></div>
+                <div class="stat-box" style="margin-bottom: 15px;">Mentalidade Ativa: <span id="card-tactic" style="font-weight: bold; color: var(--accent);">Equilibrada</span></div>
+                <button class="btn btn-danger" style="width: 100%; justify-content: center;" onclick="resetAllData()">Limpar Tudo (Reset Geral)</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-squad" class="tab-content">
+        <div class="card">
+            <div class="flex-between" style="margin-bottom: 15px;">
+                <h2>Gestão do Elenco Corporativo</h2>
+                <span style="color: var(--text-muted);" id="squad-count-txt">Titulares: 0 / 11</span>
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 15px;">Selecione manualmente os seus titulares. Atletas fadigados (Stamina baixa) perdem rendimento drástico nas jogadas críticas!</p>
+            <table id="squad-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Idade</th>
+                        <th>Posição</th>
+                        <th>Ataque</th>
+                        <th>Defesa</th>
+                        <th>Stamina (Energia)</th>
+                        <th>Status</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="tab-training" class="tab-content">
+        <div class="manager-grid">
+            <div class="card">
+                <h2>Foco do Treinamento Semanal</h2>
+                <p style="color: var(--text-muted); margin-bottom: 15px;">Defina a área de foco para o elenco nesta semana. Os efeitos de evolução e fadiga consolidam-se ao final de cada rodada simulada.</p>
+                <select id="training-focus-select" onchange="updateTrainingFocus()">
+                    <option value="physio">⚡ Recuperação Física Intensiva (+5 Stamina global)</option>
+                    <option value="tactical">🧠 Tático Coesivo (10% de chance de +1 Atq/Def global)</option>
+                    <option value="offensive">🎯 Calibração Ofensiva (10% de chance de +2 Atq para Meias e Atacantes)</option>
+                    <option value="defensive">🛡️ Barreira Defensiva (10% de chance de +2 Def para Defensores e Goleiros)</option>
+                    <option value="youth">🌱 Lapidação da Base (10% de chance de evolução duplicada para < 23 anos)</option>
+                </select>
+                <div style="margin-top: 15px; padding: 15px; background: var(--bg-main); border-radius: 8px;" id="training-focus-desc"></div>
+            </div>
+            <div class="card">
+                <h2>Instalações da Academia Técnico</h2>
+                <div class="stat-box" style="margin-bottom: 15px; text-align: left;">
+                    Nível do Complexo: <strong id="training-level-txt">Nível 1</strong>
+                </div>
+                <button class="btn btn-success" style="width: 100%; justify-content: center;" id="btn-upgrade-training" onclick="upgradeTrainingFacilities()">Melhorar Complexo de Treino (Custo: Cr$ 180k)</button>
+                <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">Cada avanço de nível expande em +50% os bônus gerados pelas rotinas semanais de treino. O custo de upgrade DOBRA a cada nível.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-market" class="tab-content">
+        <div class="manager-grid">
+            <div class="card">
+                <h2>Jogadores Disponíveis para Compra</h2>
+                <p style="color: var(--text-muted); margin-bottom: 15px;">Novos talentos e medalhões mudam a cada virada de rodada. O preço dos craques cresce exponencialmente com o ganho de OVER.</p>
+                <table id="market-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Posição</th>
+                            <th>Ataque</th>
+                            <th>Defesa</th>
+                            <th>Preço</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="card">
+                <h2>Vender Reservas</h2>
+                <table id="sell-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Posição</th>
+                            <th>Valor de Mercado</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-table" class="tab-content">
+        <div class="manager-grid">
+            <div class="card">
+                <h2>Classificação da Liga (38 Rodadas)</h2>
+                <table id="league-table">
+                    <thead>
+                        <tr><th>Pos</th><th>Time</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th>SG</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="card">
+                <h2 id="round-fixtures-title">Jogos Marcados</h2>
+                <div id="fixtures-list" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-tactics" class="tab-content">
+        <div class="manager-grid">
+            <div class="card">
+                <h2>Modelagem Estratégica (10 Opções)</h2>
+                <select id="tactic-select" onchange="updateTactics()">
+                    <option value="balanced">Equilibrada (4-4-2 Tradicional)</option>
+                    <option value="attacking">Ataque Total (4-3-3 Voraz)</option>
+                    <option value="defensive">Retranca Sólida (5-4-1 Ônibus)</option>
+                    <option value="tikitaka">Tiki-Taka Posicional (Controle de Linhas)</option>
+                    <option value="counter">Contra-Ataque Letal (Transição de Velocidade)</option>
+                    <option value="gegenpress">Gegenpressing Alemão (Pressão no Bloco Alto)</option>
+                    <option value="longball">Chuveirinho / Bola Longa (Físico Rústico)</option>
+                    <option value="bailado">Jogo Bailado (Ofensiva de Drible Técnico)</option>
+                    <option value="catenaccio">Catenaccio Italiano (Tranca Extrema de Cadeado)</option>
+                    <option value="totalfootball">Carrossel Holandês (Futebol Dinâmico Total)</option>
+                </select>
+                <div style="margin-top: 20px; padding: 15px; background: var(--bg-main); border-radius: 8px;" id="tactic-desc"></div>
+            </div>
+            <div class="card">
+                <h2>Investimentos de Infraestrutura Comercial</h2>
+                <div class="stat-box" style="margin-bottom: 15px; text-align: left;">
+                    Estádio Comercial: <strong id="stadium-level-txt">Nível 1 (Capacidade: 15k)</strong>
+                </div>
+                <button class="btn" style="width: 100%; justify-content: center;" id="btn-upgrade-stadium" onclick="upgradeStadium()">Expandir Capacidade da Arena (Custo: Cr$ 200k)</button>
+                <p style="font-size: 11px; color: var(--text-muted); margin-top: 5px;">Aumenta a arrecadação de ingressos baseada na força ELO. O custo de upgrade DOBRA a cada nível.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-custom" class="tab-content">
+        <div class="card">
+            <h2>Editor de Clubes Integrado</h2>
+            <div id="editor-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 20px;"></div>
+            <button class="btn btn-success" onclick="applyCustomization()">Salvar Alterações Globais</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const firstNames = ["Gabriel", "Lucas", "Matheus", "Pedro", "Rodrigo", "Thiago", "Vinícius", "Vitor", "Guilherme", "Felipe", "Enzo", "Arthur", "Diego", "Alex", "Bruno", "Daniel", "Hugo", "Samuel", "Murilo", "Leonardo"];
+    const lastNames = ["Silva", "Santos", "Oliveira", "Souza", "Rodrigues", "Ferreira", "Almeida", "Costa", "Carvalho", "Gomes", "Martins", "Araújo", "Ribeiro", "Melo", "Teixeira", "Cardoso", "Marques", "Rocha"];
+    
+    function generateRandomPlayerName() {
+        return firstNames[Math.floor(Math.random() * firstNames.length)] + " " + lastNames[Math.floor(Math.random() * lastNames.length)];
+    }
+
+    let userTeamId = null;
+    let season = 1;
+    let currentRound = 0;
+    let finances = 250; 
+    let stadiumLevel = 1;
+    let trainingLevel = 1;
+    let currentTactic = 'balanced';
+    let trainingFocus = 'physio';
+    let teams = [];
+    let fixtures = [];
+    let marketPlayers = [];
+    let tutorialStep = 0;
+
+    const tutorialTexts = [
+        "🏟️ ESCRITÓRIO: Agora, a simulação roda por RODADA COMPLETA. Toda rodada virada rende Cotas de TV proporcionais ao seu ELO. Quando o jogo indicar que você é mandante, a bilheteria renderá com base no seu ELO e tamanho do seu estádio!",
+        "👥 ESCALAÇÃO MANUAL: O botão de auto-escalação foi completamente removido. O controle físico do elenco é seu! Monitore e mude o status dos atletas. Jogadores fadigados entregarão lances de gols preciosos de bandeja.",
+        "🏋️ CENTRO DE TREINAMENTO: Use a nova aba exclusiva de treinos para planejar o foco estratégico do elenco na semana. Os bônus foram nerfados para trazer equilíbrio e as instalações dobram de custo de forma progressiva.",
+        "🧠 10 TÁTICAS DISPONÍVEIS: Na aba de táticas, você conta com dez modelos clássicos e modernos de jogo (do Tiki-Taka ao Catenaccio). Cada um altera profundamente a produção de gols e o cansaço dos atletas titularizados.",
+        "📈 MERCADO & DINÂMICA DE SALÁRIOS: Ao final de cada rodada, além da manutenção física, você paga a comissão técnica e salários específicos baseados na qualidade técnica (Ataque + Defesa) de cada um dos seus atletas."
+    ];
+
+    function createInitialDatabase() {
+        const baseTeams = [
+            { id: 1, name: "Mestres do Norte FC", elo: 1680, tier: "elite" },
+            { id: 2, name: "Real Metrópole S.A.", elo: 1660, tier: "elite" },
+            { id: 3, name: "Porto Alegre City", elo: 1670, tier: "elite" },
+            { id: 4, name: "União Imperial", elo: 1655, tier: "elite" },
+            { id: 5, name: "Atlético Progresso", elo: 1620, tier: "forte" },
+            { id: 6, name: "Sport Zênite", elo: 1590, tier: "forte" },
+            { id: 7, name: "Cruzeiro do Sul AC", elo: 1600, tier: "forte" },
+            { id: 8, name: "Recife SC", elo: 1575, tier: "forte" },
+            { id: 9, name: "Boca do Rio FC", elo: 1520, tier: "moderado" },
+            { id: 10, name: "Sampaio Real Club", elo: 1490, tier: "moderado" },
+            { id: 11, name: "Costa de Ouro FC", elo: 1510, tier: "moderado" },
+            { id: 12, name: "Vanguardas S.A.", elo: 1475, tier: "moderado" },
+            { id: 13, name: "Inter Estelar", elo: 1420, tier: "fraco" },
+            { id: 14, name: "Delta Futebol", elo: 1390, tier: "fraco" },
+            { id: 15, name: "Força Central AC", elo: 1410, tier: "fraco" },
+            { id: 16, name: "Goiás Unido", elo: 1430, tier: "fraco" },
+            { id: 17, name: "Cavalaria Alvinegra", elo: 1320, tier: "crise" },
+            { id: 18, name: "Serra Alta FC", elo: 1290, tier: "crise" },
+            { id: 19, name: "Maranhão AC", elo: 1310, tier: "crise" },
+            { id: 20, name: "Belo Horizonte FC", elo: 1250, tier: "crise" }
+        ];
+
+        teams = baseTeams.map(t => {
+            let squad = [];
+            const positions = ["GOL", "DEF", "DEF", "DEF", "DEF", "MEI", "MEI", "MEI", "MEI", "ATA", "ATA", "GOL", "DEF", "MEI", "ATA"];
+            for(let i=0; i<15; i++) {
+                let isStarter = i < 11;
+                let skillBase = Math.round(t.elo / 21) + Math.floor(Math.random() * 14 - 7);
+                squad.push({
+                    id: i + 1,
+                    name: generateRandomPlayerName(),
+                    age: Math.floor(Math.random() * 16) + 18,
+                    position: positions[i],
+                    attack: Math.max(30, Math.min(99, positions[i] === 'ATA' ? skillBase + 10 : (positions[i]==='MEI'? skillBase: skillBase - 10))),
+                    defense: Math.max(30, Math.min(99, positions[i] === 'DEF' ? skillBase + 10 : (positions[i]==='GOL'? skillBase + 15: skillBase - 10))),
+                    stamina: 100,
+                    starter: isStarter
+                });
+            }
+            return { ...t, p:0, j:0, v:0, e:0, d:0, gp:0, gc:0, players: squad };
+        });
+        generateFixtures();
+        generateMarket();
+    }
+
+    function generateFixtures() {
+        let pool = [...teams];
+        const numTeams = pool.length;
+        const totalRounds = (numTeams - 1) * 2;
+        fixtures = [];
+
+        let turnos = [];
+        for (let r = 0; r < totalRounds / 2; r++) {
+            let roundMatches = [];
+            for (let m = 0; m < numTeams / 2; m++) {
+                let home = pool[m];
+                let away = pool[numTeams - 1 - m];
+                if (r % 2 === 1) { let tmp = home; home = away; away = tmp; }
+                roundMatches.push({ home: home.id, away: away.id, homeScore: null, awayScore: null, simulated: false });
+            }
+            turnos.push(roundMatches);
+            pool.splice(1, 0, pool.pop());
+        }
+
+        let returnos = turnos.map(round => round.map(m => ({
+            home: m.away, away: m.home, homeScore: null, awayScore: null, simulated: false
+        })));
+
+        fixtures = [...turnos, ...returnos];
+    }
+
+    function calculatePlayerPrice(attack, defense) {
+        let over = Math.round((attack + defense) / 2);
+        // Curva Exponencial Balanceada para evitar que supercraques custem migalhas
+        return Math.round(50 + Math.pow(over / 11, 3.2));
+    }
+
+    function generateMarket() {
+        const positions = ["GOL", "DEF", "MEI", "ATA"];
+        marketPlayers = [];
+        for(let i=0; i<6; i++) {
+            let pos = positions[Math.floor(Math.random()*4)];
+            let att = Math.floor(Math.random()*45) + 48;
+            let def = Math.floor(Math.random()*45) + 48;
+            marketPlayers.push({
+                id: Date.now() + i,
+                name: generateRandomPlayerName(),
+                age: Math.floor(Math.random()*14) + 19,
+                position: pos,
+                attack: att,
+                defense: def,
+                price: calculatePlayerPrice(att, def)
+            });
+        }
+    }
+
+    function checkSaveOnLoad() {
+        if(localStorage.getItem('FM_PRO_SAVE_DATA')) {
+            document.getElementById('btn-load-save').style.display = 'block';
+        }
+        buildEditor();
+    }
+
+    function startGameFromTier() {
+        let chosenTier = document.getElementById('select-team-tier').value;
+        createInitialDatabase();
+        
+        let poolOptions = teams.filter(t => t.tier === chosenTier);
+        let chosenTeam = poolOptions[Math.floor(Math.random() * poolOptions.length)];
+        userTeamId = chosenTeam.id;
+
+        if (chosenTier === 'elite') finances = 650;
+        else if (chosenTier === 'forte') finances = 450;
+        else if (chosenTier === 'moderado') finances = 300;
+        else if (chosenTier === 'fraco') finances = 180;
+        else if (chosenTier === 'crise') finances = 60; 
+
+        stadiumLevel = 1;
+        trainingLevel = 1;
+        currentTactic = 'balanced';
+        trainingFocus = 'physio';
+        season = 1;
+        currentRound = 0;
+
+        localStorage.removeItem('FM_PRO_SAVE_DATA');
+        saveGameData();
+        triggerTutorial();
+
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('main-game').style.display = 'block';
+        
+        updateTactics();
+        updateTrainingFocus();
+        updateUI();
+    }
+
+    function startGame(useSave) {
+        if(useSave && localStorage.getItem('FM_PRO_SAVE_DATA')) {
+            createInitialDatabase();
+            loadGameData();
+        }
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('main-game').style.display = 'block';
+        updateTactics();
+        updateTrainingFocus();
+        updateUI();
+    }
+
+    function saveGameData() {
+        const payload = {
+            userTeamId, season, currentRound, finances, stadiumLevel, trainingLevel, currentTactic, trainingFocus, teams, fixtures, marketPlayers
+        };
+        localStorage.setItem('FM_PRO_SAVE_DATA', JSON.stringify(payload));
+    }
+
+    function loadGameData() {
+        const data = JSON.parse(localStorage.getItem('FM_PRO_SAVE_DATA'));
+        userTeamId = data.userTeamId; season = data.season; currentRound = data.currentRound;
+        finances = data.finances; stadiumLevel = data.stadiumLevel || 1; trainingLevel = data.trainingLevel || 1;
+        currentTactic = data.currentTactic; trainingFocus = data.trainingFocus || 'physio';
+        teams = data.teams; fixtures = data.fixtures; marketPlayers = data.marketPlayers;
+        
+        document.getElementById('tactic-select').value = currentTactic;
+        document.getElementById('training-focus-select').value = trainingFocus;
+        logGame(">> Sistema: Estado do save game recuperado com sucesso via LocalStorage.");
+    }
+
+    function triggerTutorial() {
+        tutorialStep = 0;
+        document.getElementById('tutorial-modal').style.display = 'flex';
+        setTutorialContent();
+    }
+
+    function setTutorialContent() {
+        document.getElementById('tut-title').innerText = `📖 Guia do Manager: Passo ${tutorialStep + 1} de 5`;
+        document.getElementById('tut-text').innerText = tutorialTexts[tutorialStep];
+    }
+
+    function nextTutorialStep() {
+        tutorialStep++;
+        if(tutorialStep < tutorialTexts.length) {
+            setTutorialContent();
+        } else {
+            document.getElementById('tutorial-modal').style.display = 'none';
+        }
+    }
+
+    function calculateWeeklyExpenses(team) {
+        // Nerf 1: Comissão técnica fixa (40) + manutenção infraestrutura base (30) + salário dinâmico por qualidade do jogador
+        let staffCost = 40;
+        let infrastructureBase = 30;
+        let playersSalary = team.players.reduce((acc, p) => acc + Math.round((p.attack + p.defense) * 0.12), 0);
+        return staffCost + infrastructureBase + playersSalary;
+    }
+
+    function playFullRoundDetailed() {
+        if (currentRound >= fixtures.length) return;
+
+        let roundMatches = fixtures[currentRound];
+        
+        let uMatch = roundMatches.find(m => m.home === userTeamId || m.away === userTeamId);
+        if(uMatch) {
+            let hTeam = teams.find(t => t.id === uMatch.home);
+            let aTeam = teams.find(t => t.id === uMatch.away);
+            let activeManagerTeam = hTeam.id === userTeamId ? hTeam : aTeam;
+            let starterCount = activeManagerTeam.players.filter(p => p.starter).length;
+            if(starterCount !== 11) {
+                alert(`Erro de Escalação: O seu time está com ${starterCount} jogadores em campo. Ajuste para EXATAMENTE 11 titulares na aba Gerenciar Elenco.`);
+                switchTab('tab-squad');
+                return;
+            }
+        }
+
+        logGame(`🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA ${currentRound + 1} ---`);
+
+        for(let i = 0; i < roundMatches.length; i++) {
+            simulateMatchEngine(roundMatches[i]);
+        }
+
+        let myTeam = teams.find(t => t.id === userTeamId);
+
+        // Nerf 6: Cota de TV proporcional ao ELO do clube (Mais meritocrático)
+        let tvRights = Math.round(50 + (myTeam.elo / 15));
+        finances += tvRights;
+        logGame(`📺 Direitos de Transmissão: Creditado +Cr$ ${tvRights}k de Cotas de TV (Proporcional ao ELO).`);
+
+        let costBase = calculateWeeklyExpenses(myTeam);
+        finances -= costBase;
+        logGame(`📉 Custos de Operação: Descontado Cr$ ${costBase}k em salários do plantel, comissão tática e infraestrutura.`);
+
+        applyWeeklyTrainingEffects(myTeam);
+
+        currentRound++;
+        generateMarket();
+
+        if (currentRound >= fixtures.length) {
+            checkSeasonEnd();
+        }
+
+        saveGameData();
+        updateUI();
+    }
+
+    function simulateMatchEngine(match) {
+        if (match.simulated) return;
+
+        let hTeam = teams.find(t => t.id === match.home);
+        let aTeam = teams.find(t => t.id === match.away);
+
+        const computeTeamSquadBonus = (team, isHome) => {
+            let starters = team.players.filter(p => p.starter);
+            if(starters.length === 0) return { starters, avgAttack: 30, avgDefense: 30, attBonus: 0, defBonus: 0, stamCost: 12 };
+            let avgAttack = starters.reduce((acc, p) => acc + (p.attack * (p.stamina/100)), 0) / starters.length;
+            let avgDefense = starters.reduce((acc, p) => acc + (p.defense * (p.stamina/100)), 0) / starters.length;
+            
+            let attMod = 1.0; let defMod = 1.0; let stamCost = 12;
+            
+            if(team.id === userTeamId) {
+                switch(currentTactic) {
+                    case 'attacking': attMod = 1.30; defMod = 0.90; stamCost = 18; break;
+                    case 'defensive': attMod = 0.85; defMod = 1.35; stamCost = 8; break;
+                    case 'tikitaka': attMod = 1.20; defMod = 1.10; stamCost = 15; break;
+                    case 'counter': attMod = isHome ? 1.05 : 1.25; defMod = 1.10; stamCost = 11; break;
+                    case 'gegenpress': attMod = 1.40; defMod = 0.80; stamCost = 24; break;
+                    case 'longball': attMod = 1.15; defMod = 1.00; stamCost = 12; break;
+                    case 'bailado': attMod = 1.35; defMod = 0.75; stamCost = 16; break;
+                    case 'catenaccio': attMod = 0.70; defMod = 1.50; stamCost = 7; break;
+                    case 'totalfootball': attMod = 1.25; defMod = 1.25; stamCost = 22; break;
+                }
+            }
+            return { starters, avgAttack, avgDefense, attBonus: avgAttack * 2.5 * attMod, defBonus: avgDefense * 2.5 * defMod, stamCost };
+        };
+
+        let hBonus = computeTeamSquadBonus(hTeam, true);
+        let aBonus = computeTeamSquadBonus(aTeam, false);
+
+        let calculatedHomeElo = hTeam.elo + 50 + (hBonus.attBonus - aBonus.defBonus);
+        let calculatedAwayElo = aTeam.elo + (aBonus.attBonus - hBonus.defBonus);
+
+        let expHome = 1 / (1 + Math.pow(10, (calculatedAwayElo - calculatedHomeElo) / 400));
+        let expAway = 1 - expHome;
+
+        let lambdaHome = 1.2 + (expHome - 0.5) * 2.0;
+        let lambdaAway = 1.2 + (expAway - 0.5) * 2.0;
+
+        const rollPoisson = (l) => {
+            let L = Math.exp(-Math.max(0.1, l)), k = 0, p = 1.0;
+            do { k++; p *= Math.random(); } while (p > L);
+            return k - 1;
+        };
+
+        match.homeScore = rollPoisson(lambdaHome);
+        match.awayScore = rollPoisson(lambdaAway);
+        match.simulated = true;
+
+        hTeam.j++; aTeam.j++;
+        hTeam.gp += match.homeScore; hTeam.gc += match.awayScore;
+        aTeam.gp += match.awayScore; aTeam.gc += match.homeScore;
+
+        if (match.homeScore > match.awayScore) { hTeam.p += 3; hTeam.v++; aTeam.d++; }
+        else if (match.homeScore < match.awayScore) { aTeam.p += 3; aTeam.v++; hTeam.d++; }
+        else { hTeam.p += 1; aTeam.p += 1; hTeam.e++; aTeam.e++; }
+
+        let actualHomeRes = match.homeScore > match.awayScore ? 1 : (match.homeScore === match.awayScore ? 0.5 : 0);
+        let eloDelta = 24 * (actualHomeRes - expHome);
+        hTeam.elo += eloDelta;
+        aTeam.elo -= eloDelta;
+
+        hTeam.players.forEach(p => { if(p.starter) p.stamina = Math.max(10, p.stamina - hBonus.stamCost); else p.stamina = Math.min(100, p.stamina + 15); });
+        aTeam.players.forEach(p => { if(p.starter) p.stamina = Math.max(10, p.stamina - aBonus.stamCost); else p.stamina = Math.min(100, p.stamina + 15); });
+
+        // Nerf 2: Redução drástica da Bilheteria Base + Parcela baseada fortemente no ELO
+        if(hTeam.id === userTeamId) {
+            let cashIn = Math.round(40 + (stadiumLevel * 25) + (hTeam.elo / 6.5));
+            finances += cashIn;
+            logGame(`🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ ${cashIn}k.`);
+        }
+
+        let isUserMatch = (hTeam.id === userTeamId || aTeam.id === userTeamId);
+        if(isUserMatch) {
+            logGame(`⚽ [JOGO EM DESTAQUE] ${hTeam.name} vs ${aTeam.name}`);
+            
+            let narratives = [];
+            let totalEvents = match.homeScore + match.awayScore + Math.floor(Math.random() * 3) + 2;
+            
+            // Separando os minutos primeiro para organizar cronologicamente a timeline
+            let timelineMinutes = [];
+            for(let e=0; e<totalEvents; e++) {
+                timelineMinutes.push(Math.floor(Math.random() * 88) + 2);
+            }
+            timelineMinutes.sort((a, b) => a - b);
+
+            let goalsH = match.homeScore; 
+            let goalsA = match.awayScore;
+            let currentScoreH = 0;
+            let currentScoreA = 0;
+
+            // Auxiliares de escalação para destaques nominais de jogadores
+            let hStarters = hBonus.starters.length > 0 ? hBonus.starters : [{name: "Jogador Mandante"}];
+            let aStarters = aBonus.starters.length > 0 ? aBonus.starters : [{name: "Jogador Visitante"}];
+
+            for(let e=0; e<totalEvents; e++) {
+                let min = timelineMinutes[e];
+                
+                if(goalsH > 0 && (goalsA === 0 || Math.random() > 0.5)) {
+                    currentScoreH++;
+                    let scorer = hStarters[Math.floor(Math.random() * hStarters.length)].name;
+                    let assistant = hStarters[Math.floor(Math.random() * hStarters.length)].name;
+                    if (scorer === assistant) assistant = "trabalho coletivo";
+                    
+                    narratives.push(`⏱️ ${min}' - GOL! ⚽ O ataque do ${hTeam.name} infiltra com velocidade. Passe de ${assistant} e gol de ${scorer}! [${hTeam.name} ${currentScoreH} x ${currentScoreA} ${aTeam.name}]`);
+                    goalsH--;
+                } else if(goalsA > 0) {
+                    currentScoreA++;
+                    let scorer = aStarters[Math.floor(Math.random() * aStarters.length)].name;
+                    let assistant = aStarters[Math.floor(Math.random() * aStarters.length)].name;
+                    if (scorer === assistant) assistant = "jogada individual";
+
+                    narratives.push(`⏱️ ${min}' - GOL! ⚽ Contra-ataque cirúrgico do ${aTeam.name}. ${scorer} recebe livre e chuta morrendo no canto! [${hTeam.name} ${currentScoreH} x ${currentScoreA} ${aTeam.name}]`);
+                    goalsA--;
+                } else {
+                    let sideIsHome = Math.random() > 0.5;
+                    let side = sideIsHome ? hTeam.name : aTeam.name;
+                    let attackingPlayer = sideIsHome ? hStarters[Math.floor(Math.random() * hStarters.length)].name : aStarters[Math.floor(Math.random() * aStarters.length)].name;
+                    let defensivePlayer = sideIsHome ? aStarters[Math.floor(Math.random() * aStarters.length)].name : hStarters[Math.floor(Math.random() * hStarters.length)].name;
+                    
+                    let actions = [
+                        `${attackingPlayer} carimba o travessão em uma bomba espetacular de longa distância!`,
+                        `${attackingPlayer} finaliza forte, obrigando o goleiro adversário a operar um verdadeiro milagre elástico na linha!`,
+                        `${attackingPlayer} aparece livre de marcação após falha defensiva, mas cabeceia torto para fora.`,
+                        `${attackingPlayer} tenta o drible na área, é desarmado por ${defensivePlayer} e cai pedindo pênalti, mas o juiz manda seguir.`
+                    ];
+                    narratives.push(`⏱️ ${min}' - CHANCE REAL! ⚠️ O ataque do ${side}: ${actions[Math.floor(Math.random()*actions.length)]}`);
+                }
+            }
+            
+            // Imprime na ordem correta
+            narratives.forEach(n => logGame(n));
+            logGame(`🏁 PLACAR FINAL: ${hTeam.name} ${match.homeScore} x ${match.awayScore} ${aTeam.name} (ELO: ${eloDelta > 0 ? '+' : ''}${eloDelta.toFixed(1)})`);
+        } else {
+            logGame(`🔹 [LIGA] ${hTeam.name} ${match.homeScore} - ${match.awayScore} ${aTeam.name}`);
+        }
+    }
+
+    function applyWeeklyTrainingEffects(myTeam) {
+        let mult = 1 + (trainingLevel - 1) * 0.5;
+        myTeam.players.forEach(p => {
+            // Nerf 4: Ajustes rigorosos nas taxas de ganho e chance (RNG de 10% para evoluções)
+            if(trainingFocus === 'physio') {
+                p.stamina = Math.min(100, p.stamina + Math.round(5 * mult));
+            } else if(trainingFocus === 'tactical') {
+                if(Math.random() < 0.10) p.attack = Math.min(99, p.attack + Math.round(1 * mult));
+                if(Math.random() < 0.10) p.defense = Math.min(99, p.defense + Math.round(1 * mult));
+            } else if(trainingFocus === 'offensive') {
+                if((p.position === 'ATA' || p.position === 'MEI') && Math.random() < 0.10) p.attack = Math.min(99, p.attack + Math.round(2 * mult));
+            } else if(trainingFocus === 'defensive') {
+                if((p.position === 'DEF' || p.position === 'GOL') && Math.random() < 0.10) p.defense = Math.min(99, p.defense + Math.round(2 * mult));
+            } else if(trainingFocus === 'youth') {
+                if(p.age < 23 && Math.random() < 0.10) {
+                    p.attack = Math.min(99, p.attack + Math.round(2 * mult));
+                    p.defense = Math.min(99, p.defense + Math.round(2 * mult));
+                }
+            }
+        });
+        logGame(`🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [${trainingFocus}].`);
+    }
+
+    function checkSeasonEnd() {
+        let sorted = [...teams].sort((a,b) => b.p - a.p);
+        alert(`🏆 FIM DE CAMPEONATO! O grande Campeão da Liga foi: ${sorted[0].name}`);
+        
+        teams.forEach(t => {
+            t.players.forEach(p => {
+                p.age += 1;
+                p.stamina = 100;
+                if (p.age < 24) {
+                    let gain = Math.floor(Math.random() * 4) + 2;
+                    p.attack = Math.min(99, p.attack + gain);
+                    p.defense = Math.min(99, p.defense + gain);
+                } else if (p.age > 32) {
+                    let loss = Math.floor(Math.random() * 3) + 1;
+                    p.attack = Math.max(30, p.attack - loss);
+                    p.defense = Math.max(30, p.defense - loss);
+                }
+            });
+            t.p=0; t.j=0; t.v=0; t.e=0; t.d=0; t.gp=0; t.gc=0;
+        });
+
+        season++; currentRound = 0;
+        generateFixtures();
+        logGame(`✨ --- VIRADA DE TEMPORADA REALIZADA: BEM-VINDO À TEMPORADA ${season} ---`);
+    }
+
+    function togglePlayerStarter(playerId) {
+        let myTeam = teams.find(t => t.id === userTeamId);
+        let player = myTeam.players.find(p => p.id === playerId);
+        
+        if (!player.starter) {
+            let activeStarters = myTeam.players.filter(p => p.starter).length;
+            if(activeStarters >= 11) {
+                alert("Você já possui 11 titulares em campo! Desabilite o status de algum reserva antes.");
+                return;
+            }
+            player.starter = true;
+        } else {
+            player.starter = false;
+        }
+        saveGameData();
+        updateUI();
+    }
+
+    function buyPlayer(marketId) {
+        let ply = marketPlayers.find(p => p.id === marketId);
+        if(finances < ply.price) { alert("Caixa insuficiente!"); return; }
+        
+        let myTeam = teams.find(t => t.id === userTeamId);
+        if(myTeam.players.length >= 18) { alert("Cota máxima de elenco atingida (Máx: 18)."); return; }
+
+        finances -= ply.price;
+        marketPlayers = marketPlayers.filter(p => p.id !== marketId);
+        
+        myTeam.players.push({
+            id: Date.now(), name: ply.name, age: ply.age, position: ply.position,
+            attack: ply.attack, defense: ply.defense, stamina: 100, starter: false
+        });
+
+        saveGameData(); updateUI();
+        logGame(`🤝 Contratação Efetuada: ${ply.name} assinou contrato por Cr$ ${ply.price}k.`);
+    }
+
+    function sellPlayer(playerId) {
+        let myTeam = teams.find(t => t.id === userTeamId);
+        if(myTeam.players.length <= 12) { alert("Veto Operacional: Plantel mínimo de 12 jogadores impede a venda."); return; }
+        
+        let ply = myTeam.players.find(p => p.id === playerId);
+        let payout = Math.round(calculatePlayerPrice(ply.attack, ply.defense) * 0.75); // Valor de revenda levemente menor
+        
+        finances += payout;
+        myTeam.players = myTeam.players.filter(p => p.id !== playerId);
+
+        saveGameData(); updateUI();
+        logGame(`💸 Caixa Extra: O reserva ${ply.name} foi vendido por Cr$ ${payout}k.`);
+    }
+
+    function upgradeStadium() {
+        // Nerf 3: Custo progressivo Dobrando a cada nível
+        let currentCost = 200 * Math.pow(2, stadiumLevel - 1);
+        if(finances < currentCost) { alert(`Crédito insuficiente! Custo para o próximo nível: Cr$ ${currentCost}k.`); return; }
+        finances -= currentCost; stadiumLevel++;
+        saveGameData(); updateUI();
+    }
+
+    function upgradeTrainingFacilities() {
+        // Nerf 3: Custo progressivo Dobrando a cada nível
+        let currentCost = 180 * Math.pow(2, trainingLevel - 1);
+        if(finances < currentCost) { alert(`Crédito insuficiente! Custo para o próximo nível: Cr$ ${currentCost}k.`); return; }
+        finances -= currentCost; trainingLevel++;
+        saveGameData(); updateUI();
+        logGame(`🏋️ Estrutura: Academia Técnica promovida ao Nível ${trainingLevel}.`);
+    }
+
+    function updateTactics() {
+        currentTactic = document.getElementById('tactic-select').value;
+        const box = document.getElementById('tactic-desc');
+        const descMap = {
+            balanced: "Equilibrada: Sem bônus ou penalidades táticas estruturais. Fadiga padrão por rodada (-12).",
+            attacking: "4-3-3 Voraz: +30% de bônus de Ataque, porém abre brechas defensivas (-10% Defesa) e cansa muito (-18 Stamina).",
+            defensive: "5-4-1 Ônibus: Retranca sólida conferindo +35% de Defesa, sacrificando o poder de fogo de frente (-15% Ataque) e poupando vigor (-8 Stamina).",
+            tikitaka: "Tiki-Taka Fino: Foco em posse curta. +20% Ataque, +10% Defesa, com cansaço físico moderadamente elevado (-15 Stamina).",
+            counter: "Contra-Ataque Letal: Desempenho amplificado jogando como VISITANTE (+25% Ataque fora, +10% Defesa) em explosão rápida.",
+            gegenpress: "Gegenpressing Alemão: Pressão sufocante gerando +40% Ataque, mas liquida a resistência física rapidamente (-24 Stamina, -20% Defesa).",
+            longball: "Chuveirinho / Bola Longa: +15% de Ataque rudimentar ignorando cansaço tático. Útil para quebrar retrancas estáveis.",
+            bailado: "Jogo Bailado Tradicional: Futebol arte solto. +35% de bônus de Ataque com enfraquecimento drástico na recomposição (-25% Defesa).",
+            catenaccio: "Catenaccio Italiano: A barreira intransponível perfeita. +50% de bônus na Defesa, mas anula quase toda saída ofensiva (-30% Ataque).",
+            totalfootball: "Carrossel Holandês: Futebol Total. Todos atacam e defendem coordenados (+25% Ataque, +25% Defesa), mas exige fôlego extremo (-22 Stamina)."
+        };
+        box.innerText = descMap[currentTactic] || descMap.balanced;
+        document.getElementById('card-tactic').innerText = document.getElementById('tactic-select').options[document.getElementById('tactic-select').selectedIndex].text;
+        saveGameData();
+    }
+
+    function updateTrainingFocus() {
+        trainingFocus = document.getElementById('training-focus-select').value;
+        const box = document.getElementById('training-focus-desc');
+        const descMap = {
+            physio: "Foco Físico: Prioriza o descanso ativo. Todo o elenco ganha bônus de recuperação energética (+5 de Stamina base).",
+            tactical: "Foco Tático: Ensaios de posicionamento estratégico com 10% de chance de subida equilibrada de Ataque e Defesa.",
+            offensive: "Foco Ofensivo: Treinos de arremate e drible. 10% de chance de aprimorar os atributos de Ataque de Meias e Atacantes.",
+            defensive: "Foco Defensivo: Treinos de desarme e posicionamento. 10% de chance de melhorar a Defesa de Defensores e Goleiros.",
+            youth: "Lapidação de Talentos: Foco exclusivo nas promessas. Atletas com menos de 23 anos têm 10% de chance de ganhar progressão dobrada."
+        };
+        box.innerText = descMap[trainingFocus] || descMap.physio;
+        saveGameData();
+    }
+
+    function buildEditor() {
+        const c = document.getElementById('editor-container'); c.innerHTML = '';
+        teams.forEach(t => {
+            c.innerHTML += `
+                <div style="background:var(--bg-main); padding:10px; border-radius:8px; border:1px solid var(--border)">
+                    <input type="text" id="ed-name-${t.id}" value="${t.name}">
+                    <input type="number" id="ed-elo-${t.id}" value="${Math.round(t.elo)}" style="margin-top:5px">
+                </div>`;
+        });
+    }
+
+    function applyCustomization() {
+        teams.forEach(t => {
+            t.name = document.getElementById(`ed-name-${t.id}`).value;
+            t.elo = parseInt(document.getElementById(`ed-elo-${t.id}`).value);
+        });
+        saveGameData(); updateUI(); alert("Alterações globais gravadas com sucesso!");
+    }
+
+    function switchTab(id) {
+        document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    function updateUI() {
+        let myTeam = teams.find(t => t.id === userTeamId);
+        let currentStarters = myTeam.players.filter(p => p.starter).length;
+        let costBase = calculateWeeklyExpenses(myTeam);
+
+        // Atualização Dinâmica do Custo de Upgrade dos Botões
+        let nextStadiumUpgradeCost = 200 * Math.pow(2, stadiumLevel - 1);
+        let nextTrainingUpgradeCost = 180 * Math.pow(2, trainingLevel - 1);
+        document.getElementById('btn-upgrade-stadium').innerText = `Expandir Arena (Custo: Cr$ ${nextStadiumUpgradeCost}k)`;
+        document.getElementById('btn-upgrade-training').innerText = `Melhorar Complexo de Treino (Custo: Cr$ ${nextTrainingUpgradeCost}k)`;
+
+        document.getElementById('header-manager-title').innerText = `Gestão Ativa: ${myTeam.name}`;
+        document.getElementById('header-team-status').innerText = `Liga Principal de Elite | Instalações Técnicas Nível ${trainingLevel}`;
+        document.getElementById('display-season').innerText = `Temporada ${season}`;
+        document.getElementById('display-round').innerText = `Rodada ${currentRound + 1} / ${fixtures.length}`;
+        document.getElementById('card-finances').innerText = `Cr$ ${finances}k`;
+        document.getElementById('card-expenses').innerText = `Cr$ ${costBase}k`;
+        document.getElementById('card-elo').innerText = Math.round(myTeam.elo);
+        document.getElementById('squad-count-txt').innerText = `Titulares Escalados: ${currentStarters} / 11`;
+
+        document.getElementById('stadium-level-txt').innerText = `Nível ${stadiumLevel} (Capacidade: ${15 * stadiumLevel}k)`;
+        document.getElementById('training-level-txt').innerText = `Nível ${trainingLevel}`;
+
+        let sorted = [...teams].sort((a,b) => (b.p !== a.p) ? (b.p - a.p) : ((b.gp - b.gc) - (a.gp - a.gc)));
+        document.getElementById('card-position').innerText = `${sorted.findIndex(t => t.id === userTeamId) + 1}º Lugar`;
+
+        let lBody = document.querySelector('#league-table tbody'); lBody.innerHTML = '';
+        sorted.forEach((t, i) => {
+            let r = lBody.insertRow(); if(t.id === userTeamId) r.className = 'user-team-row';
+            r.innerHTML = `<td>${i+1}</td><td>${t.name}</td><td><strong>${t.p}</strong></td><td>${t.j}</td><td>${t.v}</td><td>${t.e}</td><td>${t.d}</td><td>${t.gp-t.gc}</td>`;
+        });
+
+        let sBody = document.querySelector('#squad-table tbody'); sBody.innerHTML = '';
+        myTeam.players.sort((a,b) => b.starter - a.starter).forEach(p => {
+            let r = sBody.insertRow();
+            r.innerHTML = `
+                <td><strong>${p.name}</strong></td><td>${p.age} anos</td><td><span class="badge badge-pos">${p.position}</span></td>
+                <td>${p.attack}</td><td>${p.defense}</td>
+                <td>${p.stamina}% <div class="stamina-bar-bg"><div class="stamina-bar-fill" style="width:${p.stamina}%; background:${p.stamina < 40 ? 'var(--danger)' : 'var(--accent)'}"></div></div></td>
+                <td><span class="badge ${p.starter?'badge-starter':'badge-bench'}">${p.starter?'Titular':'Reserva'}</span></td>
+                <td><button class="btn" style="padding:4px 8px; font-size:11px;" onclick="togglePlayerStarter(${p.id})">Mudar Status</button></td>
+            `;
+        });
+
+        let mBody = document.querySelector('#market-table tbody'); mBody.innerHTML = '';
+        marketPlayers.forEach(p => {
+            let r = mBody.insertRow();
+            r.innerHTML = `<td><strong>${p.name}</strong></td><td><span class="badge badge-pos">${p.position}</span></td><td>${p.attack}</td><td>${p.defense}</td><td style="color:var(--accent); font-weight:bold;">Cr$ ${p.price}k</td><td><button class="btn btn-success" style="padding:4px 8px;" onclick="buyPlayer(${p.id})">Contratar</button></td>`;
+        });
+
+        let sellBody = document.querySelector('#sell-table tbody'); sellBody.innerHTML = '';
+        myTeam.players.filter(p => !p.starter).forEach(p => {
+            let val = Math.round(calculatePlayerPrice(p.attack, p.defense) * 0.75);
+            let r = sellBody.insertRow();
+            r.innerHTML = `<td>${p.name}</td><td>${p.position}</td><td style="color:var(--warning)">Cr$ ${val}k</td><td><button class="btn btn-danger" style="padding:4px 8px;" onclick="sellPlayer(${p.id})">Vender</button></td>`;
+        });
+
+        let tRound = currentRound >= fixtures.length ? fixtures.length - 1 : currentRound;
+        let roundMatches = fixtures[tRound];
+        let fixList = document.getElementById('fixtures-list'); fixList.innerHTML = '';
+        
+        if(roundMatches) {
+            let uMatch = roundMatches.find(m => m.home === userTeamId || m.away === userTeamId);
+            if(uMatch && !uMatch.simulated) {
+                let h = teams.find(t => t.id === uMatch.home); let a = teams.find(t => t.id === uMatch.away);
+                document.getElementById('next-match-preview').innerHTML = `<div class="fixture-item"><div><strong>${h.name} (Mandante)</strong></div><div class="score-badge">VS</div><div><strong>${a.name} (Visitante)</strong></div></div>`;
+            } else {
+                document.getElementById('next-match-preview').innerHTML = `<p style="color:var(--text-muted)">Aguardando próxima rodada comercial...</p>`;
+            }
+
+            roundMatches.forEach(m => {
+                let h = teams.find(t => t.id === m.home); let a = teams.find(t => t.id === m.away);
+                fixList.innerHTML += `<div class="fixture-item"><span>${h.name}</span><span class="score-badge">${m.simulated ? m.homeScore+' - '+m.awayScore : 'vs'}</span><span>${a.name}</span></div>`;
+            });
+        }
+    }
+
+    function logGame(m) {
+        let c = document.getElementById('game-console'); c.innerHTML += `<div>${m}</div>`; c.scrollTop = c.scrollHeight;
+    }
+
+    function resetAllData() {
+        if(confirm("Deseja apagar definitivamente todos os dados salvos em cache de LocalStorage?")) {
+            localStorage.clear(); window.location.reload();
+        }
+    }
+
+    checkSaveOnLoad();
+</script>
+</body>
+</html>
 Mercado de Transferências
 Classificação & Tabela
 Estádio & Táticas
