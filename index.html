@@ -269,53 +269,7 @@
 </div>
 
 <script>
-    // Geradores Procedurais de Nomes Reais para Imersão Completa
-    const firstNames = ["Gabriel", "Lucas", "Matheus", "Pedro", "Rodrigo", "Thiago", "Vinícius", "Vitor", "Guilherme", "Felipe", "Enzo", "Arthur", "Diego", "Alex", "Bruno"];
-    const lastNames = ["Silva", "Santos", "Oliveira", "Souza", "Rodrigues", "Ferreira", "Almeida", "Costa", "Carvalho", "Gomes", "Martins", "Araújo", "Ribeiro", "Melo"];
-    
-    function generateRandomPlayerName() {
-        return firstNames[Math.floor(Math.random() * firstNames.length)] + " " + lastNames[Math.floor(Math.random() * lastNames.length)];
-    }
-
-    // Estruturas de Estado
-    let userTeamId = null;
-    let season = 1;
-    let currentRound = 0;
-    let currentMatchIndex = 0;
-    let finances = 250; 
-    let stadiumLevel = 1;
-    let currentTactic = 'balanced';
-    let teams = [];
-    let fixtures = [];
-    let marketPlayers = [];
-    let tutorialStep = 0;
-
-    // Estado da Comissão Técnica
-    let staffPhysical = false;
-    let staffTactical = false;
-    let staffScout = false;
-
-    const tutorialTexts = [
-        "Bem-vindo à área de comando! No 'Escritório', você monitora as finanças e clica para simular partidas de toda a liga baseada em ELO.",
-        "Aba 'Gerenciar Elenco': Aqui reside a alma do Manager. Você deve selecionar EXATAMENTE 11 titulares. Atletas fadigados rendem muito menos!",
-        "Aba 'Mercado': Use seus créditos para comprar reforços gerados dinamicamente ou venda ativos reservas para equilibrar o orçamento.",
-        "O jogo é salvo automaticamente via LocalStorage a cada modificação. Divirta-se criando uma dinastia vitoriosa!"
-    ];
-
-    // Inicialização de Fábrica de Dados do Campeonato
-    function createInitialDatabase() {
-        const baseTeams = [
-            { id: 1, name: "Mestres do Norte", elo: 1650 },
-            { id: 2, name: "Atlético Progresso", elo: 1580 },
-            { id: 3, name: "União Imperial", elo: 1520 },
-            { id: 4, name: "Sport Zênite", elo: 1500 },
-            { id: 5, name: "Real Metrópole", elo: 1480 },
-            { id: 6, name: "Costa de Ouro FC", elo: 1450 },
-            { id: 7, name: "Inter Estelar", elo: 1420 },
-            { id: 8, name: "Cavalaria Alvinegra", elo: 1400 }
-        ];
-
-        function aiSquadRotation() {
+    function aiSquadRotation() {
     teams.forEach(team => {
         // REGRA ESTRITA: NUNCA aplica ao jogador humano
         if (team.id === userTeamId) return;
@@ -371,6 +325,52 @@
         });
     }
 }
+    
+    // Geradores Procedurais de Nomes Reais para Imersão Completa
+    const firstNames = ["Gabriel", "Lucas", "Matheus", "Pedro", "Rodrigo", "Thiago", "Vinícius", "Vitor", "Guilherme", "Felipe", "Enzo", "Arthur", "Diego", "Alex", "Bruno"];
+    const lastNames = ["Silva", "Santos", "Oliveira", "Souza", "Rodrigues", "Ferreira", "Almeida", "Costa", "Carvalho", "Gomes", "Martins", "Araújo", "Ribeiro", "Melo"];
+    
+    function generateRandomPlayerName() {
+        return firstNames[Math.floor(Math.random() * firstNames.length)] + " " + lastNames[Math.floor(Math.random() * lastNames.length)];
+    }
+
+    // Estruturas de Estado
+    let userTeamId = null;
+    let season = 1;
+    let currentRound = 0;
+    let currentMatchIndex = 0;
+    let finances = 250; 
+    let stadiumLevel = 1;
+    let currentTactic = 'balanced';
+    let teams = [];
+    let fixtures = [];
+    let marketPlayers = [];
+    let tutorialStep = 0;
+
+    // Estado da Comissão Técnica
+    let staffPhysical = false;
+    let staffTactical = false;
+    let staffScout = false;
+
+    const tutorialTexts = [
+        "Bem-vindo à área de comando! No 'Escritório', você monitora as finanças e clica para simular partidas de toda a liga baseada em ELO.",
+        "Aba 'Gerenciar Elenco': Aqui reside a alma do Manager. Você deve selecionar EXATAMENTE 11 titulares. Atletas fadigados rendem muito menos!",
+        "Aba 'Mercado': Use seus créditos para comprar reforços gerados dinamicamente ou venda ativos reservas para equilibrar o orçamento.",
+        "O jogo é salvo automaticamente via LocalStorage a cada modificação. Divirta-se criando uma dinastia vitoriosa!"
+    ];
+
+    // Inicialização de Fábrica de Dados do Campeonato
+    function createInitialDatabase() {
+        const baseTeams = [
+            { id: 1, name: "Mestres do Norte", elo: 1650 },
+            { id: 2, name: "Atlético Progresso", elo: 1580 },
+            { id: 3, name: "União Imperial", elo: 1520 },
+            { id: 4, name: "Sport Zênite", elo: 1500 },
+            { id: 5, name: "Real Metrópole", elo: 1480 },
+            { id: 6, name: "Costa de Ouro FC", elo: 1450 },
+            { id: 7, name: "Inter Estelar", elo: 1420 },
+            { id: 8, name: "Cavalaria Alvinegra", elo: 1400 }
+        ];
 
         teams = baseTeams.map(t => {
             let squad = [];
