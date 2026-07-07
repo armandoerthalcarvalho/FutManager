@@ -315,6 +315,63 @@
             { id: 8, name: "Cavalaria Alvinegra", elo: 1400 }
         ];
 
+        function aiSquadRotation() {
+    teams.forEach(team => {
+        // REGRA ESTRITA: NUNCA aplica ao jogador humano
+        if (team.id === userTeamId) return;
+
+        // Reseta os titulares atuais da IA para reescalar de forma inteligente
+        team.players.forEach(p => p.starter = false);
+
+        // Seleciona os melhores disponíveis ponderando Atributos x Stamina
+        const pickBestAI = (pos, count) => {
+            let pool = team.players
+                .filter(p => p.position === pos)
+                .sort((a, b) => ((b.attack + b.defense) * b.stamina) - ((a.attack + a.defense) * a.stamina));
+            
+            for (let i = 0; i < count; i++) {
+                if (pool[i]) pool[i].starter = true;
+            }
+        };
+
+        // Escala a formação padrão (1 GOL, 4 DEF, 4 MEI, 2 ATA)
+        pickBestAI("GOL", 1);
+        pickBestAI("DEF", 4);
+        pickBestAI("MEI", 4);
+        pickBestAI("ATA", 2);
+    });
+}
+        function aiGainRandomPlayers() {
+    // Exemplo: Executa a cada 2 rodadas completadas (exceto na rodada inicial)
+    if (currentRound % 2 === 0 && currentRound > 0) {
+        teams.forEach(team => {
+            // REGRA ESTRITA: NUNCA aplica ao jogador humano
+            if (team.id === userTeamId) return;
+
+            // Define um limite máximo para o elenco da IA (ex: 18 jogadores)
+            if (team.players.length >= 18) return;
+
+            const positions = ["GOL", "DEF", "MEI", "ATA"];
+            let pos = positions[Math.floor(Math.random() * 4)];
+            let att = Math.floor(Math.random() * 45) + 45;
+            let def = Math.floor(Math.random() * 45) + 45;
+
+            team.players.push({
+                id: Date.now() + Math.floor(Math.random() * 10000) + team.id,
+                name: generateRandomPlayerName(),
+                age: Math.floor(Math.random() * 14) + 19,
+                position: pos,
+                attack: att,
+                defense: def,
+                stamina: 100,
+                starter: false
+            });
+            
+            logGame(`📢 Academia: O clube IA ${team.name} promoveu um jovem talento ao plantel principal.`);
+        });
+    }
+}
+
         teams = baseTeams.map(t => {
             let squad = [];
             const positions = ["GOL", "DEF", "DEF", "DEF", "DEF", "MEI", "MEI", "MEI", "MEI", "ATA", "ATA", "GOL", "DEF", "MEI", "ATA"];
@@ -468,6 +525,8 @@
     function playNextMatch() {
         if (currentRound >= fixtures.length) return;
 
+        aiSquadRotation();
+
         let round = fixtures[currentRound];
         let match = round[currentMatchIndex];
 
@@ -581,6 +640,7 @@
             currentMatchIndex = 0;
             currentRound++;
             generateMarket(); // Renova ofertas do mercado global
+            aiGainRandomPlayers();
             if (currentRound >= fixtures.length) {
                 logGame(`🏆 TEMPORADA FINALIZADA!`);
                 checkSeasonEnd();
