@@ -155,7 +155,7 @@
                 <h2>Gestão do Elenco Corporativo</h2>
                 <button class="btn" onclick="autoSquadSelection()">Auto-Escalar Melhores (Física/Técnica)</button>
             </div>
-            <p style="color: var(--text-muted); margin-bottom: 15px;">Atletas escalados como <strong>Titulares</strong> gastam energia por partida. Reservas recuperam energia na folga.</p>
+            <p style="color: var(--text-muted); margin-bottom: 15px;">Atletas titulares gastam energia por jogo. <strong>Treinar consome 20% de Stamina</strong> e aumenta +1 permanente no atributo (Máx: 99).</p>
             <table id="squad-table">
                 <thead>
                     <tr>
@@ -166,7 +166,7 @@
                         <th>Defesa</th>
                         <th>Stamina (Energia)</th>
                         <th>Status</th>
-                        <th>Ações</th>
+                        <th>Ações de Gerenciamento</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -231,14 +231,21 @@
 
     <div id="tab-tactics" class="tab-content">
         <div class="manager-grid">
-            <div class="card">
-                <h2>Mentalidade Estratégica</h2>
-                <select id="tactic-select" onchange="updateTactics()">
-                    <option value="balanced">Equilibrada (Foco no ELO Padrão)</option>
-                    <option value="attacking">Ataque Total (+Gols Pró, ++Desgaste de Energia)</option>
-                    <option value="defensive">Retranca Sólida (Jogo amarrado, -Gols Sofridos)</option>
-                </select>
-                <div style="margin-top: 20px; padding: 15px; background: var(--bg-main); border-radius: 8px;" id="tactic-desc"></div>
+            <div>
+                <div class="card">
+                    <h2>Mentalidade Estratégica</h2>
+                    <select id="tactic-select" onchange="updateTactics()">
+                        <option value="balanced">Equilibrada (Foco no ELO Padrão)</option>
+                        <option value="attacking">Ataque Total (+Gols Pró, ++Desgaste de Energia)</option>
+                        <option value="defensive">Retranca Sólida (Jogo amarrado, -Gols Sofridos)</option>
+                    </select>
+                    <div style="margin-top: 20px; padding: 15px; background: var(--bg-main); border-radius: 8px;" id="tactic-desc"></div>
+                </div>
+                <div class="card">
+                    <h2>Comissão Técnica (Contratos Passivos)</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 15px;">Contrate profissionais para obter bônus passivos permanentes em sua equipe.</p>
+                    <div id="staff-list"></div>
+                </div>
             </div>
             <div class="card">
                 <h2>Investimentos de Infraestrutura</h2>
@@ -282,6 +289,11 @@
     let fixtures = [];
     let marketPlayers = [];
     let tutorialStep = 0;
+
+    // Estado da Comissão Técnica
+    let staffPhysical = false;
+    let staffTactical = false;
+    let staffScout = false;
 
     const tutorialTexts = [
         "Bem-vindo à área de comando! No 'Escritório', você monitora as finanças e clica para simular partidas de toda a liga baseada em ELO.",
@@ -363,7 +375,7 @@
             let def = Math.floor(Math.random()*45) + 45;
             let score = Math.round((att + def) / 2);
             marketPlayers.push({
-                id: Date.now() + i,
+                id: Date.now() + i + Math.floor(Math.random() * 10000),
                 name: generateRandomPlayerName(),
                 age: Math.floor(Math.random()*14) + 19,
                 position: pos,
@@ -374,7 +386,7 @@
         }
     }
 
-    // Inicializador Inicializador Principal
+    // Inicializador Principal
     function checkSaveOnLoad() {
         const select = document.getElementById('select-user-team');
         select.innerHTML = '';
@@ -410,7 +422,8 @@
     // Persistência em Disco LocalStorage
     function saveGameData() {
         const payload = {
-            userTeamId, season, currentRound, currentMatchIndex, finances, stadiumLevel, currentTactic, teams, fixtures, marketPlayers
+            userTeamId, season, currentRound, currentMatchIndex, finances, stadiumLevel, currentTactic, teams, fixtures, marketPlayers,
+            staffPhysical, staffTactical, staffScout
         };
         localStorage.setItem('FM_PRO_SAVE_DATA', JSON.stringify(payload));
     }
@@ -420,6 +433,10 @@
         userTeamId = data.userTeamId; season = data.season; currentRound = data.currentRound;
         currentMatchIndex = data.currentMatchIndex; finances = data.finances; stadiumLevel = data.stadiumLevel;
         currentTactic = data.currentTactic; teams = data.teams; fixtures = data.fixtures; marketPlayers = data.marketPlayers;
+        
+        staffPhysical = data.staffPhysical || false;
+        staffTactical = data.staffTactical || false;
+        staffScout = data.staffScout || false;
         
         document.getElementById('tactic-select').value = currentTactic;
         document.getElementById('stadium-level-txt').innerText = `Nível ${stadiumLevel} (Capacidade: ${15000 * stadiumLevel}k)`;
@@ -483,6 +500,10 @@
         let calculatedHomeElo = hTeam.elo + 50 + (hBonus.attBonus - aBonus.defBonus);
         let calculatedAwayElo = aTeam.elo + (aBonus.attBonus - hBonus.defBonus);
 
+        // Bônus passivo do Auxiliar Técnico (+30 ELO fixo)
+        if (hTeam.id === userTeamId && staffTactical) calculatedHomeElo += 30;
+        if (aTeam.id === userTeamId && staffTactical) calculatedAwayElo += 30;
+
         let expHome = 1 / (1 + Math.pow(10, (calculatedAwayElo - calculatedHomeElo) / 400));
         let expAway = 1 - expHome;
 
@@ -523,9 +544,26 @@
         hTeam.elo += eloDelta;
         aTeam.elo -= eloDelta;
 
-        // Desgaste Físico da Rodada (Stamina)
-        hTeam.players.forEach(p => { if(p.starter) p.stamina = Math.max(15, p.stamina - (currentTactic==='attacking'?18:12)); else p.stamina = Math.min(100, p.stamina + 20); });
-        aTeam.players.forEach(p => { if(p.starter) p.stamina = Math.max(15, p.stamina - (currentTactic==='attacking'?18:12)); else p.stamina = Math.min(100, p.stamina + 20); });
+        // Desgaste Físico da Rodada (Stamina) com mitigação do Preparador Físico (-2 de gasto)
+        hTeam.players.forEach(p => { 
+            if(p.starter) {
+                let loss = currentTactic === 'attacking' ? 18 : 12;
+                if(hTeam.id === userTeamId && staffPhysical) loss = Math.max(1, loss - 2);
+                p.stamina = Math.max(15, p.stamina - loss); 
+            } else { 
+                p.stamina = Math.min(100, p.stamina + 20); 
+            } 
+        });
+        
+        aTeam.players.forEach(p => { 
+            if(p.starter) {
+                let loss = currentTactic === 'attacking' ? 18 : 12;
+                if(aTeam.id === userTeamId && staffPhysical) loss = Math.max(1, loss - 2);
+                p.stamina = Math.max(15, p.stamina - loss); 
+            } else { 
+                p.stamina = Math.min(100, p.stamina + 20); 
+            } 
+        });
 
         // Cálculo de Arrecadação de Caixa Comercial
         if(hTeam.id === userTeamId) {
@@ -571,7 +609,7 @@
         updateUI();
     }
 
-    // Gerenciamento e Escalação de Atletas
+    // Gerenciamento, Escalação e Treinamento de Atletas
     function togglePlayerStarter(playerId) {
         let myTeam = teams.find(t => t.id === userTeamId);
         let player = myTeam.players.find(p => p.id === playerId);
@@ -611,25 +649,55 @@
         logGame(">> Gestão: Auto-escalação montou a formação ideal baseada em vigor e capacidade técnica.");
     }
 
-    // Mercado de Negociações
+    function trainPlayer(playerId, stat) {
+        let myTeam = teams.find(t => t.id === userTeamId);
+        let p = myTeam.players.find(p => p.id === playerId);
+        if (!p) return;
+
+        if (p.stamina < 20) {
+            alert("Stamina insuficiente! O jogador precisa de pelo menos 20% de energia para aguentar o treino.");
+            return;
+        }
+
+        if (stat === 'attack') {
+            if (p.attack >= 99) { alert("Este atleta já atingiu o limite máximo de ataque (99)!"); return; }
+            p.attack++;
+            p.stamina -= 20;
+            logGame(`🏋️ Treinamento: ${p.name} evoluiu fundamentos ofensivos (+1 ATA, -20%⚡).`);
+        } else if (stat === 'defense') {
+            if (p.defense >= 99) { alert("Este atleta já atingiu o limite máximo de defesa (99)!"); return; }
+            p.defense++;
+            p.stamina -= 20;
+            logGame(`🏋️ Treinamento: ${p.name} evoluiu fundamentos defensivos (+1 DEF, -20%⚡).`);
+        }
+
+        saveGameData();
+        updateUI();
+    }
+
+    // Mercado de Negociações e Contratação de Comissão
     function buyPlayer(marketId) {
         let ply = marketPlayers.find(p => p.id === marketId);
-        if(finances < ply.price) { alert("Caixa insuficiente!"); return; }
+        
+        // Aplicação do bônus passivo do Olheiro Chefe (15% de desconto)
+        let finalPrice = staffScout ? Math.round(ply.price * 0.85) : ply.price;
+        
+        if(finances < finalPrice) { alert("Caixa insuficiente!"); return; }
         
         let myTeam = teams.find(t => t.id === userTeamId);
         if(myTeam.players.length >= 18) { alert("Limite de elenco atingido (Máx: 18 jogadores)."); return; }
 
-        finances -= ply.price;
+        finances -= finalPrice;
         marketPlayers = marketPlayers.filter(p => p.id !== marketId);
         
         myTeam.players.push({
-            id: Date.now(), name: ply.name, age: ply.age, position: ply.position,
+            id: Date.now() + Math.floor(Math.random() * 10000), name: ply.name, age: ply.age, position: ply.position,
             attack: ply.attack, defense: ply.defense, stamina: 100, starter: false
         });
 
         saveGameData();
         updateUI();
-        logGame(`🤝 Contratação: ${ply.name} assinou contrato por Cr$ ${ply.price}k.`);
+        logGame(`🤝 Contratação: ${ply.name} assinou contrato por Cr$ ${finalPrice}k.`);
     }
 
     function sellPlayer(playerId) {
@@ -645,6 +713,27 @@
         saveGameData();
         updateUI();
         logGame(`💸 Negociação: ${ply.name} foi vendido ao exterior por Cr$ ${payout}k.`);
+    }
+
+    function hireStaff(type) {
+        if (type === 'physical') {
+            if (staffPhysical) return;
+            if (finances < 150) { alert("Saldo insuficiente para contratar o Preparador Físico!"); return; }
+            finances -= 150; staffPhysical = true;
+            logGame("👔 Comissão: Preparador Físico contratado! Desgaste físico nas partidas reduzido permanentemente.");
+        } else if (type === 'tactical') {
+            if (staffTactical) return;
+            if (finances < 180) { alert("Saldo insuficiente para contratar o Auxiliar Técnico!"); return; }
+            finances -= 180; staffTactical = true;
+            logGame("👔 Comissão: Auxiliar Técnico contratado! +30 de ELO simulado aplicado em campo de forma passiva.");
+        } else if (type === 'scout') {
+            if (staffScout) return;
+            if (finances < 120) { alert("Saldo insuficiente para contratar o Olheiro Chefe!"); return; }
+            finances -= 120; staffScout = true;
+            logGame("👔 Comissão: Olheiro Chefe contratado! Recebeu 15% de desconto vitalício em compras de mercado.");
+        }
+        saveGameData();
+        updateUI();
     }
 
     // Infraestrutura Financeira
@@ -699,7 +788,9 @@
         document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        event.currentTarget.classList.add('active');
+        
+        const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(id));
+        if(btn) btn.classList.add('active');
     }
 
     function updateUI() {
@@ -730,7 +821,13 @@
                 <td>${p.attack}</td><td>${p.defense}</td>
                 <td>${p.stamina}% <div class="stamina-bar-bg"><div class="stamina-bar-fill" style="width:${p.stamina}%; background:${p.stamina < 40 ? 'var(--danger)' : 'var(--accent)'}"></div></div></td>
                 <td><span class="badge ${p.starter?'badge-starter':'badge-bench'}">${p.starter?'Titular':'Reserva'}</span></td>
-                <td><button class="btn" style="padding:4px 8px; font-size:11px;" onclick="togglePlayerStarter(${p.id})">Mudar Status</button></td>
+                <td>
+                    <div style="display:flex; gap:4px;">
+                        <button class="btn" style="padding:4px 6px; font-size:11px;" onclick="togglePlayerStarter(${p.id})">Status</button>
+                        <button class="btn btn-success" style="padding:4px 6px; font-size:11px; background-color: #10b981;" onclick="trainPlayer(${p.id}, 'attack')" title="Treinar Ataque (-20%⚡)">+ATA</button>
+                        <button class="btn btn-success" style="padding:4px 6px; font-size:11px; background-color: #2563eb;" onclick="trainPlayer(${p.id}, 'defense')" title="Treinar Defesa (-20%⚡)">+DEF</button>
+                    </div>
+                </td>
             `;
         });
 
@@ -738,7 +835,10 @@
         let mBody = document.querySelector('#market-table tbody'); mBody.innerHTML = '';
         marketPlayers.forEach(p => {
             let r = mBody.insertRow();
-            r.innerHTML = `<td><strong>${p.name}</strong></td><td>${p.position}</td><td>${p.attack}</td><td>${p.defense}</td><td style="color:var(--accent); font-weight:bold;">Cr$ ${p.price}k</td><td><button class="btn btn-success" style="padding:4px 8px;" onclick="buyPlayer(${p.id})">Contratar</button></td>`;
+            let finalPrice = staffScout ? Math.round(p.price * 0.85) : p.price;
+            let priceHTML = staffScout ? `<span style="text-decoration:line-through;color:var(--text-muted);font-size:11px;">Cr$ ${p.price}k</span><br>Cr$ ${finalPrice}k` : `Cr$ ${p.price}k`;
+            
+            r.innerHTML = `<td><strong>${p.name}</strong></td><td>${p.position}</td><td>${p.attack}</td><td>${p.defense}</td><td style="color:var(--accent); font-weight:bold;">${priceHTML}</td><td><button class="btn btn-success" style="padding:4px 8px;" onclick="buyPlayer(${p.id})">Contratar</button></td>`;
         });
 
         let sellBody = document.querySelector('#sell-table tbody'); sellBody.innerHTML = '';
@@ -747,6 +847,40 @@
             let r = sellBody.insertRow();
             r.innerHTML = `<td>${p.name}</td><td>${p.position}</td><td style="color:var(--warning)">Cr$ ${val}k</td><td><button class="btn btn-danger" style="padding:4px 8px;" onclick="sellPlayer(${p.id})">Vender</button></td>`;
         });
+
+        // Render Comissão Técnica Dinâmica
+        let staffList = document.getElementById('staff-list');
+        if(staffList) {
+            staffList.innerHTML = `
+                <div class="stat-box" style="text-align: left; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>Preparador Físico</strong><br>
+                        <span style="font-size:11px; color:var(--text-muted)">Reduz o desgaste de stamina das partidas em -2 pontos.</span>
+                    </div>
+                    <button class="btn ${staffPhysical ? 'btn-success' : ''}" style="padding: 6px 12px; font-size: 12px;" onclick="hireStaff('physical')" ${staffPhysical ? 'disabled' : ''}>
+                        ${staffPhysical ? 'Adquirido' : 'Contratar (Cr$ 150k)'}
+                    </button>
+                </div>
+                <div class="stat-box" style="text-align: left; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>Auxiliar Técnico</strong><br>
+                        <span style="font-size:11px; color:var(--text-muted)">Garante +30 de bônus fixo de ELO simulado nas partidas.</span>
+                    </div>
+                    <button class="btn ${staffTactical ? 'btn-success' : ''}" style="padding: 6px 12px; font-size: 12px;" onclick="hireStaff('tactical')" ${staffTactical ? 'disabled' : ''}>
+                        ${staffTactical ? 'Adquirido' : 'Contratar (Cr$ 180k)'}
+                    </button>
+                </div>
+                <div class="stat-box" style="text-align: left; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>Olheiro Chefe</strong><br>
+                        <span style="font-size:11px; color:var(--text-muted)">Concede 15% de desconto na compra de qualquer jogador do mercado.</span>
+                    </div>
+                    <button class="btn ${staffScout ? 'btn-success' : ''}" style="padding: 6px 12px; font-size: 12px;" onclick="hireStaff('scout')" ${staffScout ? 'disabled' : ''}>
+                        ${staffScout ? 'Adquirido' : 'Contratar (Cr$ 120k)'}
+                    </button>
+                </div>
+            `;
+        }
 
         // Render Próximo Confronto
         let tRound = currentRound >= fixtures.length ? fixtures.length - 1 : currentRound;
@@ -757,14 +891,14 @@
             let uMatch = roundMatches.find(m => m.home === userTeamId || m.away === userTeamId);
             if(uMatch && !uMatch.simulated) {
                 let h = teams.find(t => t.id === uMatch.home); let a = teams.find(t => t.id === uMatch.away);
-                document.getElementById('next-match-preview').innerHTML = `<div class="fixture-item"><div><strong>${h.name}</strong></div><div class="score-badge">VS</div><div><strong>${a.name}</strong></div></div>`;
+                document.getElementById('next-match-preview').innerHTML = `<div class=\"fixture-item\"><div><strong>${h.name}</strong></div><div class=\"score-badge\">VS</div><div><strong>${a.name}</strong></div></div>`;
             } else {
-                document.getElementById('next-match-preview').innerHTML = `<p style="color:var(--text-muted)">Aguardando próxima rodada...</p>`;
+                document.getElementById('next-match-preview').innerHTML = `<p style=\"color:var(--text-muted)\">Aguardando próxima rodada...</p>`;
             }
 
             roundMatches.forEach(m => {
                 let h = teams.find(t => t.id === m.home); let a = teams.find(t => t.id === m.away);
-                fixList.innerHTML += `<div class="fixture-item"><span>${h.name}</span><span class="score-badge">${m.simulated ? m.homeScore+' - '+m.awayScore : 'vs'}</span><span>${a.name}</span></div>`;
+                fixList.innerHTML += `<div class=\"fixture-item\"><span>${h.name}</span><span class=\"score-badge\">${m.simulated ? m.homeScore+' - '+m.awayScore : 'vs'}</span><span>${a.name}</span></div>`;
             });
         }
     }
