@@ -183,6 +183,7 @@
                     <thead>
                         <tr>
                             <th>Nome</th>
+                            <th>Idade</th>
                             <th>Posição</th>
                             <th>Ataque</th>
                             <th>Defesa</th>
@@ -214,7 +215,16 @@
     <div id="tab-table" class="tab-content">
         <div class="manager-grid">
             <div class="card">
-                <h2>Classificação da Liga</h2>
+                <div class="flex-between" style="margin-bottom: 15px;">
+                    <h2>Classificação da Liga</h2>
+                    <select id="view-division-select" onchange="changeViewingDivision()" style="width: auto; margin-top: 0; padding: 5px 10px;">
+                        <option value="1">Série A (Elite)</option>
+                        <option value="2">Série B</option>
+                        <option value="3">Série C</option>
+                        <option value="4">Série D</option>
+                        <option value="5">Série E</option>
+                    </select>
+                </div>
                 <table id="league-table">
                     <thead>
                         <tr><th>Pos</th><th>Time</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th>SG</th></tr>
@@ -236,15 +246,27 @@
                     <h2>Mentalidade Estratégica</h2>
                     <select id="tactic-select" onchange="updateTactics()">
                         <option value="balanced">Equilibrada (Foco no ELO Padrão)</option>
-                        <option value="attacking">Ataque Total (+Gols Pró, ++Desgaste de Energia)</option>
-                        <option value="defensive">Retranca Sólida (Jogo amarrado, -Gols Sofridos)</option>
+                        <option value="pressao">Pressão Total (+1.0 ATA / +0.4 ADV | 24⚡)</option>
+                        <option value="tikitaka">Tiki-Taka (+0.5 ATA / +0.3 ADV | 16⚡)</option>
+                        <option value="contra">Contra-Ataque (-0.3 ATA / -0.18 ADV | 9⚡)</option>
+                        <option value="retranca">Retranca (-0.5 ATA / -0.2 ADV | 6⚡)</option>
+                        <option value="minimalista">Minimalista (-0.5 ATA / +0.5 ADV | 3⚡)</option>
                     </select>
                     <div style="margin-top: 20px; padding: 15px; background: var(--bg-main); border-radius: 8px;" id="tactic-desc"></div>
                 </div>
                 <div class="card">
-                    <h2>Comissão Técnica (Contratos Passivos)</h2>
+                    <h2>Comissão Técnico (Contratos Passivos)</h2>
                     <p style="color: var(--text-muted); margin-bottom: 15px;">Contrate profissionais para obter bônus passivos permanentes em sua equipe.</p>
                     <div id="staff-list"></div>
+                </div>
+                <div class="card">
+                    <h2>🏆 Hall da Fama (Série A)</h2>
+                    <table id="hof-table">
+                        <thead>
+                            <tr><th>Time</th><th>Títulos 🏆</th><th>Vices 🥈</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
             <div class="card">
@@ -270,69 +292,74 @@
 
 <script>
     function aiSquadRotation() {
-    teams.forEach(team => {
-        // REGRA ESTRITA: NUNCA aplica ao jogador humano
-        if (team.id === userTeamId) return;
-
-        // Reseta os titulares atuais da IA para reescalar de forma inteligente
-        team.players.forEach(p => p.starter = false);
-
-        // Seleciona os melhores disponíveis ponderando Atributos x Stamina
-        const pickBestAI = (pos, count) => {
-            let pool = team.players
-                .filter(p => p.position === pos)
-                .sort((a, b) => ((b.attack + b.defense) * b.stamina) - ((a.attack + a.defense) * a.stamina));
-            
-            for (let i = 0; i < count; i++) {
-                if (pool[i]) pool[i].starter = true;
-            }
-        };
-
-        // Escala a formação padrão (1 GOL, 4 DEF, 4 MEI, 2 ATA)
-        pickBestAI("GOL", 1);
-        pickBestAI("DEF", 4);
-        pickBestAI("MEI", 4);
-        pickBestAI("ATA", 2);
-    });
-}
-        function aiGainRandomPlayers() {
-    // Exemplo: Executa a cada 2 rodadas completadas (exceto na rodada inicial)
-    if (currentRound % 2 === 0 && currentRound > 0) {
         teams.forEach(team => {
-            // REGRA ESTRITA: NUNCA aplica ao jogador humano
             if (team.id === userTeamId) return;
+            team.players.forEach(p => p.starter = false);
 
-            // Define um limite máximo para o elenco da IA (ex: 18 jogadores)
-            if (team.players.length >= 18) return;
+            const pickBestAI = (pos, count) => {
+                let pool = team.players
+                    .filter(p => p.position === pos)
+                    .sort((a, b) => ((b.attack + b.defense) * b.stamina) - ((a.attack + a.defense) * a.stamina));
+                
+                for (let i = 0; i < count; i++) {
+                    if (pool[i]) pool[i].starter = true;
+                }
+            };
 
-            const positions = ["GOL", "DEF", "MEI", "ATA"];
-            let pos = positions[Math.floor(Math.random() * 4)];
-            let att = Math.floor(Math.random() * 45) + 45;
-            let def = Math.floor(Math.random() * 45) + 45;
-
-            team.players.push({
-                id: Date.now() + Math.floor(Math.random() * 10000) + team.id,
-                name: generateRandomPlayerName(),
-                age: Math.floor(Math.random() * 14) + 19,
-                position: pos,
-                attack: att,
-                defense: def,
-                stamina: 100,
-                starter: false
-            });
-            
-            logGame(`📢 Academia: O clube IA ${team.name} promoveu um jovem talento ao plantel principal.`);
+            pickBestAI("GOL", 1);
+            pickBestAI("DEF", 4);
+            pickBestAI("MEI", 4);
+            pickBestAI("ATA", 2);
         });
     }
-}
+
+    function aiGainRandomPlayers() {
+        if (currentRound % 2 === 0 && currentRound > 0) {
+            teams.forEach(team => {
+                if (team.id === userTeamId) return;
+                if (team.players.length >= 18) return;
+
+                const positions = ["GOL", "DEF", "MEI", "ATA"];
+                let pos = positions[Math.floor(Math.random() * 4)];
+                let att = Math.floor(Math.random() * 45) + 45;
+                let def = Math.floor(Math.random() * 45) + 45;
+
+                team.players.push({
+                    id: Date.now() + Math.floor(Math.random() * 10000) + team.id,
+                    name: generateRandomPlayerName(),
+                    age: Math.floor(Math.random() * 6) + 17,
+                    position: pos,
+                    attack: att,
+                    defense: def,
+                    stamina: 100,
+                    starter: false
+                });
+                
+                logGame(`📢 Academia: O clube IA ${team.name} promoveu um jovem talento ao plantel principal.`);
+            });
+        }
+    }
     
-    // Geradores Procedurais de Nomes Reais para Imersão Completa
     const firstNames = ["Gabriel", "Lucas", "Matheus", "Pedro", "Rodrigo", "Thiago", "Vinícius", "Vitor", "Guilherme", "Felipe", "Enzo", "Arthur", "Diego", "Alex", "Bruno"];
     const lastNames = ["Silva", "Santos", "Oliveira", "Souza", "Rodrigues", "Ferreira", "Almeida", "Costa", "Carvalho", "Gomes", "Martins", "Araújo", "Ribeiro", "Melo"];
     
     function generateRandomPlayerName() {
         return firstNames[Math.floor(Math.random() * firstNames.length)] + " " + lastNames[Math.floor(Math.random() * lastNames.length)];
     }
+
+    // Nomes Oficiais do Sistema Dinâmico de 5 Divisões
+    const allTeamNames = [
+        // Série A
+        "Mestres do Norte", "Atlético Progresso", "União Imperial", "Sport Zênite", "Real Metrópole", "Costa de Ouro FC", "Inter Estelar", "Cavalaria Alvinegra",
+        // Série B
+        "Sampaio Cristal", "Belo Horizonte FC", "Esporte Campinas", "Vila Nova United", "Catarinense EC", "Goiás Atlético", "Ferroviário Porto", "Radical FC",
+        // Série C
+        "Industrial de Mauá", "Juventude Operária", "Metropolitano AC", "Planalto Central", "Serra Gaúcha", "Pampa Verde", "Amazonas Rangers", "Sertão Valente",
+        // Série D
+        "Carioca de Raça", "Paulistano FC", "Baiano de Ouro", "Sport Recife Athletic", "Minas Gerais City", "Paranaense União", "Capixaba Mar", "Nordeste Fênix",
+        // Série E
+        "Vila Real EC", "Piratas do Asfalto", "Grêmio Operário", "Independente Local", "Futebol Base", "Bairro Novo FC", "Canelas Futsal", "Serrano de Petrópolis"
+    ];
 
     // Estruturas de Estado
     let userTeamId = null;
@@ -346,6 +373,11 @@
     let fixtures = [];
     let marketPlayers = [];
     let tutorialStep = 0;
+    let viewingDivision = 1;
+
+    // Histórico e Prêmios
+    let pastSeasons = [];
+    let hallOfFame = {};
 
     // Estado da Comissão Técnica
     let staffPhysical = false;
@@ -359,29 +391,27 @@
         "O jogo é salvo automaticamente via LocalStorage a cada modificação. Divirta-se criando uma dinastia vitoriosa!"
     ];
 
-    // Inicialização de Fábrica de Dados do Campeonato
     function createInitialDatabase() {
-        const baseTeams = [
-            { id: 1, name: "Mestres do Norte", elo: 1650 },
-            { id: 2, name: "Atlético Progresso", elo: 1580 },
-            { id: 3, name: "União Imperial", elo: 1520 },
-            { id: 4, name: "Sport Zênite", elo: 1500 },
-            { id: 5, name: "Real Metrópole", elo: 1480 },
-            { id: 6, name: "Costa de Ouro FC", elo: 1450 },
-            { id: 7, name: "Inter Estelar", elo: 1420 },
-            { id: 8, name: "Cavalaria Alvinegra", elo: 1400 }
-        ];
+        teams = [];
+        hallOfFame = {};
 
-        teams = baseTeams.map(t => {
+        allTeamNames.forEach((name, index) => {
+            let div = Math.floor(index / 8) + 1;
+            let id = index + 1;
+            
+            // Gradiente de ELO inicial de acordo com a Divisão
+            let baseElo = 1700 - (div - 1) * 150 - (index % 8) * 15;
+            
             let squad = [];
             const positions = ["GOL", "DEF", "DEF", "DEF", "DEF", "MEI", "MEI", "MEI", "MEI", "ATA", "ATA", "GOL", "DEF", "MEI", "ATA"];
+            
             for(let i=0; i<15; i++) {
                 let isStarter = i < 11;
-                let skillBase = Math.round(t.elo / 20) + Math.floor(Math.random() * 15 - 7);
+                let skillBase = Math.round(baseElo / 20) + Math.floor(Math.random() * 12 - 6);
                 squad.push({
-                    id: i + 1,
+                    id: id * 100 + i,
                     name: generateRandomPlayerName(),
-                    age: Math.floor(Math.random() * 18) + 18,
+                    age: Math.floor(Math.random() * 14) + 18, // 18 a 31 anos
                     position: positions[i],
                     attack: Math.max(30, Math.min(99, positions[i] === 'ATA' ? skillBase + 10 : (positions[i]==='MEI'? skillBase: skillBase - 10))),
                     defense: Math.max(30, Math.min(99, positions[i] === 'DEF' ? skillBase + 10 : (positions[i]==='GOL'? skillBase + 15: skillBase - 10))),
@@ -389,38 +419,57 @@
                     starter: isStarter
                 });
             }
-            return {
-                ...t, p:0, j:0, v:0, e:0, d:0, gp:0, gc:0, players: squad
-            };
+            
+            hallOfFame[id] = { titles: 0, vices: 0 };
+            
+            teams.push({
+                id: id,
+                name: name,
+                elo: baseElo,
+                division: div,
+                p:0, j:0, v:0, e:0, d:0, gp:0, gc:0,
+                players: squad
+            });
         });
+        
         generateFixtures();
         generateMarket();
     }
 
     function generateFixtures() {
-        let pool = [...teams];
-        const numTeams = pool.length;
-        const totalRounds = (numTeams - 1) * 2;
         fixtures = [];
-
-        let turnos = [];
-        for (let r = 0; r < totalRounds / 2; r++) {
-            let roundMatches = [];
-            for (let m = 0; m < numTeams / 2; m++) {
-                let home = pool[m];
-                let away = pool[numTeams - 1 - m];
-                if (r % 2 === 1) { let tmp = home; home = away; away = tmp; }
-                roundMatches.push({ home: home.id, away: away.id, homeScore: null, awayScore: null, simulated: false });
-            }
-            turnos.push(roundMatches);
-            pool.splice(1, 0, pool.pop());
+        for (let r = 0; r < 14; r++) {
+            fixtures.push([]);
         }
 
-        let returnos = turnos.map(round => round.map(m => ({
-            home: m.away, away: m.home, homeScore: null, awayScore: null, simulated: false
-        })));
+        // Gera o chaveamento em paralelo para as 5 divisões (20 jogos por rodada)
+        for (let div = 1; div <= 5; div++) {
+            let divTeams = teams.filter(t => t.division === div);
+            let pool = [...divTeams];
+            let numTeams = pool.length;
+            let turnos = [];
 
-        fixtures = [...turnos, ...returnos];
+            for (let r = 0; r < 7; r++) {
+                let roundMatches = [];
+                for (let m = 0; m < numTeams / 2; m++) {
+                    let home = pool[m];
+                    let away = pool[numTeams - 1 - m];
+                    if (r % 2 === 1) { let tmp = home; home = away; away = tmp; }
+                    roundMatches.push({ home: home.id, away: away.id, homeScore: null, awayScore: null, simulated: false, division: div });
+                }
+                turnos.push(roundMatches);
+                pool.splice(1, 0, pool.pop());
+            }
+
+            let returnos = turnos.map(round => round.map(m => ({
+                home: m.away, away: m.home, homeScore: null, awayScore: null, simulated: false, division: div
+            })));
+
+            let divFixtures = [...turnos, ...returnos];
+            for (let r = 0; r < 14; r++) {
+                fixtures[r].push(...divFixtures[r]);
+            }
+        }
     }
 
     function generateMarket() {
@@ -431,19 +480,25 @@
             let att = Math.floor(Math.random()*45) + 45;
             let def = Math.floor(Math.random()*45) + 45;
             let score = Math.round((att + def) / 2);
+            let pAge = Math.floor(Math.random()*14) + 19;
+            
+            // Fator mercadológico condicionado à idade do atleta
+            let ageMod = 1.0;
+            if (pAge <= 23) ageMod = 1.3; // Promessa valorizada
+            else if (pAge >= 30) ageMod = Math.max(0.4, 1.0 - (pAge - 29) * 0.1); // Depreciação física de veteranos
+
             marketPlayers.push({
                 id: Date.now() + i + Math.floor(Math.random() * 10000),
                 name: generateRandomPlayerName(),
-                age: Math.floor(Math.random()*14) + 19,
+                age: pAge,
                 position: pos,
                 attack: att,
                 defense: def,
-                price: score * 3 + Math.floor(Math.random()*50)
+                price: Math.round((score * 3 + Math.floor(Math.random()*50)) * ageMod)
             });
         }
     }
 
-    // Inicializador Principal
     function checkSaveOnLoad() {
         const select = document.getElementById('select-user-team');
         select.innerHTML = '';
@@ -453,8 +508,8 @@
         }
 
         createInitialDatabase(); 
-        teams.forEach(t => {
-            select.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+        teams.sort((a,b) => a.division - b.division || a.name.localeCompare(b.name)).forEach(t => {
+            select.innerHTML += `<option value="${t.id}">${t.name} (Série ${String.fromCharCode(64 + t.division)})</option>`;
         });
         buildEditor();
     }
@@ -464,6 +519,7 @@
             loadGameData();
         } else {
             userTeamId = parseInt(document.getElementById('select-user-team').value);
+            viewingDivision = teams.find(t => t.id === userTeamId).division;
             localStorage.removeItem('FM_PRO_SAVE_DATA');
             saveGameData();
             triggerTutorial();
@@ -472,15 +528,15 @@
         document.getElementById('setup-screen').style.display = 'none';
         document.getElementById('main-game').style.display = 'block';
         
+        document.getElementById('view-division-select').value = viewingDivision;
         updateTactics();
         updateUI();
     }
 
-    // Persistência em Disco LocalStorage
     function saveGameData() {
         const payload = {
             userTeamId, season, currentRound, currentMatchIndex, finances, stadiumLevel, currentTactic, teams, fixtures, marketPlayers,
-            staffPhysical, staffTactical, staffScout
+            staffPhysical, staffTactical, staffScout, pastSeasons, hallOfFame, viewingDivision
         };
         localStorage.setItem('FM_PRO_SAVE_DATA', JSON.stringify(payload));
     }
@@ -495,12 +551,16 @@
         staffTactical = data.staffTactical || false;
         staffScout = data.staffScout || false;
         
+        pastSeasons = data.pastSeasons || [];
+        hallOfFame = data.hallOfFame || {};
+        viewingDivision = data.viewingDivision || 1;
+        
         document.getElementById('tactic-select').value = currentTactic;
         document.getElementById('stadium-level-txt').innerText = `Nível ${stadiumLevel} (Capacidade: ${15000 * stadiumLevel}k)`;
+        document.getElementById('view-division-select').value = viewingDivision;
         logGame(">> Sistema: Estado do save game recuperado com sucesso via LocalStorage.");
     }
 
-    // Tutorial Dinâmico Modulado
     function triggerTutorial() {
         tutorialStep = 0;
         document.getElementById('tutorial-modal').style.display = 'flex';
@@ -521,7 +581,7 @@
         }
     }
 
-    // Engine Avançada de Partidas (Física + Tática + ELO)
+    // Engine Sincronizada com a Nova Matriz Tática de 6 Níveis
     function playNextMatch() {
         if (currentRound >= fixtures.length) return;
 
@@ -533,7 +593,6 @@
         let hTeam = teams.find(t => t.id === match.home);
         let aTeam = teams.find(t => t.id === match.away);
 
-        // Validação estrita de escalação para o Usuário Humano
         if(hTeam.id === userTeamId || aTeam.id === userTeamId) {
             let activeManagerTeam = hTeam.id === userTeamId ? hTeam : aTeam;
             let starterCount = activeManagerTeam.players.filter(p => p.starter).length;
@@ -544,7 +603,6 @@
             }
         }
 
-        // Modificadores baseados nos Atributos dos Atletas escalados e Stamina
         const computeTeamSquadBonus = (team) => {
             let starters = team.players.filter(p => p.starter);
             let avgAttack = starters.reduce((acc, p) => acc + (p.attack * (p.stamina/100)), 0) / 11;
@@ -555,11 +613,9 @@
         let hBonus = computeTeamSquadBonus(hTeam);
         let aBonus = computeTeamSquadBonus(aTeam);
 
-        // Integração de Força ELO adaptada com habilidades reais dos jogadores escalados
         let calculatedHomeElo = hTeam.elo + 50 + (hBonus.attBonus - aBonus.defBonus);
         let calculatedAwayElo = aTeam.elo + (aBonus.attBonus - hBonus.defBonus);
 
-        // Bônus passivo do Auxiliar Técnico (+30 ELO fixo)
         if (hTeam.id === userTeamId && staffTactical) calculatedHomeElo += 30;
         if (aTeam.id === userTeamId && staffTactical) calculatedAwayElo += 30;
 
@@ -569,12 +625,19 @@
         let lambdaHome = 1.2 + (expHome - 0.5) * 2.0;
         let lambdaAway = 1.2 + (expAway - 0.5) * 2.0;
 
-        // Injeção de Estratégias Táticas do Usuário
+        // Injeção Matemática Qualificada das 6 Novas Diretrizes
         if(hTeam.id === userTeamId || aTeam.id === userTeamId) {
-            if(currentTactic === 'attacking') {
-                if(hTeam.id === userTeamId) { lambdaHome += 0.5; lambdaAway += 0.2; } else { lambdaAway += 0.5; lambdaHome += 0.2; }
-            } else if(currentTactic === 'defensive') {
-                if(hTeam.id === userTeamId) { lambdaHome -= 0.2; lambdaAway -= 0.5; } else { lambdaAway -= 0.2; lambdaHome -= 0.5; }
+            let isHomeUser = hTeam.id === userTeamId;
+            if(currentTactic === 'pressao') {
+                if(isHomeUser) { lambdaHome += 1.0; lambdaAway += 0.4; } else { lambdaAway += 1.0; lambdaHome += 0.4; }
+            } else if(currentTactic === 'tikitaka') {
+                if(isHomeUser) { lambdaHome += 0.5; lambdaAway += 0.3; } else { lambdaAway += 0.5; lambdaHome += 0.3; }
+            } else if(currentTactic === 'contra') {
+                if(isHomeUser) { lambdaHome -= 0.3; lambdaAway -= 0.18; } else { lambdaAway -= 0.3; lambdaHome -= 0.18; }
+            } else if(currentTactic === 'retranca') {
+                if(isHomeUser) { lambdaHome -= 0.5; lambdaAway -= 0.2; } else { lambdaAway -= 0.5; lambdaHome -= 0.2; }
+            } else if(currentTactic === 'minimalista') {
+                if(isHomeUser) { lambdaHome -= 0.5; lambdaAway += 0.5; } else { lambdaAway -= 0.5; lambdaHome += 0.5; }
             }
         }
 
@@ -588,7 +651,6 @@
         match.awayScore = rollPoisson(lambdaAway);
         match.simulated = true;
 
-        // Computação de Dados de Desempenho na Liga
         hTeam.j++; aTeam.j++;
         hTeam.gp += match.homeScore; hTeam.gc += match.awayScore;
         aTeam.gp += match.awayScore; aTeam.gc += match.homeScore;
@@ -597,34 +659,40 @@
         else if (match.homeScore < match.awayScore) { aTeam.p += 3; aTeam.v++; hTeam.d++; }
         else { hTeam.p += 1; aTeam.p += 1; hTeam.e++; aTeam.e++; }
 
-        // Transferência Matemática de Peso ELO
         let actualHomeRes = match.homeScore > match.awayScore ? 1 : (match.homeScore === match.awayScore ? 0.5 : 0);
         let eloDelta = 24 * (actualHomeRes - expHome);
         hTeam.elo += eloDelta;
         aTeam.elo -= eloDelta;
 
-        // Desgaste Físico da Rodada (Stamina) com mitigação do Preparador Físico (-2 de gasto)
+        // Atribuição de Custo Físico Personalizado
+        let hLoss = 12;
+        if (hTeam.id === userTeamId) {
+            if(currentTactic === 'pressao') hLoss = 24;
+            else if(currentTactic === 'tikitaka') hLoss = 16;
+            else if(currentTactic === 'contra') hLoss = 9;
+            else if(currentTactic === 'retranca') hLoss = 6;
+            else if(currentTactic === 'minimalista') hLoss = 3;
+            if(staffPhysical) hLoss = Math.max(1, hLoss - 2);
+        }
         hTeam.players.forEach(p => { 
-            if(p.starter) {
-                let loss = currentTactic === 'attacking' ? 18 : 12;
-                if(hTeam.id === userTeamId && staffPhysical) loss = Math.max(1, loss - 2);
-                p.stamina = Math.max(15, p.stamina - loss); 
-            } else { 
-                p.stamina = Math.min(100, p.stamina + 20); 
-            } 
+            if(p.starter) p.stamina = Math.max(15, p.stamina - hLoss); 
+            else p.stamina = Math.min(100, p.stamina + 20); 
         });
         
+        let aLoss = 12;
+        if (aTeam.id === userTeamId) {
+            if(currentTactic === 'pressao') aLoss = 24;
+            else if(currentTactic === 'tikitaka') aLoss = 16;
+            else if(currentTactic === 'contra') aLoss = 9;
+            else if(currentTactic === 'retranca') aLoss = 6;
+            else if(currentTactic === 'minimalista') aLoss = 3;
+            if(staffPhysical) aLoss = Math.max(1, aLoss - 2);
+        }
         aTeam.players.forEach(p => { 
-            if(p.starter) {
-                let loss = currentTactic === 'attacking' ? 18 : 12;
-                if(aTeam.id === userTeamId && staffPhysical) loss = Math.max(1, loss - 2);
-                p.stamina = Math.max(15, p.stamina - loss); 
-            } else { 
-                p.stamina = Math.min(100, p.stamina + 20); 
-            } 
+            if(p.starter) p.stamina = Math.max(15, p.stamina - aLoss); 
+            else p.stamina = Math.min(100, p.stamina + 20); 
         });
 
-        // Cálculo de Arrecadação de Caixa Comercial
         if(hTeam.id === userTeamId) {
             let cashIn = Math.round(20 + (stadiumLevel * 25) + (hTeam.elo / 120));
             finances += cashIn;
@@ -632,17 +700,17 @@
         }
 
         let isUserMatch = (hTeam.id === userTeamId || aTeam.id === userTeamId);
-        let msg = `[R${currentRound+1}] ${hTeam.name} ${match.homeScore} x ${match.awayScore} ${aTeam.name}`;
+        let msg = `[R${currentRound+1} - S${match.division}] ${hTeam.name} ${match.homeScore} x ${match.awayScore} ${aTeam.name}`;
         logGame(isUserMatch ? `⭐ MARCADOR: ${msg} (ELO: ${eloDelta > 0 ? '+' : ''}${eloDelta.toFixed(1)})` : msg);
 
         currentMatchIndex++;
         if (currentMatchIndex >= round.length) {
             currentMatchIndex = 0;
             currentRound++;
-            generateMarket(); // Renova ofertas do mercado global
+            generateMarket(); 
             aiGainRandomPlayers();
             if (currentRound >= fixtures.length) {
-                logGame(`🏆 TEMPORADA FINALIZADA!`);
+                logGame(`🏆 RODADA CRUCIAL FINALIZADA! PROCESSANDO GEOPOLÍTICA DA LIGA...`);
                 checkSeasonEnd();
             }
         }
@@ -659,17 +727,139 @@
         }
     }
 
+    // Processamento de Ciclo de Vida: Envelhecimento, Evolução e Regeneração de Base
+    function processPlayerAging() {
+        teams.forEach(team => {
+            let newPlayersList = [];
+            team.players.forEach(p => {
+                p.age++;
+                
+                // Curva Bio-Esportiva Estocástica
+                let change = 0;
+                if (p.age <= 23) change = Math.floor(Math.random() * 4) + 1;      // Jovens: +1 a +4
+                else if (p.age <= 29) change = Math.floor(Math.random() * 3) - 1; // Auge: -1 a +1
+                else if (p.age <= 32) change = -Math.floor(Math.random() * 4);    // Declínio leve: 0 a -3
+                else change = -(Math.floor(Math.random() * 4) + 2);               // Veteranos: -2 a -5
+                
+                p.attack = Math.max(30, Math.min(99, p.attack + change));
+                p.defense = Math.max(30, Math.min(99, p.defense + change));
+
+                // Validação de Aposentadoria Compulsória por Rendimento Baixo
+                let overall = (p.attack + p.defense) / 2;
+                if (p.age > 32 && overall < 65) {
+                    logGame(`🧓 Aposentadoria: ${p.name} (${p.position}, ${p.age} anos) pendurou as chuteiras no clube ${team.name}.`);
+                    
+                    // Reposição Automática por Joia da Base (Regen)
+                    let attRegen = Math.floor(Math.random() * 11) + 50;
+                    let defRegen = Math.floor(Math.random() * 11) + 50;
+                    newPlayersList.push({
+                        id: Date.now() + Math.floor(Math.random() * 100000),
+                        name: generateRandomPlayerName(),
+                        age: Math.floor(Math.random() * 3) + 16, // 16 a 18 anos
+                        position: p.position,
+                        attack: attRegen,
+                        defense: defRegen,
+                        stamina: 100,
+                        starter: false
+                    });
+                } else {
+                    newPlayersList.push(p);
+                }
+            });
+            team.players = newPlayersList;
+        });
+
+        // Envelhecimento do Bloco de Mercado Livre
+        marketPlayers.forEach(p => {
+            p.age++;
+            let change = p.age <= 23 ? 2 : (p.age <= 29 ? 0 : (p.age <= 32 ? -1 : -3));
+            p.attack = Math.max(30, Math.min(99, p.attack + change));
+            p.defense = Math.max(30, Math.min(99, p.defense + change));
+        });
+    }
+
+    // Algoritmo de Fechamento de Temporada, Recompensas e G2/Z2
     function checkSeasonEnd() {
-        let sorted = [...teams].sort((a,b) => b.p - a.p);
-        alert(`Fim da Temporada! Campeão da edição: ${sorted[0].name}`);
-        season++; currentRound = 0; currentMatchIndex = 0;
-        teams.forEach(t => { t.p=0; t.j=0; t.v=0; t.e=0; t.d=0; t.gp=0; t.gc=0; t.players.forEach(p=>p.stamina=100); });
+        if (!hallOfFame) hallOfFame = {};
+
+        // 1. Processamento Financeiro e Registro de Pódios por Divisão
+        for (let div = 1; div <= 5; div++) {
+            let divTeams = teams.filter(t => t.division === div);
+            divTeams.sort((a,b) => (b.p !== a.p) ? (b.p - a.p) : ((b.gp - b.gc) - (a.gp - a.gc)));
+
+            // Atribuição de Títulos Exclusivos na Série A
+            if (div === 1) {
+                alert(`Fim da Temporada! Campeão da Elite (Série A): ${divTeams[0].name}`);
+                
+                if (!hallOfFame[divTeams[0].id]) hallOfFame[divTeams[0].id] = { titles: 0, vices: 0 };
+                if (!hallOfFame[divTeams[1].id]) hallOfFame[divTeams[1].id] = { titles: 0, vices: 0 };
+                
+                hallOfFame[divTeams[0].id].titles++;
+                hallOfFame[divTeams[1].id].vices++;
+                
+                pastSeasons.push({ season: season, champion: divTeams[0].name, vice: divTeams[1].name });
+            }
+
+            // Balanço de Prêmios por Posição/Importância Comercial da Liga
+            let basePrize = (6 - div) * 40; 
+            divTeams.forEach((t, idx) => {
+                let positionBonus = (8 - idx) * 10;
+                let finalPayout = basePrize + positionBonus;
+                if (t.id === userTeamId) {
+                    finances += finalPayout;
+                    logGame(`💰 Premiação Executiva: Recebido Cr$ ${finalPayout}k pelo ${idx+1}º lugar na Série ${String.fromCharCode(64 + div)}.`);
+                }
+            });
+        }
+
+        // 2. Execução da Matriz Corporativa de Promoção e Rebaixamento (G2 / Z2)
+        let structuralMoves = [];
+        for (let div = 1; div <= 5; div++) {
+            let divTeams = teams.filter(t => t.division === div).sort((a,b) => (b.p !== a.p) ? (b.p - a.p) : ((b.gp - b.gc) - (a.gp - a.gc)));
+            
+            if (div > 1) {
+                structuralMoves.push({ id: divTeams[0].id, nextDiv: div - 1, type: 'promo' });
+                structuralMoves.push({ id: divTeams[1].id, nextDiv: div - 1, type: 'promo' });
+            }
+            if (div < 5) {
+                structuralMoves.push({ id: divTeams[6].id, nextDiv: div + 1, type: 'releg' });
+                structuralMoves.push({ id: divTeams[7].id, nextDiv: div + 1, type: 'releg' });
+            }
+        }
+
+        structuralMoves.forEach(move => {
+            let t = teams.find(team => team.id === move.id);
+            let oldLetter = String.fromCharCode(64 + t.division);
+            let newLetter = String.fromCharCode(64 + move.nextDiv);
+            t.division = move.nextDiv;
+            
+            if (move.type === 'promo') {
+                logGame(`🚀 Ascensão: ${t.name} subiu da Série ${oldLetter} para a Série ${newLetter}!`);
+            } else {
+                logGame(`📉 Queda: ${t.name} foi rebaixado da Série ${oldLetter} para a Série ${newLetter}.`);
+            }
+        });
+
+        // 3. Rodar Ciclo Físico Anual
+        processPlayerAging();
+
+        // 4. Virada de Calendário e Reset Controlado de Planilhas
+        season++;
+        currentRound = 0;
+        currentMatchIndex = 0;
+        viewingDivision = teams.find(t => t.id === userTeamId).division;
+        document.getElementById('view-division-select').value = viewingDivision;
+
+        teams.forEach(t => {
+            t.p = 0; t.j = 0; t.v = 0; t.e = 0; t.d = 0; t.gp = 0; t.gc = 0;
+            t.players.forEach(p => p.stamina = 100);
+        });
+
         generateFixtures();
         saveGameData();
         updateUI();
     }
 
-    // Gerenciamento, Escalação e Treinamento de Atletas
     function togglePlayerStarter(playerId) {
         let myTeam = teams.find(t => t.id === userTeamId);
         let player = myTeam.players.find(p => p.id === playerId);
@@ -690,10 +880,8 @@
 
     function autoSquadSelection() {
         let myTeam = teams.find(t => t.id === userTeamId);
-        // Reseta todos
         myTeam.players.forEach(p => p.starter = false);
         
-        // Separa por posições e ordena por melhor média ponderada por stamina
         const pickBest = (pos, count) => {
             let pool = myTeam.players.filter(p => p.position === pos).sort((a,b) => ((b.attack + b.defense) * b.stamina) - ((a.attack + a.defense) * a.stamina));
             for(let i=0; i<count; i++) { if(pool[i]) pool[i].starter = true; }
@@ -735,11 +923,8 @@
         updateUI();
     }
 
-    // Mercado de Negociações e Contratação de Comissão
     function buyPlayer(marketId) {
         let ply = marketPlayers.find(p => p.id === marketId);
-        
-        // Aplicação do bônus passivo do Olheiro Chefe (15% de desconto)
         let finalPrice = staffScout ? Math.round(ply.price * 0.85) : ply.price;
         
         if(finances < finalPrice) { alert("Caixa insuficiente!"); return; }
@@ -757,7 +942,7 @@
 
         saveGameData();
         updateUI();
-        logGame(`🤝 Contratação: ${ply.name} assinou contrato por Cr$ ${finalPrice}k.`);
+        logGame(`🤝 Contratação: ${ply.name} (${ply.age} anos) assinou contrato por Cr$ ${finalPrice}k.`);
     }
 
     function sellPlayer(playerId) {
@@ -796,7 +981,6 @@
         updateUI();
     }
 
-    // Infraestrutura Financeira
     function upgradeStadium() {
         if(finances < 200) { alert("Crédito insuficiente!"); return; }
         finances -= 200; stadiumLevel++;
@@ -816,19 +1000,29 @@
     function updateTactics() {
         currentTactic = document.getElementById('tactic-select').value;
         const box = document.getElementById('tactic-desc');
-        if(currentTactic === 'balanced') box.innerText = "Equilibrada: Mantém o foco padrão de ELO.";
-        if(currentTactic === 'attacking') box.innerText = "Ataque Total: Aumenta produção de gols ofensivos em troca de desgaste físico acelerado (-18 de Stamina por jogo).";
-        if(currentTactic === 'defensive') box.innerText = "Retranca Sólida: Prejudica o ataque adversário e conserva mais energia tática geral.";
+        if(currentTactic === 'balanced') box.innerText = "Equilibrada: Mantém o foco padrão estável de ELO. Gasto: 12 Stamina.";
+        if(currentTactic === 'pressao') box.innerText = "Pressão Total: Linhas altas e abafamento. Modificadores: +1.0 para você / +0.4 para o adversário. Gasto: 24 Stamina.";
+        if(currentTactic === 'tikitaka') box.innerText = "Tiki-Taka: Domínio territorial e paciência na posse. Modificadores: +0.5 para você / +0.3 para o adversário. Gasto: 16 Stamina.";
+        if(currentTactic === 'contra') box.innerText = "Contra-Ataque: Bloco médio-baixo estruturado para espetadas rápidas. Modificadores: -0.3 para você / -0.18 para o adversário. Gasto: 9 Stamina.";
+        if(currentTactic === 'retranca') box.innerText = "Retranca: Ônibus estacionado na frente da grande área. Modificadores: -0.5 para você / -0.2 para o adversário. Gasto: 6 Stamina.";
+        if(currentTactic === 'minimalista') box.innerText = "Minimalista: Jogo arrastado para descanso extremo do plantel. Modificadores: -0.5 para você / +0.5 para o adversário. Gasto: 3 Stamina.";
+        
         document.getElementById('card-tactic').innerText = document.getElementById('tactic-select').options[document.getElementById('tactic-select').selectedIndex].text;
         saveGameData();
     }
 
-    // Customização de Dados
+    function changeViewingDivision() {
+        viewingDivision = parseInt(document.getElementById('view-division-select').value);
+        saveGameData();
+        updateUI();
+    }
+
     function buildEditor() {
         const c = document.getElementById('editor-container'); c.innerHTML = '';
-        teams.forEach(t => {
+        teams.sort((a,b) => a.id - b.id).forEach(t => {
             c.innerHTML += `
                 <div style="background:var(--bg-main); padding:10px; border-radius:8px; border:1px solid var(--border)">
+                    <strong style="font-size:11px;color:var(--text-muted)">Série ${String.fromCharCode(64 + t.division)}</strong>
                     <input type="text" id="ed-name-${t.id}" value="${t.name}">
                     <input type="number" id="ed-elo-${t.id}" value="${Math.round(t.elo)}" style="margin-top:5px">
                 </div>`;
@@ -843,7 +1037,6 @@
         saveGameData(); updateUI(); alert("Alterações de banco aplicadas!");
     }
 
-    // Renderizadores de Interface de Usuário (UI)
     function switchTab(id) {
         document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
@@ -856,14 +1049,18 @@
     function updateUI() {
         let myTeam = teams.find(t => t.id === userTeamId);
         document.getElementById('header-manager-title').innerText = `Gestão Ativa: ${myTeam.name}`;
-        document.getElementById('header-team-status').innerText = `Liga de Elite | Nível Estrutural da Arena: ${stadiumLevel}`;
+        document.getElementById('header-team-status').innerText = `Divisão: Série ${String.fromCharCode(64 + myTeam.division)} | Estrutura da Arena: Nível ${stadiumLevel}`;
         document.getElementById('display-season').innerText = `Temporada ${season}`;
-        document.getElementById('display-round').innerText = `Rodada ${currentRound + 1} / ${fixtures.length}`;
+        document.getElementById('display-round').innerText = `Rodada ${currentRound + 1} / 14`;
         document.getElementById('card-finances').innerText = `Cr$ ${finances}k`;
         document.getElementById('card-elo').innerText = Math.round(myTeam.elo);
 
-        let sorted = [...teams].sort((a,b) => (b.p !== a.p) ? (b.p - a.p) : ((b.gp - b.gc) - (a.gp - a.gc)));
-        document.getElementById('card-position').innerText = `${sorted.findIndex(t => t.id === userTeamId) + 1}º Lugar`;
+        // Filtro e Ordenação Baseados na Divisão Visualizada
+        let currentDivTeams = teams.filter(t => t.division === viewingDivision);
+        let sorted = [...currentDivTeams].sort((a,b) => (b.p !== a.p) ? (b.p - a.p) : ((b.gp - b.gc) - (a.gp - a.gc)));
+        
+        let userDivTeams = teams.filter(t => t.division === myTeam.division).sort((a,b) => (b.p !== a.p) ? (b.p - a.p) : ((b.gp - b.gc) - (a.gp - a.gc)));
+        document.getElementById('card-position').innerText = `${userDivTeams.findIndex(t => t.id === userTeamId) + 1}º Lugar (Série ${String.fromCharCode(64 + myTeam.division)})`;
 
         // Render Classificação
         let lBody = document.querySelector('#league-table tbody'); lBody.innerHTML = '';
@@ -891,21 +1088,21 @@
             `;
         });
 
-        // Render Mercado de Transferências
+        // Render Mercado de Transferências com Idade
         let mBody = document.querySelector('#market-table tbody'); mBody.innerHTML = '';
         marketPlayers.forEach(p => {
             let r = mBody.insertRow();
             let finalPrice = staffScout ? Math.round(p.price * 0.85) : p.price;
             let priceHTML = staffScout ? `<span style="text-decoration:line-through;color:var(--text-muted);font-size:11px;">Cr$ ${p.price}k</span><br>Cr$ ${finalPrice}k` : `Cr$ ${p.price}k`;
             
-            r.innerHTML = `<td><strong>${p.name}</strong></td><td>${p.position}</td><td>${p.attack}</td><td>${p.defense}</td><td style="color:var(--accent); font-weight:bold;">${priceHTML}</td><td><button class="btn btn-success" style="padding:4px 8px;" onclick="buyPlayer(${p.id})">Contratar</button></td>`;
+            r.innerHTML = `<td><strong>${p.name}</strong></td><td>${p.age} anos</td><td><span class="badge badge-pos">${p.position}</span></td><td>${p.attack}</td><td>${p.defense}</td><td style="color:var(--accent); font-weight:bold;">${priceHTML}</td><td><button class="btn btn-success" style="padding:4px 8px;" onclick="buyPlayer(${p.id})">Contratar</button></td>`;
         });
 
         let sellBody = document.querySelector('#sell-table tbody'); sellBody.innerHTML = '';
         myTeam.players.filter(p => !p.starter).forEach(p => {
             let val = Math.round((p.attack + p.defense) * 1.2);
             let r = sellBody.insertRow();
-            r.innerHTML = `<td>${p.name}</td><td>${p.position}</td><td style="color:var(--warning)">Cr$ ${val}k</td><td><button class="btn btn-danger" style="padding:4px 8px;" onclick="sellPlayer(${p.id})">Vender</button></td>`;
+            r.innerHTML = `<td>${p.name}</td><td><span class="badge badge-pos">${p.position}</span></td><td style="color:var(--warning)">Cr$ ${val}k</td><td><button class="btn btn-danger" style="padding:4px 8px;" onclick="sellPlayer(${p.id})">Vender</button></td>`;
         });
 
         // Render Comissão Técnica Dinâmica
@@ -942,7 +1139,29 @@
             `;
         }
 
-        // Render Próximo Confronto
+        // Render Hall da Fama
+        let hofBody = document.querySelector('#hof-table tbody');
+        if (hofBody) {
+            hofBody.innerHTML = '';
+            let hofData = [];
+            teams.forEach(t => {
+                let rec = hallOfFame[t.id] || { titles: 0, vices: 0 };
+                if (rec.titles > 0 || rec.vices > 0) {
+                    hofData.push({ name: t.name, titles: rec.titles, vices: rec.vices });
+                }
+            });
+            hofData.sort((a,b) => b.titles !== a.titles ? b.titles - a.titles : b.vices - a.vices);
+            if (hofData.length === 0) {
+                hofBody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:var(--text-muted)">Nenhum título registrado na elite.</td></tr>`;
+            } else {
+                hofData.forEach(d => {
+                    let r = hofBody.insertRow();
+                    r.innerHTML = `<td><strong>${d.name}</strong></td><td>${d.titles}</td><td>${d.vices}</td>`;
+                });
+            }
+        }
+
+        // Render Próximo Confronto do Usuário
         let tRound = currentRound >= fixtures.length ? fixtures.length - 1 : currentRound;
         let roundMatches = fixtures[tRound];
         let fixList = document.getElementById('fixtures-list'); fixList.innerHTML = '';
@@ -956,7 +1175,9 @@
                 document.getElementById('next-match-preview').innerHTML = `<p style=\"color:var(--text-muted)\">Aguardando próxima rodada...</p>`;
             }
 
-            roundMatches.forEach(m => {
+            // Exibe jogos filtrados pela divisão selecionada no painel de tabelas
+            let divRoundMatches = roundMatches.filter(m => m.division === viewingDivision);
+            divRoundMatches.forEach(m => {
                 let h = teams.find(t => t.id === m.home); let a = teams.find(t => t.id === m.away);
                 fixList.innerHTML += `<div class=\"fixture-item\"><span>${h.name}</span><span class=\"score-badge\">${m.simulated ? m.homeScore+' - '+m.awayScore : 'vs'}</span><span>${a.name}</span></div>`;
             });
