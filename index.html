@@ -1,11 +1,4 @@
-Gestão Ativa: Boca do Rio FC
-Liga Principal de Elite | Instalações Técnicas Nível 160
-
-Temporada 4
-Rodada 34 / 38
-Escritório
-Gerenciar Elenco
-Centro de Treinamento<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -159,9 +152,9 @@ Centro de Treinamento<!DOCTYPE html>
         <div class="card">
             <div class="flex-between" style="margin-bottom: 15px;">
                 <h2>Gestão do Elenco Corporativo</h2>
-                <span style="color: var(--text-muted);" id="squad-count-txt">Titulares: 0 / 11</span>
+                <span style="color: var(--text-muted); font-weight: bold;" id="squad-count-txt">Titulares: 0 / 11</span>
             </div>
-            <p style="color: var(--text-muted); margin-bottom: 15px;">Selecione manualmente os seus titulares. Atletas fadigados (Stamina baixa) perdem rendimento drástico nas jogadas críticas!</p>
+            <p style="color: var(--text-muted); margin-bottom: 15px;">Ajuste seus titulares de acordo com as exigências da tática atual. Atletas fadigados (Stamina baixa) perdem rendimento drástico nas jogadas críticas!</p>
             <table id="squad-table">
                 <thead>
                     <tr>
@@ -186,11 +179,11 @@ Centro de Treinamento<!DOCTYPE html>
                 <h2>Foco do Treinamento Semanal</h2>
                 <p style="color: var(--text-muted); margin-bottom: 15px;">Defina a área de foco para o elenco nesta semana. Os efeitos de evolução e fadiga consolidam-se ao final de cada rodada simulada.</p>
                 <select id="training-focus-select" onchange="updateTrainingFocus()">
-                    <option value="physio">⚡ Recuperação Física Intensiva (+5 Stamina global)</option>
-                    <option value="tactical">🧠 Tático Coesivo (10% de chance de +1 Atq/Def global)</option>
-                    <option value="offensive">🎯 Calibração Ofensiva (10% de chance de +2 Atq para Meias e Atacantes)</option>
-                    <option value="defensive">🛡️ Barreira Defensiva (10% de chance de +2 Def para Defensores e Goleiros)</option>
-                    <option value="youth">🌱 Lapidação da Base (10% de chance de evolução duplicada para < 23 anos)</option>
+                    <option value="physio">⚡ Recuperação Física Intensiva (+10 Stamina global)</option>
+                    <option value="tactical">🧠 Tático Coesivo (25% de chance +1 Ataque, +1 Defesa geral equilibrado)</option>
+                    <option value="offensive">🎯 Calibração Ofensiva (30% de chance +2 Ataque para Meias e Atacantes)</option>
+                    <option value="defensive">🛡️ Barreira Defensiva (30% de chance +2 Defesa para Defensores e Goleiros)</option>
+                    <option value="youth">🌱 Lapidação da Base (30% de chance de Evolução duplicada para atletas menores de 23 anos)</option>
                 </select>
                 <div style="margin-top: 15px; padding: 15px; background: var(--bg-main); border-radius: 8px;" id="training-focus-desc"></div>
             </div>
@@ -199,8 +192,8 @@ Centro de Treinamento<!DOCTYPE html>
                 <div class="stat-box" style="margin-bottom: 15px; text-align: left;">
                     Nível do Complexo: <strong id="training-level-txt">Nível 1</strong>
                 </div>
-                <button class="btn btn-success" style="width: 100%; justify-content: center;" id="btn-upgrade-training" onclick="upgradeTrainingFacilities()">Melhorar Complexo de Treino (Custo: Cr$ 180k)</button>
-                <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">Cada avanço de nível expande em +50% os bônus gerados pelas rotinas semanais de treino. O custo de upgrade DOBRA a cada nível.</p>
+                <button class="btn btn-success" style="width: 100%; justify-content: center;" onclick="upgradeTrainingFacilities()">Melhorar Complexo de Treino (Custo: Cr$ 180k)</button>
+                <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">Cada avanço de nível expande em +50% os bônus gerados pelas rotinas semanais de treino.</p>
             </div>
         </div>
     </div>
@@ -209,7 +202,7 @@ Centro de Treinamento<!DOCTYPE html>
         <div class="manager-grid">
             <div class="card">
                 <h2>Jogadores Disponíveis para Compra</h2>
-                <p style="color: var(--text-muted); margin-bottom: 15px;">Novos talentos e medalhões mudam a cada virada de rodada. O preço dos craques cresce exponencialmente com o ganho de OVER.</p>
+                <p style="color: var(--text-muted); margin-bottom: 15px;">Novos talentos e medalhões mudam a cada virada de rodada.</p>
                 <table id="market-table">
                     <thead>
                         <tr>
@@ -267,13 +260,13 @@ Centro de Treinamento<!DOCTYPE html>
                     <option value="balanced">Equilibrada (4-4-2 Tradicional)</option>
                     <option value="attacking">Ataque Total (4-3-3 Voraz)</option>
                     <option value="defensive">Retranca Sólida (5-4-1 Ônibus)</option>
-                    <option value="tikitaka">Tiki-Taka Posicional (Controle de Linhas)</option>
-                    <option value="counter">Contra-Ataque Letal (Transição de Velocidade)</option>
-                    <option value="gegenpress">Gegenpressing Alemão (Pressão no Bloco Alto)</option>
-                    <option value="longball">Chuveirinho / Bola Longa (Físico Rústico)</option>
-                    <option value="bailado">Jogo Bailado (Ofensiva de Drible Técnico)</option>
-                    <option value="catenaccio">Catenaccio Italiano (Tranca Extrema de Cadeado)</option>
-                    <option value="totalfootball">Carrossel Holandês (Futebol Dinâmico Total)</option>
+                    <option value="tikitaka">Tiki-Taka Posicional (4-5-1 Linhas de Controle)</option>
+                    <option value="counter">Contra-Ataque Letal (5-3-2 Transição Rápida)</option>
+                    <option value="gegenpress">Gegenpressing Alemão (4-3-3 Pressão Alta)</option>
+                    <option value="longball">Chuveirinho / Bola Longa (4-4-2 Rústico)</option>
+                    <option value="bailado">Jogo Bailado (4-3-3 Drible Técnico)</option>
+                    <option value="catenaccio">Catenaccio Italiano (5-4-1 Tranca Total)</option>
+                    <option value="totalfootball">Carrossel Holandês (3-4-3 Dinâmico Total)</option>
                 </select>
                 <div style="margin-top: 20px; padding: 15px; background: var(--bg-main); border-radius: 8px;" id="tactic-desc"></div>
             </div>
@@ -282,8 +275,8 @@ Centro de Treinamento<!DOCTYPE html>
                 <div class="stat-box" style="margin-bottom: 15px; text-align: left;">
                     Estádio Comercial: <strong id="stadium-level-txt">Nível 1 (Capacidade: 15k)</strong>
                 </div>
-                <button class="btn" style="width: 100%; justify-content: center;" id="btn-upgrade-stadium" onclick="upgradeStadium()">Expandir Capacidade da Arena (Custo: Cr$ 200k)</button>
-                <p style="font-size: 11px; color: var(--text-muted); margin-top: 5px;">Aumenta a arrecadação de ingressos baseada na força ELO. O custo de upgrade DOBRA a cada nível.</p>
+                <button class="btn" style="width: 100%; justify-content: center;" onclick="upgradeStadium()">Expandir Capacidade da Arena (Custo: Cr$ 200k)</button>
+                <p style="font-size: 11px; color: var(--text-muted); margin-top: 5px;">Aumenta drasticamente a arrecadação de ingressos quando você for o mandante do jogo.</p>
             </div>
         </div>
     </div>
@@ -318,12 +311,26 @@ Centro de Treinamento<!DOCTYPE html>
     let marketPlayers = [];
     let tutorialStep = 0;
 
+    // Definição estrita das formações correspondentes a cada tática do jogo
+    const formationRequirements = {
+        balanced: { GOL: 1, DEF: 4, MEI: 4, ATA: 2 },      // 4-4-2
+        attacking: { GOL: 1, DEF: 4, MEI: 3, ATA: 3 },     // 4-3-3
+        defensive: { GOL: 1, DEF: 5, MEI: 4, ATA: 1 },     // 5-4-1
+        tikitaka: { GOL: 1, DEF: 4, MEI: 5, ATA: 1 },      // 4-5-1
+        counter: { GOL: 1, DEF: 5, MEI: 3, ATA: 2 },       // 5-3-2
+        gegenpress: { GOL: 1, DEF: 4, MEI: 3, ATA: 3 },    // 4-3-3
+        longball: { GOL: 1, DEF: 4, MEI: 4, ATA: 2 },      // 4-4-2
+        bailado: { GOL: 1, DEF: 4, MEI: 3, ATA: 3 },       // 4-3-3
+        catenaccio: { GOL: 1, DEF: 5, MEI: 4, ATA: 1 },    // 5-4-1
+        totalfootball: { GOL: 1, DEF: 3, MEI: 4, ATA: 3 }  // 3-4-3
+    };
+
     const tutorialTexts = [
-        "🏟️ ESCRITÓRIO: Agora, a simulação roda por RODADA COMPLETA. Toda rodada virada rende Cotas de TV proporcionais ao seu ELO. Quando o jogo indicar que você é mandante, a bilheteria renderá com base no seu ELO e tamanho do seu estádio!",
-        "👥 ESCALAÇÃO MANUAL: O botão de auto-escalação foi completamente removido. O controle físico do elenco é seu! Monitore e mude o status dos atletas. Jogadores fadigados entregarão lances de gols preciosos de bandeja.",
-        "🏋️ CENTRO DE TREINAMENTO: Use a nova aba exclusiva de treinos para planejar o foco estratégico do elenco na semana. Os bônus foram nerfados para trazer equilíbrio e as instalações dobram de custo de forma progressiva.",
-        "🧠 10 TÁTICAS DISPONÍVEIS: Na aba de táticas, você conta com dez modelos clássicos e modernos de jogo (do Tiki-Taka ao Catenaccio). Cada um altera profundamente a produção de gols e o cansaço dos atletas titularizados.",
-        "📈 MERCADO & DINÂMICA DE SALÁRIOS: Ao final de cada rodada, além da manutenção física, você paga a comissão técnica e salários específicos baseados na qualidade técnica (Ataque + Defesa) de cada um dos seus atletas."
+        "🏟️ ESCRITÓRIO: Agora, a simulação roda por RODADA COMPLETA. Toda rodada virada rende Cr$ 150k fixos em Direitos de TV. Quando o jogo indicar que você é mandante, a sua Arena comercial rebalanceada renderá bilheterias gigantescas!",
+        "👥 ESCALAÇÃO MANUAL: O botão de auto-escalação foi completamente removido. O controle físico do elenco é seu! Monitore e mude o status dos atletas. Você deve obedecer estritamente a distribuição posicional exigida por sua tática ativa.",
+        "🏋️ CENTRO DE TREINAMENTO: Use a nova aba exclusiva de treinos para planejar o foco estratégico do elenco na semana (Físico, Ofensivo, Defensivo ou Categoria de Base). Invista capital para subir o nível da estrutura e multiplicar seus ganhos técnicos.",
+        "🧠 10 TÁTICAS DISPONÍVEIS: Na aba de táticas, você conta com dez modelos clássicos e modernos de jogo (do Tiki-Taka ao Catenaccio). Cada um exige um esquema de escalação específico e altera profundamente a fadiga e a produção de gols.",
+        "📈 MERCADO & ENVELHECIMENTO: Ao completar as 38 rodadas regulamentares, a temporada avança. Os jogadores envelhecem 1 ano, causando evolução massiva em jovens promissores e declínio em veteranos. Negocie com inteligência!"
     ];
 
     function createInitialDatabase() {
@@ -399,12 +406,6 @@ Centro de Treinamento<!DOCTYPE html>
         fixtures = [...turnos, ...returnos];
     }
 
-    function calculatePlayerPrice(attack, defense) {
-        let over = Math.round((attack + defense) / 2);
-        // Curva Exponencial Balanceada para evitar que supercraques custem migalhas
-        return Math.round(50 + Math.pow(over / 11, 3.2));
-    }
-
     function generateMarket() {
         const positions = ["GOL", "DEF", "MEI", "ATA"];
         marketPlayers = [];
@@ -412,6 +413,7 @@ Centro de Treinamento<!DOCTYPE html>
             let pos = positions[Math.floor(Math.random()*4)];
             let att = Math.floor(Math.random()*45) + 48;
             let def = Math.floor(Math.random()*45) + 48;
+            let score = Math.round((att + def) / 2);
             marketPlayers.push({
                 id: Date.now() + i,
                 name: generateRandomPlayerName(),
@@ -419,7 +421,7 @@ Centro de Treinamento<!DOCTYPE html>
                 position: pos,
                 attack: att,
                 defense: def,
-                price: calculatePlayerPrice(att, def)
+                price: score * 3 + Math.floor(Math.random()*40)
             });
         }
     }
@@ -443,7 +445,7 @@ Centro de Treinamento<!DOCTYPE html>
         else if (chosenTier === 'forte') finances = 450;
         else if (chosenTier === 'moderado') finances = 300;
         else if (chosenTier === 'fraco') finances = 180;
-        else if (chosenTier === 'crise') finances = 60; 
+        else if (chosenTier === 'crise') finances = 40; 
 
         stadiumLevel = 1;
         trainingLevel = 1;
@@ -451,6 +453,22 @@ Centro de Treinamento<!DOCTYPE html>
         trainingFocus = 'physio';
         season = 1;
         currentRound = 0;
+
+        // Resetar escalação padrão para se adaptar à tática equilibrada inicial
+        let myTeam = teams.find(t => t.id === userTeamId);
+        if (myTeam) {
+            myTeam.players.forEach((p, index) => {
+                p.starter = false;
+            });
+            // Escalar 1 GOL, 4 DEF, 4 MEI, 2 ATA automaticamente na criação para facilitar
+            let cGOL = 0, cDEF = 0, cMEI = 0, cATA = 0;
+            myTeam.players.forEach(p => {
+                if (p.position === 'GOL' && cGOL < 1) { p.starter = true; cGOL++; }
+                else if (p.position === 'DEF' && cDEF < 4) { p.starter = true; cDEF++; }
+                else if (p.position === 'MEI' && cMEI < 4) { p.starter = true; cMEI++; }
+                else if (p.position === 'ATA' && cATA < 2) { p.starter = true; cATA++; }
+            });
+        }
 
         localStorage.removeItem('FM_PRO_SAVE_DATA');
         saveGameData();
@@ -486,12 +504,14 @@ Centro de Treinamento<!DOCTYPE html>
     function loadGameData() {
         const data = JSON.parse(localStorage.getItem('FM_PRO_SAVE_DATA'));
         userTeamId = data.userTeamId; season = data.season; currentRound = data.currentRound;
-        finances = data.finances; stadiumLevel = data.stadiumLevel || 1; trainingLevel = data.trainingLevel || 1;
-        currentTactic = data.currentTactic; trainingFocus = data.trainingFocus || 'physio';
+        finances = data.finances; stadiumLevel = data.stadiumLevel; trainingLevel = data.trainingLevel || 1;
+        currentTactic = data.currentTactic || 'balanced'; trainingFocus = data.trainingFocus || 'physio';
         teams = data.teams; fixtures = data.fixtures; marketPlayers = data.marketPlayers;
         
         document.getElementById('tactic-select').value = currentTactic;
         document.getElementById('training-focus-select').value = trainingFocus;
+        document.getElementById('stadium-level-txt').innerText = `Nível ${stadiumLevel} (Capacidade: ${15 * stadiumLevel}k)`;
+        document.getElementById('training-level-txt').innerText = `Nível ${trainingLevel}`;
         logGame(">> Sistema: Estado do save game recuperado com sucesso via LocalStorage.");
     }
 
@@ -515,14 +535,6 @@ Centro de Treinamento<!DOCTYPE html>
         }
     }
 
-    function calculateWeeklyExpenses(team) {
-        // Nerf 1: Comissão técnica fixa (40) + manutenção infraestrutura base (30) + salário dinâmico por qualidade do jogador
-        let staffCost = 40;
-        let infrastructureBase = 30;
-        let playersSalary = team.players.reduce((acc, p) => acc + Math.round((p.attack + p.defense) * 0.12), 0);
-        return staffCost + infrastructureBase + playersSalary;
-    }
-
     function playFullRoundDetailed() {
         if (currentRound >= fixtures.length) return;
 
@@ -533,9 +545,20 @@ Centro de Treinamento<!DOCTYPE html>
             let hTeam = teams.find(t => t.id === uMatch.home);
             let aTeam = teams.find(t => t.id === uMatch.away);
             let activeManagerTeam = hTeam.id === userTeamId ? hTeam : aTeam;
-            let starterCount = activeManagerTeam.players.filter(p => p.starter).length;
-            if(starterCount !== 11) {
-                alert(`Erro de Escalação: O seu time está com ${starterCount} jogadores em campo. Ajuste para EXATAMENTE 11 titulares na aba Gerenciar Elenco.`);
+            
+            // Validar combinação ilegal e distribuição exata das posições antes de rodar o motor
+            let req = formationRequirements[currentTactic] || formationRequirements.balanced;
+            let starters = activeManagerTeam.players.filter(p => p.starter);
+            
+            let counts = { GOL: 0, DEF: 0, MEI: 0, ATA: 0 };
+            starters.forEach(p => counts[p.position]++);
+
+            if (counts.GOL !== req.GOL || counts.DEF !== req.DEF || counts.MEI !== req.MEI || counts.ATA !== req.ATA) {
+                let tacticName = document.getElementById('tactic-select').options[document.getElementById('tactic-select').selectedIndex].text;
+                alert(`🚨 Erro de Escalação Ilegal!\n\nSua escalação não atende às exigências da tática atual: "${tacticName}".\n\n` +
+                      `Exigido: GOL: ${req.GOL} | DEF: ${req.DEF} | MEI: ${req.MEI} | ATA: ${req.ATA}\n` +
+                      `Escalado: GOL: ${counts.GOL} | DEF: ${counts.DEF} | MEI: ${counts.MEI} | ATA: ${counts.ATA}\n\n` +
+                      `Por favor, ajuste o status de seus atletas na aba "Gerenciar Elenco".`);
                 switchTab('tab-squad');
                 return;
             }
@@ -547,16 +570,13 @@ Centro de Treinamento<!DOCTYPE html>
             simulateMatchEngine(roundMatches[i]);
         }
 
+        finances += 150;
+        logGame(`📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.`);
+
         let myTeam = teams.find(t => t.id === userTeamId);
-
-        // Nerf 6: Cota de TV proporcional ao ELO do clube (Mais meritocrático)
-        let tvRights = Math.round(50 + (myTeam.elo / 15));
-        finances += tvRights;
-        logGame(`📺 Direitos de Transmissão: Creditado +Cr$ ${tvRights}k de Cotas de TV (Proporcional ao ELO).`);
-
-        let costBase = calculateWeeklyExpenses(myTeam);
+        let costBase = 150 + (myTeam.players.length * 2);
         finances -= costBase;
-        logGame(`📉 Custos de Operação: Descontado Cr$ ${costBase}k em salários do plantel, comissão tática e infraestrutura.`);
+        logGame(`📉 Custos de Operação: Descontado Cr$ ${costBase}k em manutenção de plantel e infraestrutura.`);
 
         applyWeeklyTrainingEffects(myTeam);
 
@@ -579,7 +599,7 @@ Centro de Treinamento<!DOCTYPE html>
 
         const computeTeamSquadBonus = (team, isHome) => {
             let starters = team.players.filter(p => p.starter);
-            if(starters.length === 0) return { starters, avgAttack: 30, avgDefense: 30, attBonus: 0, defBonus: 0, stamCost: 12 };
+            if(starters.length === 0) return { attBonus: 0, defBonus: 0, stamCost: 12 };
             let avgAttack = starters.reduce((acc, p) => acc + (p.attack * (p.stamina/100)), 0) / starters.length;
             let avgDefense = starters.reduce((acc, p) => acc + (p.defense * (p.stamina/100)), 0) / starters.length;
             
@@ -598,7 +618,7 @@ Centro de Treinamento<!DOCTYPE html>
                     case 'totalfootball': attMod = 1.25; defMod = 1.25; stamCost = 22; break;
                 }
             }
-            return { starters, avgAttack, avgDefense, attBonus: avgAttack * 2.5 * attMod, defBonus: avgDefense * 2.5 * defMod, stamCost };
+            return { attBonus: avgAttack * 2.5 * attMod, defBonus: avgDefense * 2.5 * defMod, stamCost };
         };
 
         let hBonus = computeTeamSquadBonus(hTeam, true);
@@ -639,9 +659,8 @@ Centro de Treinamento<!DOCTYPE html>
         hTeam.players.forEach(p => { if(p.starter) p.stamina = Math.max(10, p.stamina - hBonus.stamCost); else p.stamina = Math.min(100, p.stamina + 15); });
         aTeam.players.forEach(p => { if(p.starter) p.stamina = Math.max(10, p.stamina - aBonus.stamCost); else p.stamina = Math.min(100, p.stamina + 15); });
 
-        // Nerf 2: Redução drástica da Bilheteria Base + Parcela baseada fortemente no ELO
         if(hTeam.id === userTeamId) {
-            let cashIn = Math.round(40 + (stadiumLevel * 25) + (hTeam.elo / 6.5));
+            let cashIn = Math.round(180 + (stadiumLevel * 75) + (hTeam.elo / 8));
             finances += cashIn;
             logGame(`🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ ${cashIn}k.`);
         }
@@ -652,88 +671,61 @@ Centro de Treinamento<!DOCTYPE html>
             
             let narratives = [];
             let totalEvents = match.homeScore + match.awayScore + Math.floor(Math.random() * 3) + 2;
-            
-            // Separando os minutos primeiro para organizar cronologicamente a timeline
-            let timelineMinutes = [];
-            for(let e=0; e<totalEvents; e++) {
-                timelineMinutes.push(Math.floor(Math.random() * 88) + 2);
-            }
-            timelineMinutes.sort((a, b) => a - b);
-
-            let goalsH = match.homeScore; 
-            let goalsA = match.awayScore;
-            let currentScoreH = 0;
-            let currentScoreA = 0;
-
-            // Auxiliares de escalação para destaques nominais de jogadores
-            let hStarters = hBonus.starters.length > 0 ? hBonus.starters : [{name: "Jogador Mandante"}];
-            let aStarters = aBonus.starters.length > 0 ? aBonus.starters : [{name: "Jogador Visitante"}];
+            let goalsH = match.homeScore; let goalsA = match.awayScore;
 
             for(let e=0; e<totalEvents; e++) {
-                let min = timelineMinutes[e];
-                
+                let min = Math.floor(Math.random() * 88) + 2;
                 if(goalsH > 0 && (goalsA === 0 || Math.random() > 0.5)) {
-                    currentScoreH++;
-                    let scorer = hStarters[Math.floor(Math.random() * hStarters.length)].name;
-                    let assistant = hStarters[Math.floor(Math.random() * hStarters.length)].name;
-                    if (scorer === assistant) assistant = "trabalho coletivo";
-                    
-                    narratives.push(`⏱️ ${min}' - GOL! ⚽ O ataque do ${hTeam.name} infiltra com velocidade. Passe de ${assistant} e gol de ${scorer}! [${hTeam.name} ${currentScoreH} x ${currentScoreA} ${aTeam.name}]`);
+                    narratives.push({ min, txt: `⏱️ ${min}' - GOL! ⚽ O ataque do ${hTeam.name} infiltra com velocidade e estufa a rede! [${hTeam.name} ${match.homeScore-goalsH+1} x ${match.awayScore-goalsA}]` });
                     goalsH--;
                 } else if(goalsA > 0) {
-                    currentScoreA++;
-                    let scorer = aStarters[Math.floor(Math.random() * aStarters.length)].name;
-                    let assistant = aStarters[Math.floor(Math.random() * aStarters.length)].name;
-                    if (scorer === assistant) assistant = "jogada individual";
-
-                    narratives.push(`⏱️ ${min}' - GOL! ⚽ Contra-ataque cirúrgico do ${aTeam.name}. ${scorer} recebe livre e chuta morrendo no canto! [${hTeam.name} ${currentScoreH} x ${currentScoreA} ${aTeam.name}]`);
+                    narratives.push({ min, txt: `⏱️ ${min}' - GOL! ⚽ Contra-ataque cirúrgico do ${aTeam.name} morrendo no canto do goleiro! [${hTeam.name} ${match.homeScore-goalsH} x ${match.awayScore-goalsA+1}]` });
                     goalsA--;
                 } else {
-                    let sideIsHome = Math.random() > 0.5;
-                    let side = sideIsHome ? hTeam.name : aTeam.name;
-                    let attackingPlayer = sideIsHome ? hStarters[Math.floor(Math.random() * hStarters.length)].name : aStarters[Math.floor(Math.random() * aStarters.length)].name;
-                    let defensivePlayer = sideIsHome ? aStarters[Math.floor(Math.random() * aStarters.length)].name : hStarters[Math.floor(Math.random() * hStarters.length)].name;
-                    
+                    let side = Math.random() > 0.5 ? hTeam.name : aTeam.name;
                     let actions = [
-                        `${attackingPlayer} carimba o travessão em uma bomba espetacular de longa distância!`,
-                        `${attackingPlayer} finaliza forte, obrigando o goleiro adversário a operar um verdadeiro milagre elástico na linha!`,
-                        `${attackingPlayer} aparece livre de marcação após falha defensiva, mas cabeceia torto para fora.`,
-                        `${attackingPlayer} tenta o drible na área, é desarmado por ${defensivePlayer} e cai pedindo pênalti, mas o juiz manda seguir.`
+                        "carimba o travessão em bomba de longa distância!",
+                        "obriga o goleiro a operar um verdadeiro milagre elástico na linha!",
+                        "aparece livre de marcação, mas cabeceia torto para fora.",
+                        "tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir."
                     ];
-                    narratives.push(`⏱️ ${min}' - CHANCE REAL! ⚠️ O ataque do ${side}: ${actions[Math.floor(Math.random()*actions.length)]}`);
+                    narratives.push({ min, txt: `⏱️ ${min}' - CHANCE REAL! ⚠️ O ataque do ${side} ${actions[Math.floor(Math.random()*actions.length)]}` });
                 }
             }
-            
-            // Imprime na ordem correta
-            narratives.forEach(n => logGame(n));
+            narratives.sort((a,b) => a.min - b.min).forEach(n => logGame(n.txt));
             logGame(`🏁 PLACAR FINAL: ${hTeam.name} ${match.homeScore} x ${match.awayScore} ${aTeam.name} (ELO: ${eloDelta > 0 ? '+' : ''}${eloDelta.toFixed(1)})`);
         } else {
             logGame(`🔹 [LIGA] ${hTeam.name} ${match.homeScore} - ${match.awayScore} ${aTeam.name}`);
         }
     }
 
-    function applyWeeklyTrainingEffects(myTeam) {
-        let mult = 1 + (trainingLevel - 1) * 0.5;
-        myTeam.players.forEach(p => {
-            // Nerf 4: Ajustes rigorosos nas taxas de ganho e chance (RNG de 10% para evoluções)
-            if(trainingFocus === 'physio') {
-                p.stamina = Math.min(100, p.stamina + Math.round(5 * mult));
-            } else if(trainingFocus === 'tactical') {
-                if(Math.random() < 0.10) p.attack = Math.min(99, p.attack + Math.round(1 * mult));
-                if(Math.random() < 0.10) p.defense = Math.min(99, p.defense + Math.round(1 * mult));
-            } else if(trainingFocus === 'offensive') {
-                if((p.position === 'ATA' || p.position === 'MEI') && Math.random() < 0.10) p.attack = Math.min(99, p.attack + Math.round(2 * mult));
-            } else if(trainingFocus === 'defensive') {
-                if((p.position === 'DEF' || p.position === 'GOL') && Math.random() < 0.10) p.defense = Math.min(99, p.defense + Math.round(2 * mult));
-            } else if(trainingFocus === 'youth') {
-                if(p.age < 23 && Math.random() < 0.10) {
+   function applyWeeklyTrainingEffects(myTeam) {
+    let mult = 1 + (trainingLevel - 1) * 0.5;
+    myTeam.players.forEach(p => {
+        if(trainingFocus === 'physio') {
+            p.stamina = Math.min(100, p.stamina + Math.round(10 * mult));
+        } else if(trainingFocus === 'tactical') {
+            if(Math.random() < 0.25) p.attack = Math.min(99, p.attack + Math.round(1 * mult));
+            if(Math.random() < 0.25) p.defense = Math.min(99, p.defense + Math.round(1 * mult));
+        } else if(trainingFocus === 'offensive') {
+            if(p.position === 'ATA' || p.position === 'MEI') {
+                if(Math.random() < 0.30) p.attack = Math.min(99, p.attack + Math.round(2 * mult));
+            }
+        } else if(trainingFocus === 'defensive') {
+            if(p.position === 'DEF' || p.position === 'GOL') {
+                if(Math.random() < 0.30) p.defense = Math.min(99, p.defense + Math.round(2 * mult));
+            }
+        } else if(trainingFocus === 'youth') {
+            if(p.age < 23) {
+                if(Math.random() < 0.30) {
                     p.attack = Math.min(99, p.attack + Math.round(2 * mult));
                     p.defense = Math.min(99, p.defense + Math.round(2 * mult));
                 }
             }
-        });
-        logGame(`🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [${trainingFocus}].`);
-    }
+        }
+    });
+    logGame(`🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [${trainingFocus}].`);
+}
 
     function checkSeasonEnd() {
         let sorted = [...teams].sort((a,b) => b.p - a.p);
@@ -766,9 +758,14 @@ Centro de Treinamento<!DOCTYPE html>
         let player = myTeam.players.find(p => p.id === playerId);
         
         if (!player.starter) {
-            let activeStarters = myTeam.players.filter(p => p.starter).length;
-            if(activeStarters >= 11) {
-                alert("Você já possui 11 titulares em campo! Desabilite o status de algum reserva antes.");
+            let req = formationRequirements[currentTactic] || formationRequirements.balanced;
+            let starters = myTeam.players.filter(p => p.starter);
+            
+            // Contabilizar quantos titulares já existem daquela posição específica
+            let currentPositionCount = starters.filter(p => p.position === player.position).length;
+            
+            if (currentPositionCount >= req[player.position]) {
+                alert(`Combinação Proibida: A tática ativa exige exatamente ${req[player.position]} jogador(es) na posição de ${player.position}.\nRemova um titular dessa posição antes de adicionar outro.`);
                 return;
             }
             player.starter = true;
@@ -803,28 +800,26 @@ Centro de Treinamento<!DOCTYPE html>
         if(myTeam.players.length <= 12) { alert("Veto Operacional: Plantel mínimo de 12 jogadores impede a venda."); return; }
         
         let ply = myTeam.players.find(p => p.id === playerId);
-        let payout = Math.round(calculatePlayerPrice(ply.attack, ply.defense) * 0.75); // Valor de revenda levemente menor
+        let payout = Math.round((ply.attack + ply.defense) * 1.3);
         
         finances += payout;
         myTeam.players = myTeam.players.filter(p => p.id !== playerId);
 
         saveGameData(); updateUI();
-        logGame(`💸 Caixa Extra: O reserva ${ply.name} foi vendido por Cr$ ${payout}k.`);
+        logGame(`💸 Caixa Extra: O reserva ${ply.name} foi vendido ao mercado internacional por Cr$ ${payout}k.`);
     }
 
     function upgradeStadium() {
-        // Nerf 3: Custo progressivo Dobrando a cada nível
-        let currentCost = 200 * Math.pow(2, stadiumLevel - 1);
-        if(finances < currentCost) { alert(`Crédito insuficiente! Custo para o próximo nível: Cr$ ${currentCost}k.`); return; }
-        finances -= currentCost; stadiumLevel++;
+        if(finances < 200) { alert("Crédito insuficiente! Custo: Cr$ 200k."); return; }
+        finances -= 200; stadiumLevel++;
+        document.getElementById('stadium-level-txt').innerText = `Nível ${stadiumLevel} (Capacidade: ${15 * stadiumLevel}k)`;
         saveGameData(); updateUI();
     }
 
     function upgradeTrainingFacilities() {
-        // Nerf 3: Custo progressivo Dobrando a cada nível
-        let currentCost = 180 * Math.pow(2, trainingLevel - 1);
-        if(finances < currentCost) { alert(`Crédito insuficiente! Custo para o próximo nível: Cr$ ${currentCost}k.`); return; }
-        finances -= currentCost; trainingLevel++;
+        if(finances < 180) { alert("Crédito insuficiente! Custo: Cr$ 180k."); return; }
+        finances -= 180; trainingLevel++;
+        document.getElementById('training-level-txt').innerText = `Nível ${trainingLevel}`;
         saveGameData(); updateUI();
         logGame(`🏋️ Estrutura: Academia Técnica promovida ao Nível ${trainingLevel}.`);
     }
@@ -833,19 +828,24 @@ Centro de Treinamento<!DOCTYPE html>
         currentTactic = document.getElementById('tactic-select').value;
         const box = document.getElementById('tactic-desc');
         const descMap = {
-            balanced: "Equilibrada: Sem bônus ou penalidades táticas estruturais. Fadiga padrão por rodada (-12).",
-            attacking: "4-3-3 Voraz: +30% de bônus de Ataque, porém abre brechas defensivas (-10% Defesa) e cansa muito (-18 Stamina).",
-            defensive: "5-4-1 Ônibus: Retranca sólida conferindo +35% de Defesa, sacrificando o poder de fogo de frente (-15% Ataque) e poupando vigor (-8 Stamina).",
-            tikitaka: "Tiki-Taka Fino: Foco em posse curta. +20% Ataque, +10% Defesa, com cansaço físico moderadamente elevado (-15 Stamina).",
-            counter: "Contra-Ataque Letal: Desempenho amplificado jogando como VISITANTE (+25% Ataque fora, +10% Defesa) em explosão rápida.",
-            gegenpress: "Gegenpressing Alemão: Pressão sufocante gerando +40% Ataque, mas liquida a resistência física rapidamente (-24 Stamina, -20% Defesa).",
-            longball: "Chuveirinho / Bola Longa: +15% de Ataque rudimentar ignorando cansaço tático. Útil para quebrar retrancas estáveis.",
-            bailado: "Jogo Bailado Tradicional: Futebol arte solto. +35% de bônus de Ataque com enfraquecimento drástico na recomposição (-25% Defesa).",
-            catenaccio: "Catenaccio Italiano: A barreira intransponível perfeita. +50% de bônus na Defesa, mas anula quase toda saída ofensiva (-30% Ataque).",
-            totalfootball: "Carrossel Holandês: Futebol Total. Todos atacam e defendem coordenados (+25% Ataque, +25% Defesa), mas exige fôlego extremo (-22 Stamina)."
+            balanced: "Equilibrada (Esquema 4-4-2): Requer 1 GOL, 4 DEF, 4 MEI, 2 ATA. Sem bônus estruturais. Fadiga padrão (-12).",
+            attacking: "4-3-3 Voraz (Esquema 4-3-3): Requer 1 GOL, 4 DEF, 3 MEI, 3 ATA. +30% Ataque, -10% Defesa. Fadiga pesada (-18).",
+            defensive: "5-4-1 Ônibus (Esquema 5-4-1): Requer 1 GOL, 5 DEF, 4 MEI, 1 ATA. +35% Defesa, -15% Ataque. Poupa vigor (-8).",
+            tikitaka: "Tiki-Taka Posicional (Esquema 4-5-1): Requer 1 GOL, 4 DEF, 5 MEI, 1 ATA. +20% Ataque, +10% Defesa. Cansaço moderado (-15).",
+            counter: "Contra-Ataque Letal (Esquema 5-3-2): Requer 1 GOL, 5 DEF, 3 MEI, 2 ATA. Amplificado como VISITANTE (+25% Ataque, +10% Defesa). Fadiga (-11).",
+            gegenpress: "Gegenpressing Alemão (Esquema 4-3-3): Requer 1 GOL, 4 DEF, 3 MEI, 3 ATA. +40% Ataque, liquida a resistência física (-24 Stamina, -20% Defesa).",
+            longball: "Chuveirinho / Bola Longa (Esquema 4-4-2): Requer 1 GOL, 4 DEF, 4 MEI, 2 ATA. +15% de Ataque rudimentar ignorando cansaço tático.",
+            bailado: "Jogo Bailado (Esquema 4-3-3): Requer 1 GOL, 4 DEF, 3 MEI, 3 ATA. +35% bônus de Ataque com enfraquecimento na recomposição (-25% Defesa).",
+            catenaccio: "Catenaccio Italiano (Esquema 5-4-1): Requer 1 GOL, 5 DEF, 4 MEI, 1 ATA. +50% de bônus na Defesa, anulando saídas (-30% Ataque).",
+            totalfootball: "Carrossel Holandês (Esquema 3-4-3): Requer 1 GOL, 3 DEF, 4 MEI, 3 ATA. Todos atacam/defendem (+25% Ataque, +25% Defesa). Exige fôlego (-22)."
         };
         box.innerText = descMap[currentTactic] || descMap.balanced;
         document.getElementById('card-tactic').innerText = document.getElementById('tactic-select').options[document.getElementById('tactic-select').selectedIndex].text;
+        
+        // Atualiza a UI para refletir os novos requisitos imediatamente na contagem
+        if(teams.length > 0 && userTeamId !== null) {
+            updateUI();
+        }
         saveGameData();
     }
 
@@ -853,11 +853,11 @@ Centro de Treinamento<!DOCTYPE html>
         trainingFocus = document.getElementById('training-focus-select').value;
         const box = document.getElementById('training-focus-desc');
         const descMap = {
-            physio: "Foco Físico: Prioriza o descanso ativo. Todo o elenco ganha bônus de recuperação energética (+5 de Stamina base).",
-            tactical: "Foco Tático: Ensaios de posicionamento estratégico com 10% de chance de subida equilibrada de Ataque e Defesa.",
-            offensive: "Foco Ofensivo: Treinos de arremate e drible. 10% de chance de aprimorar os atributos de Ataque de Meias e Atacantes.",
-            defensive: "Foco Defensivo: Treinos de desarme e posicionamento. 10% de chance de melhorar a Defesa de Defensores e Goleiros.",
-            youth: "Lapidação de Talentos: Foco exclusivo nas promessas. Atletas com menos de 23 anos têm 10% de chance de ganhar progressão dobrada."
+            physio: "Foco Físico: Prioriza o descanso ativo. Todo o elenco ganha bônus de recuperação energética ao fim da rodada.",
+            tactical: "Foco Tático: Ensaios de posicionamento estratégico conferindo chances equilibradas de subida de Ataque e Defesa.",
+            offensive: "Foco Ofensivo: Treinos de arremate, drible e cruzamento. Aprimora os atributos de Ataque de Meias e Atacantes.",
+            defensive: "Foco Defensivo: Treinos de desarme, antecipação e posicionamento. Melhora a Defesa de Zagueiros, Laterais e Goleiros.",
+            youth: "Lapidação de Talentos: Foco exclusivo nas promessas. Atletas com menos de 23 anos ganham progressão dobrada de evolução."
         };
         box.innerText = descMap[trainingFocus] || descMap.physio;
         saveGameData();
@@ -886,19 +886,15 @@ Centro de Treinamento<!DOCTYPE html>
         document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        event.currentTarget.classList.add('active');
+        // Garantir que funcione mesmo que o evento nativo mude de contexto
+        if(window.event && window.event.currentTarget) {
+            window.event.currentTarget.classList.add('active');
+        }
     }
 
     function updateUI() {
         let myTeam = teams.find(t => t.id === userTeamId);
-        let currentStarters = myTeam.players.filter(p => p.starter).length;
-        let costBase = calculateWeeklyExpenses(myTeam);
-
-        // Atualização Dinâmica do Custo de Upgrade dos Botões
-        let nextStadiumUpgradeCost = 200 * Math.pow(2, stadiumLevel - 1);
-        let nextTrainingUpgradeCost = 180 * Math.pow(2, trainingLevel - 1);
-        document.getElementById('btn-upgrade-stadium').innerText = `Expandir Arena (Custo: Cr$ ${nextStadiumUpgradeCost}k)`;
-        document.getElementById('btn-upgrade-training').innerText = `Melhorar Complexo de Treino (Custo: Cr$ ${nextTrainingUpgradeCost}k)`;
+        let costBase = 150 + (myTeam.players.length * 2);
 
         document.getElementById('header-manager-title').innerText = `Gestão Ativa: ${myTeam.name}`;
         document.getElementById('header-team-status').innerText = `Liga Principal de Elite | Instalações Técnicas Nível ${trainingLevel}`;
@@ -907,10 +903,15 @@ Centro de Treinamento<!DOCTYPE html>
         document.getElementById('card-finances').innerText = `Cr$ ${finances}k`;
         document.getElementById('card-expenses').innerText = `Cr$ ${costBase}k`;
         document.getElementById('card-elo').innerText = Math.round(myTeam.elo);
-        document.getElementById('squad-count-txt').innerText = `Titulares Escalados: ${currentStarters} / 11`;
 
-        document.getElementById('stadium-level-txt').innerText = `Nível ${stadiumLevel} (Capacidade: ${15 * stadiumLevel}k)`;
-        document.getElementById('training-level-txt').innerText = `Nível ${trainingLevel}`;
+        // Dinâmica de monitoramento posicional de titulares na interface
+        let req = formationRequirements[currentTactic] || formationRequirements.balanced;
+        let starters = myTeam.players.filter(p => p.starter);
+        let counts = { GOL: 0, DEF: 0, MEI: 0, ATA: 0 };
+        starters.forEach(p => counts[p.position]++);
+        
+        document.getElementById('squad-count-txt').innerText = 
+            `Titulares: ${starters.length}/11 | GOL: ${counts.GOL}/${req.GOL} | DEF: ${counts.DEF}/${req.DEF} | MEI: ${counts.MEI}/${req.MEI} | ATA: ${counts.ATA}/${req.ATA}`;
 
         let sorted = [...teams].sort((a,b) => (b.p !== a.p) ? (b.p - a.p) : ((b.gp - b.gc) - (a.gp - a.gc)));
         document.getElementById('card-position').innerText = `${sorted.findIndex(t => t.id === userTeamId) + 1}º Lugar`;
@@ -941,7 +942,7 @@ Centro de Treinamento<!DOCTYPE html>
 
         let sellBody = document.querySelector('#sell-table tbody'); sellBody.innerHTML = '';
         myTeam.players.filter(p => !p.starter).forEach(p => {
-            let val = Math.round(calculatePlayerPrice(p.attack, p.defense) * 0.75);
+            let val = Math.round((p.attack + p.defense) * 1.3);
             let r = sellBody.insertRow();
             r.innerHTML = `<td>${p.name}</td><td>${p.position}</td><td style="color:var(--warning)">Cr$ ${val}k</td><td><button class="btn btn-danger" style="padding:4px 8px;" onclick="sellPlayer(${p.id})">Vender</button></td>`;
         });
@@ -980,1269 +981,3 @@ Centro de Treinamento<!DOCTYPE html>
 </script>
 </body>
 </html>
-Mercado de Transferências
-Classificação & Tabela
-Estádio & Táticas
-Editor de Clubes
-Confrontos Planejados
-Porto Alegre City (Mandante)
-VS
-Boca do Rio FC (Visitante)
-Simular Rodada Atual (Todos os Jogos)
-Painel de Transmissão & Minuto a Minuto
->> Sistema: Estado do save game recuperado com sucesso via LocalStorage.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 113.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 114.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 115.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 116.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 117.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 118.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 119.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 120.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 121.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 122.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 123.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 124.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 125.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 126.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 127.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 128.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 129.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 130.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 131.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 132.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 133.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 134.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 135.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 136.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 137.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 138.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 139.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 140.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 141.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 142.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 143.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 144.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 145.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 146.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 147.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 148.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 149.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 150.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 151.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 152.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 153.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 154.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 155.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 156.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 157.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 158.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 159.
-🏋️ Estrutura: Academia Técnica promovida ao Nível 160.
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 15 ---
-🔹 [LIGA] Mestres do Norte FC 2 - 1 Sport Zênite
-🔹 [LIGA] Cruzeiro do Sul AC 1 - 0 Atlético Progresso
-🔹 [LIGA] Recife SC 0 - 0 União Imperial
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10841k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Porto Alegre City
-⏱️ 2' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-⏱️ 41' - CHANCE REAL! ⚠️ O ataque do Porto Alegre City tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 48' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 2 x 0]
-⏱️ 60' - CHANCE REAL! ⚠️ O ataque do Porto Alegre City tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 76' - CHANCE REAL! ⚠️ O ataque do Porto Alegre City carimba o travessão em bomba de longa distância!
-⏱️ 88' - CHANCE REAL! ⚠️ O ataque do Porto Alegre City obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-🏁 PLACAR FINAL: Boca do Rio FC 2 x 0 Porto Alegre City (ELO: +6.7)
-🔹 [LIGA] Sampaio Real Club 0 - 0 Real Metrópole S.A.
-🔹 [LIGA] Costa de Ouro FC 3 - 0 Belo Horizonte FC
-🔹 [LIGA] Vanguardas S.A. 1 - 2 Maranhão AC
-🔹 [LIGA] Inter Estelar 2 - 1 Serra Alta FC
-🔹 [LIGA] Delta Futebol 2 - 4 Cavalaria Alvinegra
-🔹 [LIGA] Força Central AC 0 - 1 Goiás Unido
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 16 ---
-🔹 [LIGA] Atlético Progresso 1 - 1 Mestres do Norte FC
-🔹 [LIGA] União Imperial 2 - 2 Sport Zênite
-🔹 [LIGA] Porto Alegre City 0 - 3 Cruzeiro do Sul AC
-🔹 [LIGA] Real Metrópole S.A. 0 - 2 Recife SC
-⚽ [JOGO EM DESTAQUE] Belo Horizonte FC vs Boca do Rio FC
-⏱️ 33' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Belo Horizonte FC 0 x 1]
-⏱️ 45' - CHANCE REAL! ⚠️ O ataque do Belo Horizonte FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 87' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-🏁 PLACAR FINAL: Belo Horizonte FC 0 x 1 Boca do Rio FC (ELO: -2.1)
-🔹 [LIGA] Maranhão AC 0 - 2 Sampaio Real Club
-🔹 [LIGA] Serra Alta FC 1 - 2 Costa de Ouro FC
-🔹 [LIGA] Cavalaria Alvinegra 2 - 0 Vanguardas S.A.
-🔹 [LIGA] Goiás Unido 0 - 0 Inter Estelar
-🔹 [LIGA] Força Central AC 0 - 2 Delta Futebol
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 17 ---
-🔹 [LIGA] Mestres do Norte FC 2 - 0 União Imperial
-🔹 [LIGA] Atlético Progresso 2 - 1 Porto Alegre City
-🔹 [LIGA] Sport Zênite 1 - 0 Real Metrópole S.A.
-🔹 [LIGA] Cruzeiro do Sul AC 1 - 1 Belo Horizonte FC
-🔹 [LIGA] Recife SC 3 - 2 Maranhão AC
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10842k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Serra Alta FC
-⏱️ 10' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-⏱️ 13' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 28' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-⏱️ 34' - CHANCE REAL! ⚠️ O ataque do Serra Alta FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 63' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 2 x 0]
-⏱️ 71' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-🏁 PLACAR FINAL: Boca do Rio FC 2 x 0 Serra Alta FC (ELO: +0.7)
-🔹 [LIGA] Sampaio Real Club 1 - 0 Cavalaria Alvinegra
-🔹 [LIGA] Costa de Ouro FC 2 - 1 Goiás Unido
-🔹 [LIGA] Vanguardas S.A. 1 - 0 Força Central AC
-🔹 [LIGA] Inter Estelar 2 - 0 Delta Futebol
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 18 ---
-🔹 [LIGA] Porto Alegre City 0 - 2 Mestres do Norte FC
-🔹 [LIGA] Real Metrópole S.A. 0 - 0 União Imperial
-🔹 [LIGA] Belo Horizonte FC 0 - 3 Atlético Progresso
-🔹 [LIGA] Maranhão AC 1 - 1 Sport Zênite
-🔹 [LIGA] Serra Alta FC 2 - 2 Cruzeiro do Sul AC
-🔹 [LIGA] Cavalaria Alvinegra 0 - 2 Recife SC
-⚽ [JOGO EM DESTAQUE] Goiás Unido vs Boca do Rio FC
-⏱️ 15' - CHANCE REAL! ⚠️ O ataque do Goiás Unido aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 52' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-⏱️ 56' - CHANCE REAL! ⚠️ O ataque do Goiás Unido carimba o travessão em bomba de longa distância!
-⏱️ 70' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Goiás Unido 0 x 1]
-🏁 PLACAR FINAL: Goiás Unido 0 x 1 Boca do Rio FC (ELO: -3.5)
-🔹 [LIGA] Força Central AC 1 - 1 Sampaio Real Club
-🔹 [LIGA] Delta Futebol 2 - 1 Costa de Ouro FC
-🔹 [LIGA] Inter Estelar 0 - 2 Vanguardas S.A.
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 19 ---
-🔹 [LIGA] Mestres do Norte FC 1 - 0 Real Metrópole S.A.
-🔹 [LIGA] Porto Alegre City 2 - 1 Belo Horizonte FC
-🔹 [LIGA] União Imperial 1 - 0 Maranhão AC
-🔹 [LIGA] Atlético Progresso 2 - 0 Serra Alta FC
-🔹 [LIGA] Sport Zênite 2 - 0 Cavalaria Alvinegra
-🔹 [LIGA] Cruzeiro do Sul AC 5 - 2 Goiás Unido
-🔹 [LIGA] Recife SC 1 - 1 Força Central AC
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10842k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Delta Futebol
-⏱️ 8' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 3 x 0]
-⏱️ 9' - CHANCE REAL! ⚠️ O ataque do Delta Futebol tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 12' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-⏱️ 20' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 36' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 4 x 0]
-⏱️ 45' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 5 x 0]
-⏱️ 55' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 2 x 0]
-⏱️ 61' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-⏱️ 77' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-🏁 PLACAR FINAL: Boca do Rio FC 5 x 0 Delta Futebol (ELO: +2.7)
-🔹 [LIGA] Sampaio Real Club 0 - 1 Inter Estelar
-🔹 [LIGA] Costa de Ouro FC 1 - 0 Vanguardas S.A.
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 20 ---
-🔹 [LIGA] Belo Horizonte FC 0 - 4 Mestres do Norte FC
-🔹 [LIGA] Maranhão AC 0 - 1 Real Metrópole S.A.
-🔹 [LIGA] Serra Alta FC 0 - 1 Porto Alegre City
-🔹 [LIGA] Cavalaria Alvinegra 1 - 0 União Imperial
-🔹 [LIGA] Goiás Unido 0 - 1 Atlético Progresso
-🔹 [LIGA] Força Central AC 2 - 1 Sport Zênite
-🔹 [LIGA] Delta Futebol 1 - 2 Cruzeiro do Sul AC
-🔹 [LIGA] Inter Estelar 2 - 0 Recife SC
-⚽ [JOGO EM DESTAQUE] Vanguardas S.A. vs Boca do Rio FC
-⏱️ 6' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 70' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 72' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 89' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Vanguardas S.A. 0 x 1]
-🏁 PLACAR FINAL: Vanguardas S.A. 0 x 1 Boca do Rio FC (ELO: -3.4)
-🔹 [LIGA] Costa de Ouro FC 2 - 0 Sampaio Real Club
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 21 ---
-🔹 [LIGA] Mestres do Norte FC 4 - 0 Maranhão AC
-🔹 [LIGA] Belo Horizonte FC 2 - 0 Serra Alta FC
-🔹 [LIGA] Real Metrópole S.A. 0 - 0 Cavalaria Alvinegra
-🔹 [LIGA] Porto Alegre City 1 - 2 Goiás Unido
-🔹 [LIGA] União Imperial 1 - 0 Força Central AC
-🔹 [LIGA] Atlético Progresso 3 - 3 Delta Futebol
-🔹 [LIGA] Sport Zênite 1 - 0 Inter Estelar
-🔹 [LIGA] Cruzeiro do Sul AC 1 - 0 Vanguardas S.A.
-🔹 [LIGA] Recife SC 3 - 1 Costa de Ouro FC
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10843k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Sampaio Real Club
-⏱️ 4' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-⏱️ 11' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 3 x 0]
-⏱️ 23' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-⏱️ 36' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 4 x 0]
-⏱️ 47' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 51' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 5 x 0]
-⏱️ 53' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 2 x 0]
-⏱️ 67' - CHANCE REAL! ⚠️ O ataque do Sampaio Real Club aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 75' - CHANCE REAL! ⚠️ O ataque do Sampaio Real Club carimba o travessão em bomba de longa distância!
-🏁 PLACAR FINAL: Boca do Rio FC 5 x 0 Sampaio Real Club (ELO: +2.3)
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 22 ---
-🔹 [LIGA] Serra Alta FC 0 - 1 Mestres do Norte FC
-🔹 [LIGA] Cavalaria Alvinegra 0 - 0 Maranhão AC
-🔹 [LIGA] Goiás Unido 2 - 2 Belo Horizonte FC
-🔹 [LIGA] Força Central AC 0 - 1 Real Metrópole S.A.
-🔹 [LIGA] Delta Futebol 1 - 1 Porto Alegre City
-🔹 [LIGA] Inter Estelar 5 - 0 União Imperial
-🔹 [LIGA] Vanguardas S.A. 2 - 1 Atlético Progresso
-🔹 [LIGA] Costa de Ouro FC 0 - 2 Sport Zênite
-🔹 [LIGA] Sampaio Real Club 0 - 3 Cruzeiro do Sul AC
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10842k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Recife SC
-⏱️ 4' - CHANCE REAL! ⚠️ O ataque do Recife SC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 44' - CHANCE REAL! ⚠️ O ataque do Recife SC carimba o travessão em bomba de longa distância!
-⏱️ 61' - CHANCE REAL! ⚠️ O ataque do Recife SC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 64' - CHANCE REAL! ⚠️ O ataque do Recife SC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-🏁 PLACAR FINAL: Boca do Rio FC 0 x 0 Recife SC (ELO: -6.3)
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 23 ---
-🔹 [LIGA] Mestres do Norte FC 3 - 0 Cavalaria Alvinegra
-🔹 [LIGA] Serra Alta FC 0 - 2 Goiás Unido
-🔹 [LIGA] Maranhão AC 1 - 0 Força Central AC
-🔹 [LIGA] Belo Horizonte FC 2 - 1 Delta Futebol
-🔹 [LIGA] Real Metrópole S.A. 1 - 1 Inter Estelar
-🔹 [LIGA] Porto Alegre City 3 - 0 Vanguardas S.A.
-🔹 [LIGA] União Imperial 0 - 0 Costa de Ouro FC
-🔹 [LIGA] Atlético Progresso 0 - 1 Sampaio Real Club
-⚽ [JOGO EM DESTAQUE] Sport Zênite vs Boca do Rio FC
-⏱️ 6' - GOL! ⚽ O ataque do Sport Zênite infiltra com velocidade e estufa a rede! [Sport Zênite 1 x 1]
-⏱️ 11' - CHANCE REAL! ⚠️ O ataque do Sport Zênite tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 35' - CHANCE REAL! ⚠️ O ataque do Sport Zênite carimba o travessão em bomba de longa distância!
-⏱️ 38' - CHANCE REAL! ⚠️ O ataque do Sport Zênite obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 41' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 42' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Sport Zênite 0 x 1]
-🏁 PLACAR FINAL: Sport Zênite 1 x 1 Boca do Rio FC (ELO: +5.5)
-🔹 [LIGA] Cruzeiro do Sul AC 1 - 1 Recife SC
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 24 ---
-🔹 [LIGA] Goiás Unido 0 - 3 Mestres do Norte FC
-🔹 [LIGA] Força Central AC 0 - 0 Cavalaria Alvinegra
-🔹 [LIGA] Delta Futebol 0 - 0 Serra Alta FC
-🔹 [LIGA] Inter Estelar 1 - 0 Maranhão AC
-🔹 [LIGA] Vanguardas S.A. 4 - 2 Belo Horizonte FC
-🔹 [LIGA] Costa de Ouro FC 0 - 0 Real Metrópole S.A.
-🔹 [LIGA] Sampaio Real Club 1 - 3 Porto Alegre City
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10842k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs União Imperial
-⏱️ 3' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 15' - CHANCE REAL! ⚠️ O ataque do União Imperial obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 19' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 2 x 0]
-⏱️ 62' - GOL! ⚽ Contra-ataque cirúrgico do União Imperial morrendo no canto do goleiro! [Boca do Rio FC 2 x 1]
-⏱️ 86' - CHANCE REAL! ⚠️ O ataque do União Imperial aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 89' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-🏁 PLACAR FINAL: Boca do Rio FC 2 x 1 União Imperial (ELO: +3.7)
-🔹 [LIGA] Recife SC 0 - 0 Atlético Progresso
-🔹 [LIGA] Cruzeiro do Sul AC 2 - 0 Sport Zênite
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 25 ---
-🔹 [LIGA] Mestres do Norte FC 2 - 1 Força Central AC
-🔹 [LIGA] Goiás Unido 1 - 1 Delta Futebol
-🔹 [LIGA] Cavalaria Alvinegra 0 - 4 Inter Estelar
-🔹 [LIGA] Serra Alta FC 1 - 0 Vanguardas S.A.
-🔹 [LIGA] Maranhão AC 1 - 4 Costa de Ouro FC
-🔹 [LIGA] Belo Horizonte FC 0 - 1 Sampaio Real Club
-⚽ [JOGO EM DESTAQUE] Real Metrópole S.A. vs Boca do Rio FC
-⏱️ 8' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Real Metrópole S.A. 0 x 1]
-⏱️ 11' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Real Metrópole S.A. 0 x 2]
-⏱️ 20' - CHANCE REAL! ⚠️ O ataque do Real Metrópole S.A. obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 74' - CHANCE REAL! ⚠️ O ataque do Real Metrópole S.A. aparece livre de marcação, mas cabeceia torto para fora.
-🏁 PLACAR FINAL: Real Metrópole S.A. 0 x 2 Boca do Rio FC (ELO: -4.9)
-🔹 [LIGA] Porto Alegre City 0 - 1 Recife SC
-🔹 [LIGA] União Imperial 1 - 4 Cruzeiro do Sul AC
-🔹 [LIGA] Atlético Progresso 3 - 1 Sport Zênite
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 26 ---
-🔹 [LIGA] Delta Futebol 1 - 1 Mestres do Norte FC
-🔹 [LIGA] Inter Estelar 1 - 0 Força Central AC
-🔹 [LIGA] Vanguardas S.A. 1 - 0 Goiás Unido
-🔹 [LIGA] Costa de Ouro FC 0 - 2 Cavalaria Alvinegra
-🔹 [LIGA] Sampaio Real Club 5 - 0 Serra Alta FC
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10843k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Maranhão AC
-⏱️ 45' - CHANCE REAL! ⚠️ O ataque do Maranhão AC aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 87' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-⏱️ 88' - CHANCE REAL! ⚠️ O ataque do Maranhão AC carimba o travessão em bomba de longa distância!
-⏱️ 89' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 2 x 0]
-🏁 PLACAR FINAL: Boca do Rio FC 2 x 0 Maranhão AC (ELO: +1.9)
-🔹 [LIGA] Recife SC 4 - 1 Belo Horizonte FC
-🔹 [LIGA] Cruzeiro do Sul AC 0 - 0 Real Metrópole S.A.
-🔹 [LIGA] Sport Zênite 0 - 1 Porto Alegre City
-🔹 [LIGA] Atlético Progresso 1 - 1 União Imperial
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 27 ---
-🔹 [LIGA] Mestres do Norte FC 1 - 0 Inter Estelar
-🔹 [LIGA] Delta Futebol 4 - 0 Vanguardas S.A.
-🔹 [LIGA] Força Central AC 2 - 3 Costa de Ouro FC
-🔹 [LIGA] Goiás Unido 1 - 6 Sampaio Real Club
-⚽ [JOGO EM DESTAQUE] Cavalaria Alvinegra vs Boca do Rio FC
-⏱️ 60' - CHANCE REAL! ⚠️ O ataque do Cavalaria Alvinegra aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 62' - CHANCE REAL! ⚠️ O ataque do Cavalaria Alvinegra aparece livre de marcação, mas cabeceia torto para fora.
-🏁 PLACAR FINAL: Cavalaria Alvinegra 0 x 0 Boca do Rio FC (ELO: +8.5)
-🔹 [LIGA] Serra Alta FC 1 - 2 Recife SC
-🔹 [LIGA] Maranhão AC 0 - 6 Cruzeiro do Sul AC
-🔹 [LIGA] Belo Horizonte FC 1 - 2 Sport Zênite
-🔹 [LIGA] Real Metrópole S.A. 2 - 4 Atlético Progresso
-🔹 [LIGA] Porto Alegre City 1 - 1 União Imperial
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 28 ---
-🔹 [LIGA] Vanguardas S.A. 0 - 3 Mestres do Norte FC
-🔹 [LIGA] Costa de Ouro FC 1 - 2 Inter Estelar
-🔹 [LIGA] Sampaio Real Club 1 - 1 Delta Futebol
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10842k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Força Central AC
-⏱️ 17' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 2 x 0]
-⏱️ 35' - CHANCE REAL! ⚠️ O ataque do Força Central AC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 44' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-⏱️ 87' - CHANCE REAL! ⚠️ O ataque do Força Central AC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-🏁 PLACAR FINAL: Boca do Rio FC 2 x 0 Força Central AC (ELO: +1.0)
-🔹 [LIGA] Recife SC 0 - 0 Goiás Unido
-🔹 [LIGA] Cruzeiro do Sul AC 3 - 0 Cavalaria Alvinegra
-🔹 [LIGA] Sport Zênite 2 - 0 Serra Alta FC
-🔹 [LIGA] Atlético Progresso 1 - 2 Maranhão AC
-🔹 [LIGA] União Imperial 5 - 0 Belo Horizonte FC
-🔹 [LIGA] Porto Alegre City 2 - 1 Real Metrópole S.A.
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 29 ---
-🔹 [LIGA] Mestres do Norte FC 1 - 0 Costa de Ouro FC
-🔹 [LIGA] Vanguardas S.A. 3 - 1 Sampaio Real Club
-⚽ [JOGO EM DESTAQUE] Inter Estelar vs Boca do Rio FC
-⏱️ 2' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Inter Estelar 0 x 2]
-⏱️ 5' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 20' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Inter Estelar 0 x 1]
-⏱️ 68' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Inter Estelar 0 x 3]
-⏱️ 89' - CHANCE REAL! ⚠️ O ataque do Inter Estelar aparece livre de marcação, mas cabeceia torto para fora.
-🏁 PLACAR FINAL: Inter Estelar 0 x 3 Boca do Rio FC (ELO: -5.6)
-🔹 [LIGA] Delta Futebol 1 - 4 Recife SC
-🔹 [LIGA] Força Central AC 0 - 3 Cruzeiro do Sul AC
-🔹 [LIGA] Goiás Unido 1 - 0 Sport Zênite
-🔹 [LIGA] Cavalaria Alvinegra 1 - 2 Atlético Progresso
-🔹 [LIGA] Serra Alta FC 1 - 4 União Imperial
-🔹 [LIGA] Maranhão AC 2 - 0 Porto Alegre City
-🔹 [LIGA] Belo Horizonte FC 1 - 1 Real Metrópole S.A.
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 30 ---
-🔹 [LIGA] Sampaio Real Club 2 - 3 Mestres do Norte FC
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10843k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Costa de Ouro FC
-⏱️ 3' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-⏱️ 8' - CHANCE REAL! ⚠️ O ataque do Costa de Ouro FC carimba o travessão em bomba de longa distância!
-⏱️ 45' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 2 x 0]
-⏱️ 67' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 81' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-🏁 PLACAR FINAL: Boca do Rio FC 2 x 0 Costa de Ouro FC (ELO: +2.4)
-🔹 [LIGA] Recife SC 4 - 1 Vanguardas S.A.
-🔹 [LIGA] Cruzeiro do Sul AC 6 - 0 Inter Estelar
-🔹 [LIGA] Sport Zênite 1 - 1 Delta Futebol
-🔹 [LIGA] Atlético Progresso 3 - 1 Força Central AC
-🔹 [LIGA] União Imperial 3 - 1 Goiás Unido
-🔹 [LIGA] Porto Alegre City 2 - 0 Cavalaria Alvinegra
-🔹 [LIGA] Real Metrópole S.A. 2 - 0 Serra Alta FC
-🔹 [LIGA] Belo Horizonte FC 3 - 3 Maranhão AC
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 31 ---
-⚽ [JOGO EM DESTAQUE] Mestres do Norte FC vs Boca do Rio FC
-⏱️ 8' - CHANCE REAL! ⚠️ O ataque do Mestres do Norte FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 11' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Mestres do Norte FC 0 x 1]
-⏱️ 65' - CHANCE REAL! ⚠️ O ataque do Mestres do Norte FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 87' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-🏁 PLACAR FINAL: Mestres do Norte FC 0 x 1 Boca do Rio FC (ELO: -11.0)
-🔹 [LIGA] Sampaio Real Club 1 - 2 Recife SC
-🔹 [LIGA] Costa de Ouro FC 0 - 1 Cruzeiro do Sul AC
-🔹 [LIGA] Vanguardas S.A. 1 - 3 Sport Zênite
-🔹 [LIGA] Inter Estelar 2 - 1 Atlético Progresso
-🔹 [LIGA] Delta Futebol 0 - 1 União Imperial
-🔹 [LIGA] Força Central AC 2 - 4 Porto Alegre City
-🔹 [LIGA] Goiás Unido 0 - 0 Real Metrópole S.A.
-🔹 [LIGA] Cavalaria Alvinegra 3 - 0 Belo Horizonte FC
-🔹 [LIGA] Serra Alta FC 0 - 3 Maranhão AC
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 32 ---
-🔹 [LIGA] Recife SC 3 - 3 Mestres do Norte FC
-⚽ [JOGO EM DESTAQUE] Cruzeiro do Sul AC vs Boca do Rio FC
-⏱️ 29' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Cruzeiro do Sul AC 0 x 1]
-⏱️ 32' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 55' - CHANCE REAL! ⚠️ O ataque do Cruzeiro do Sul AC carimba o travessão em bomba de longa distância!
-⏱️ 80' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-🏁 PLACAR FINAL: Cruzeiro do Sul AC 0 x 1 Boca do Rio FC (ELO: -10.8)
-🔹 [LIGA] Sport Zênite 3 - 2 Sampaio Real Club
-🔹 [LIGA] Atlético Progresso 0 - 0 Costa de Ouro FC
-🔹 [LIGA] União Imperial 2 - 0 Vanguardas S.A.
-🔹 [LIGA] Porto Alegre City 1 - 0 Inter Estelar
-🔹 [LIGA] Real Metrópole S.A. 2 - 0 Delta Futebol
-🔹 [LIGA] Belo Horizonte FC 3 - 0 Força Central AC
-🔹 [LIGA] Maranhão AC 2 - 0 Goiás Unido
-🔹 [LIGA] Serra Alta FC 1 - 0 Cavalaria Alvinegra
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 33 ---
-🔹 [LIGA] Mestres do Norte FC 4 - 1 Cruzeiro do Sul AC
-🔹 [LIGA] Recife SC 2 - 1 Sport Zênite
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10846k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Atlético Progresso
-⏱️ 20' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 35' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-⏱️ 54' - CHANCE REAL! ⚠️ O ataque do Atlético Progresso carimba o travessão em bomba de longa distância!
-⏱️ 57' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-🏁 PLACAR FINAL: Boca do Rio FC 1 x 0 Atlético Progresso (ELO: +2.5)
-🔹 [LIGA] Sampaio Real Club 1 - 0 União Imperial
-🔹 [LIGA] Costa de Ouro FC 0 - 2 Porto Alegre City
-🔹 [LIGA] Vanguardas S.A. 0 - 2 Real Metrópole S.A.
-🔹 [LIGA] Inter Estelar 3 - 0 Belo Horizonte FC
-🔹 [LIGA] Delta Futebol 1 - 1 Maranhão AC
-🔹 [LIGA] Força Central AC 1 - 0 Serra Alta FC
-🔹 [LIGA] Goiás Unido 1 - 0 Cavalaria Alvinegra
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 34 ---
-🔹 [LIGA] Sport Zênite 0 - 0 Mestres do Norte FC
-🔹 [LIGA] Atlético Progresso 2 - 1 Cruzeiro do Sul AC
-🔹 [LIGA] União Imperial 0 - 0 Recife SC
-⚽ [JOGO EM DESTAQUE] Porto Alegre City vs Boca do Rio FC
-⏱️ 2' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Porto Alegre City 1 x 1]
-⏱️ 11' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Porto Alegre City 1 x 2]
-⏱️ 29' - CHANCE REAL! ⚠️ O ataque do Porto Alegre City aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 48' - GOL! ⚽ O ataque do Porto Alegre City infiltra com velocidade e estufa a rede! [Porto Alegre City 1 x 0]
-⏱️ 82' - CHANCE REAL! ⚠️ O ataque do Porto Alegre City carimba o travessão em bomba de longa distância!
-🏁 PLACAR FINAL: Porto Alegre City 1 x 2 Boca do Rio FC (ELO: -7.2)
-🔹 [LIGA] Real Metrópole S.A. 0 - 4 Sampaio Real Club
-🔹 [LIGA] Belo Horizonte FC 1 - 2 Costa de Ouro FC
-🔹 [LIGA] Maranhão AC 3 - 1 Vanguardas S.A.
-🔹 [LIGA] Serra Alta FC 1 - 2 Inter Estelar
-🔹 [LIGA] Cavalaria Alvinegra 2 - 0 Delta Futebol
-🔹 [LIGA] Goiás Unido 1 - 1 Força Central AC
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 35 ---
-🔹 [LIGA] Mestres do Norte FC 1 - 1 Atlético Progresso
-🔹 [LIGA] Sport Zênite 1 - 1 União Imperial
-🔹 [LIGA] Cruzeiro do Sul AC 1 - 1 Porto Alegre City
-🔹 [LIGA] Recife SC 3 - 2 Real Metrópole S.A.
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10847k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Belo Horizonte FC
-⏱️ 5' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 1]
-⏱️ 21' - GOL! ⚽ Contra-ataque cirúrgico do Belo Horizonte FC morrendo no canto do goleiro! [Boca do Rio FC 0 x 1]
-⏱️ 29' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-⏱️ 40' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 3 x 1]
-⏱️ 47' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 4 x 1]
-⏱️ 50' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 2 x 1]
-⏱️ 59' - CHANCE REAL! ⚠️ O ataque do Belo Horizonte FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 64' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 71' - CHANCE REAL! ⚠️ O ataque do Belo Horizonte FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-🏁 PLACAR FINAL: Boca do Rio FC 4 x 1 Belo Horizonte FC (ELO: +0.9)
-🔹 [LIGA] Sampaio Real Club 0 - 1 Maranhão AC
-🔹 [LIGA] Costa de Ouro FC 4 - 0 Serra Alta FC
-🔹 [LIGA] Vanguardas S.A. 2 - 2 Cavalaria Alvinegra
-🔹 [LIGA] Inter Estelar 2 - 2 Goiás Unido
-🔹 [LIGA] Delta Futebol 1 - 1 Força Central AC
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 36 ---
-🔹 [LIGA] União Imperial 0 - 1 Mestres do Norte FC
-🔹 [LIGA] Porto Alegre City 3 - 1 Atlético Progresso
-🔹 [LIGA] Real Metrópole S.A. 2 - 2 Sport Zênite
-🔹 [LIGA] Belo Horizonte FC 1 - 3 Cruzeiro do Sul AC
-🔹 [LIGA] Maranhão AC 1 - 0 Recife SC
-⚽ [JOGO EM DESTAQUE] Serra Alta FC vs Boca do Rio FC
-⏱️ 7' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-⏱️ 21' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Serra Alta FC 0 x 2]
-⏱️ 41' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Serra Alta FC 0 x 3]
-⏱️ 68' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Serra Alta FC 0 x 1]
-⏱️ 87' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-🏁 PLACAR FINAL: Serra Alta FC 0 x 3 Boca do Rio FC (ELO: -0.9)
-🔹 [LIGA] Cavalaria Alvinegra 1 - 0 Sampaio Real Club
-🔹 [LIGA] Goiás Unido 1 - 2 Costa de Ouro FC
-🔹 [LIGA] Força Central AC 0 - 2 Vanguardas S.A.
-🔹 [LIGA] Delta Futebol 1 - 1 Inter Estelar
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 37 ---
-🔹 [LIGA] Mestres do Norte FC 2 - 1 Porto Alegre City
-🔹 [LIGA] União Imperial 3 - 0 Real Metrópole S.A.
-🔹 [LIGA] Atlético Progresso 3 - 2 Belo Horizonte FC
-🔹 [LIGA] Sport Zênite 1 - 2 Maranhão AC
-🔹 [LIGA] Cruzeiro do Sul AC 2 - 0 Serra Alta FC
-🔹 [LIGA] Recife SC 0 - 2 Cavalaria Alvinegra
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10847k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Goiás Unido
-⏱️ 3' - CHANCE REAL! ⚠️ O ataque do Goiás Unido obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 18' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 39' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 2 x 0]
-⏱️ 56' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-⏱️ 56' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-⏱️ 56' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-🏁 PLACAR FINAL: Boca do Rio FC 2 x 0 Goiás Unido (ELO: +1.5)
-🔹 [LIGA] Sampaio Real Club 2 - 1 Força Central AC
-🔹 [LIGA] Costa de Ouro FC 1 - 0 Delta Futebol
-🔹 [LIGA] Vanguardas S.A. 2 - 0 Inter Estelar
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 38 ---
-🔹 [LIGA] Real Metrópole S.A. 0 - 0 Mestres do Norte FC
-🔹 [LIGA] Belo Horizonte FC 1 - 2 Porto Alegre City
-🔹 [LIGA] Maranhão AC 0 - 1 União Imperial
-🔹 [LIGA] Serra Alta FC 0 - 1 Atlético Progresso
-🔹 [LIGA] Cavalaria Alvinegra 0 - 3 Sport Zênite
-🔹 [LIGA] Goiás Unido 0 - 0 Cruzeiro do Sul AC
-🔹 [LIGA] Força Central AC 0 - 0 Recife SC
-⚽ [JOGO EM DESTAQUE] Delta Futebol vs Boca do Rio FC
-⏱️ 8' - CHANCE REAL! ⚠️ O ataque do Delta Futebol carimba o travessão em bomba de longa distância!
-⏱️ 37' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Delta Futebol 0 x 1]
-⏱️ 82' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-🏁 PLACAR FINAL: Delta Futebol 0 x 1 Boca do Rio FC (ELO: -2.7)
-🔹 [LIGA] Inter Estelar 0 - 0 Sampaio Real Club
-🔹 [LIGA] Vanguardas S.A. 0 - 1 Costa de Ouro FC
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-✨ --- VIRADA DE TEMPORADA REALIZADA: BEM-VINDO À TEMPORADA 4 ---
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 1 ---
-🔹 [LIGA] Mestres do Norte FC 3 - 0 Belo Horizonte FC
-🔹 [LIGA] Real Metrópole S.A. 2 - 1 Maranhão AC
-🔹 [LIGA] Porto Alegre City 0 - 0 Serra Alta FC
-🔹 [LIGA] União Imperial 1 - 1 Cavalaria Alvinegra
-🔹 [LIGA] Atlético Progresso 2 - 1 Goiás Unido
-🔹 [LIGA] Sport Zênite 2 - 0 Força Central AC
-🔹 [LIGA] Cruzeiro do Sul AC 2 - 0 Delta Futebol
-🔹 [LIGA] Recife SC 1 - 2 Inter Estelar
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10847k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Vanguardas S.A.
-⏱️ 12' - CHANCE REAL! ⚠️ O ataque do Vanguardas S.A. carimba o travessão em bomba de longa distância!
-⏱️ 16' - GOL! ⚽ Contra-ataque cirúrgico do Vanguardas S.A. morrendo no canto do goleiro! [Boca do Rio FC 1 x 1]
-⏱️ 30' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-⏱️ 55' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 71' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 82' - CHANCE REAL! ⚠️ O ataque do Vanguardas S.A. tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-🏁 PLACAR FINAL: Boca do Rio FC 1 x 1 Vanguardas S.A. (ELO: -5.9)
-🔹 [LIGA] Sampaio Real Club 1 - 1 Costa de Ouro FC
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 2 ---
-🔹 [LIGA] Maranhão AC 0 - 0 Mestres do Norte FC
-🔹 [LIGA] Serra Alta FC 0 - 2 Belo Horizonte FC
-🔹 [LIGA] Cavalaria Alvinegra 1 - 0 Real Metrópole S.A.
-🔹 [LIGA] Goiás Unido 1 - 3 Porto Alegre City
-🔹 [LIGA] Força Central AC 0 - 0 União Imperial
-🔹 [LIGA] Delta Futebol 1 - 1 Atlético Progresso
-🔹 [LIGA] Inter Estelar 0 - 3 Sport Zênite
-🔹 [LIGA] Vanguardas S.A. 0 - 3 Cruzeiro do Sul AC
-🔹 [LIGA] Costa de Ouro FC 0 - 1 Recife SC
-⚽ [JOGO EM DESTAQUE] Sampaio Real Club vs Boca do Rio FC
-⏱️ 60' - GOL! ⚽ O ataque do Sampaio Real Club infiltra com velocidade e estufa a rede! [Sampaio Real Club 1 x 0]
-⏱️ 69' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Sampaio Real Club 1 x 1]
-⏱️ 76' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Sampaio Real Club 1 x 3]
-⏱️ 76' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 84' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-⏱️ 86' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Sampaio Real Club 1 x 2]
-🏁 PLACAR FINAL: Sampaio Real Club 1 x 3 Boca do Rio FC (ELO: -10.1)
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 3 ---
-🔹 [LIGA] Mestres do Norte FC 2 - 0 Serra Alta FC
-🔹 [LIGA] Maranhão AC 0 - 1 Cavalaria Alvinegra
-🔹 [LIGA] Belo Horizonte FC 1 - 0 Goiás Unido
-🔹 [LIGA] Real Metrópole S.A. 1 - 0 Força Central AC
-🔹 [LIGA] Porto Alegre City 2 - 0 Delta Futebol
-🔹 [LIGA] União Imperial 2 - 1 Inter Estelar
-🔹 [LIGA] Atlético Progresso 1 - 1 Vanguardas S.A.
-🔹 [LIGA] Sport Zênite 2 - 1 Costa de Ouro FC
-🔹 [LIGA] Cruzeiro do Sul AC 2 - 0 Sampaio Real Club
-⚽ [JOGO EM DESTAQUE] Recife SC vs Boca do Rio FC
-⏱️ 19' - GOL! ⚽ O ataque do Recife SC infiltra com velocidade e estufa a rede! [Recife SC 1 x 2]
-⏱️ 33' - GOL! ⚽ O ataque do Recife SC infiltra com velocidade e estufa a rede! [Recife SC 2 x 3]
-⏱️ 33' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-⏱️ 48' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Recife SC 0 x 1]
-⏱️ 51' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 66' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Recife SC 0 x 2]
-⏱️ 70' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Recife SC 1 x 3]
-🏁 PLACAR FINAL: Recife SC 2 x 3 Boca do Rio FC (ELO: -14.8)
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 4 ---
-🔹 [LIGA] Cavalaria Alvinegra 0 - 1 Mestres do Norte FC
-🔹 [LIGA] Goiás Unido 3 - 0 Serra Alta FC
-🔹 [LIGA] Força Central AC 0 - 0 Maranhão AC
-🔹 [LIGA] Delta Futebol 2 - 1 Belo Horizonte FC
-🔹 [LIGA] Inter Estelar 4 - 0 Real Metrópole S.A.
-🔹 [LIGA] Vanguardas S.A. 0 - 2 Porto Alegre City
-🔹 [LIGA] Costa de Ouro FC 2 - 3 União Imperial
-🔹 [LIGA] Sampaio Real Club 2 - 2 Atlético Progresso
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10851k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Sport Zênite
-⏱️ 15' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 2 x 0]
-⏱️ 53' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 4 x 0]
-⏱️ 56' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 78' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-⏱️ 78' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 3 x 0]
-⏱️ 78' - CHANCE REAL! ⚠️ O ataque do Sport Zênite aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 84' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-⏱️ 87' - CHANCE REAL! ⚠️ O ataque do Sport Zênite carimba o travessão em bomba de longa distância!
-🏁 PLACAR FINAL: Boca do Rio FC 4 x 0 Sport Zênite (ELO: +7.4)
-🔹 [LIGA] Recife SC 2 - 3 Cruzeiro do Sul AC
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 5 ---
-🔹 [LIGA] Mestres do Norte FC 4 - 0 Goiás Unido
-🔹 [LIGA] Cavalaria Alvinegra 2 - 0 Força Central AC
-🔹 [LIGA] Serra Alta FC 0 - 0 Delta Futebol
-🔹 [LIGA] Maranhão AC 2 - 0 Inter Estelar
-🔹 [LIGA] Belo Horizonte FC 2 - 3 Vanguardas S.A.
-🔹 [LIGA] Real Metrópole S.A. 2 - 2 Costa de Ouro FC
-🔹 [LIGA] Porto Alegre City 2 - 1 Sampaio Real Club
-⚽ [JOGO EM DESTAQUE] União Imperial vs Boca do Rio FC
-⏱️ 20' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [União Imperial 0 x 1]
-⏱️ 22' - CHANCE REAL! ⚠️ O ataque do União Imperial obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 29' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-⏱️ 44' - CHANCE REAL! ⚠️ O ataque do União Imperial obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-🏁 PLACAR FINAL: União Imperial 0 x 1 Boca do Rio FC (ELO: -9.5)
-🔹 [LIGA] Atlético Progresso 0 - 1 Recife SC
-🔹 [LIGA] Sport Zênite 0 - 0 Cruzeiro do Sul AC
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 6 ---
-🔹 [LIGA] Força Central AC 0 - 2 Mestres do Norte FC
-🔹 [LIGA] Delta Futebol 2 - 2 Goiás Unido
-🔹 [LIGA] Inter Estelar 2 - 1 Cavalaria Alvinegra
-🔹 [LIGA] Vanguardas S.A. 2 - 0 Serra Alta FC
-🔹 [LIGA] Costa de Ouro FC 0 - 1 Maranhão AC
-🔹 [LIGA] Sampaio Real Club 2 - 2 Belo Horizonte FC
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10851k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Real Metrópole S.A.
-⏱️ 49' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 53' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 69' - CHANCE REAL! ⚠️ O ataque do Real Metrópole S.A. tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 84' - CHANCE REAL! ⚠️ O ataque do Real Metrópole S.A. tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-🏁 PLACAR FINAL: Boca do Rio FC 0 x 0 Real Metrópole S.A. (ELO: -9.0)
-🔹 [LIGA] Recife SC 0 - 0 Porto Alegre City
-🔹 [LIGA] Cruzeiro do Sul AC 4 - 0 União Imperial
-🔹 [LIGA] Sport Zênite 0 - 0 Atlético Progresso
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 7 ---
-🔹 [LIGA] Mestres do Norte FC 2 - 0 Delta Futebol
-🔹 [LIGA] Força Central AC 0 - 1 Inter Estelar
-🔹 [LIGA] Goiás Unido 3 - 0 Vanguardas S.A.
-🔹 [LIGA] Cavalaria Alvinegra 1 - 0 Costa de Ouro FC
-🔹 [LIGA] Serra Alta FC 1 - 3 Sampaio Real Club
-⚽ [JOGO EM DESTAQUE] Maranhão AC vs Boca do Rio FC
-⏱️ 11' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 19' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Maranhão AC 0 x 1]
-⏱️ 52' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-🏁 PLACAR FINAL: Maranhão AC 0 x 1 Boca do Rio FC (ELO: -4.6)
-🔹 [LIGA] Belo Horizonte FC 0 - 2 Recife SC
-🔹 [LIGA] Real Metrópole S.A. 0 - 3 Cruzeiro do Sul AC
-🔹 [LIGA] Porto Alegre City 2 - 0 Sport Zênite
-🔹 [LIGA] União Imperial 2 - 2 Atlético Progresso
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 8 ---
-🔹 [LIGA] Inter Estelar 0 - 0 Mestres do Norte FC
-🔹 [LIGA] Vanguardas S.A. 1 - 0 Delta Futebol
-🔹 [LIGA] Costa de Ouro FC 1 - 2 Força Central AC
-🔹 [LIGA] Sampaio Real Club 1 - 0 Goiás Unido
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10852k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Cavalaria Alvinegra
-⏱️ 2' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 2 x 2]
-⏱️ 17' - CHANCE REAL! ⚠️ O ataque do Cavalaria Alvinegra aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 27' - CHANCE REAL! ⚠️ O ataque do Cavalaria Alvinegra aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 29' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 5 x 2]
-⏱️ 37' - CHANCE REAL! ⚠️ O ataque do Cavalaria Alvinegra aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 39' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 3 x 2]
-⏱️ 71' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 1]
-⏱️ 71' - GOL! ⚽ Contra-ataque cirúrgico do Cavalaria Alvinegra morrendo no canto do goleiro! [Boca do Rio FC 1 x 2]
-⏱️ 77' - GOL! ⚽ Contra-ataque cirúrgico do Cavalaria Alvinegra morrendo no canto do goleiro! [Boca do Rio FC 0 x 1]
-⏱️ 78' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 4 x 2]
-⏱️ 80' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-🏁 PLACAR FINAL: Boca do Rio FC 5 x 2 Cavalaria Alvinegra (ELO: +2.0)
-🔹 [LIGA] Recife SC 1 - 0 Serra Alta FC
-🔹 [LIGA] Cruzeiro do Sul AC 4 - 0 Maranhão AC
-🔹 [LIGA] Sport Zênite 3 - 0 Belo Horizonte FC
-🔹 [LIGA] Atlético Progresso 1 - 1 Real Metrópole S.A.
-🔹 [LIGA] União Imperial 1 - 1 Porto Alegre City
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 9 ---
-🔹 [LIGA] Mestres do Norte FC 0 - 0 Vanguardas S.A.
-🔹 [LIGA] Inter Estelar 2 - 0 Costa de Ouro FC
-🔹 [LIGA] Delta Futebol 3 - 2 Sampaio Real Club
-⚽ [JOGO EM DESTAQUE] Força Central AC vs Boca do Rio FC
-⏱️ 15' - GOL! ⚽ O ataque do Força Central AC infiltra com velocidade e estufa a rede! [Força Central AC 1 x 1]
-⏱️ 32' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 50' - CHANCE REAL! ⚠️ O ataque do Força Central AC carimba o travessão em bomba de longa distância!
-⏱️ 74' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Força Central AC 0 x 1]
-⏱️ 77' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-⏱️ 81' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 84' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Força Central AC 1 x 2]
-🏁 PLACAR FINAL: Força Central AC 1 x 2 Boca do Rio FC (ELO: -1.1)
-🔹 [LIGA] Goiás Unido 0 - 2 Recife SC
-🔹 [LIGA] Cavalaria Alvinegra 0 - 0 Cruzeiro do Sul AC
-🔹 [LIGA] Serra Alta FC 0 - 5 Sport Zênite
-🔹 [LIGA] Maranhão AC 1 - 1 Atlético Progresso
-🔹 [LIGA] Belo Horizonte FC 0 - 0 União Imperial
-🔹 [LIGA] Real Metrópole S.A. 0 - 4 Porto Alegre City
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 10 ---
-🔹 [LIGA] Costa de Ouro FC 0 - 1 Mestres do Norte FC
-🔹 [LIGA] Sampaio Real Club 2 - 0 Vanguardas S.A.
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10852k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Inter Estelar
-⏱️ 27' - CHANCE REAL! ⚠️ O ataque do Inter Estelar aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 36' - CHANCE REAL! ⚠️ O ataque do Inter Estelar carimba o travessão em bomba de longa distância!
-⏱️ 64' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-⏱️ 84' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-🏁 PLACAR FINAL: Boca do Rio FC 1 x 0 Inter Estelar (ELO: +2.3)
-🔹 [LIGA] Recife SC 1 - 1 Delta Futebol
-🔹 [LIGA] Cruzeiro do Sul AC 2 - 0 Força Central AC
-🔹 [LIGA] Sport Zênite 1 - 1 Goiás Unido
-🔹 [LIGA] Atlético Progresso 2 - 0 Cavalaria Alvinegra
-🔹 [LIGA] União Imperial 0 - 0 Serra Alta FC
-🔹 [LIGA] Porto Alegre City 0 - 2 Maranhão AC
-🔹 [LIGA] Real Metrópole S.A. 1 - 0 Belo Horizonte FC
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 11 ---
-🔹 [LIGA] Mestres do Norte FC 3 - 0 Sampaio Real Club
-⚽ [JOGO EM DESTAQUE] Costa de Ouro FC vs Boca do Rio FC
-⏱️ 5' - CHANCE REAL! ⚠️ O ataque do Costa de Ouro FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 14' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Costa de Ouro FC 0 x 3]
-⏱️ 14' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Costa de Ouro FC 0 x 4]
-⏱️ 23' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Costa de Ouro FC 0 x 2]
-⏱️ 40' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-⏱️ 48' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Costa de Ouro FC 0 x 5]
-⏱️ 51' - CHANCE REAL! ⚠️ O ataque do Costa de Ouro FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 53' - CHANCE REAL! ⚠️ O ataque do Costa de Ouro FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 82' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Costa de Ouro FC 0 x 1]
-🏁 PLACAR FINAL: Costa de Ouro FC 0 x 5 Boca do Rio FC (ELO: -2.1)
-🔹 [LIGA] Vanguardas S.A. 0 - 3 Recife SC
-🔹 [LIGA] Inter Estelar 0 - 1 Cruzeiro do Sul AC
-🔹 [LIGA] Delta Futebol 3 - 3 Sport Zênite
-🔹 [LIGA] Força Central AC 1 - 3 Atlético Progresso
-🔹 [LIGA] Goiás Unido 1 - 2 União Imperial
-🔹 [LIGA] Cavalaria Alvinegra 0 - 1 Porto Alegre City
-🔹 [LIGA] Serra Alta FC 1 - 4 Real Metrópole S.A.
-🔹 [LIGA] Maranhão AC 1 - 0 Belo Horizonte FC
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 12 ---
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10853k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Mestres do Norte FC
-⏱️ 6' - GOL! ⚽ Contra-ataque cirúrgico do Mestres do Norte FC morrendo no canto do goleiro! [Boca do Rio FC 1 x 1]
-⏱️ 11' - CHANCE REAL! ⚠️ O ataque do Mestres do Norte FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 13' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 16' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 2 x 1]
-⏱️ 54' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 63' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-⏱️ 88' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-🏁 PLACAR FINAL: Boca do Rio FC 2 x 1 Mestres do Norte FC (ELO: +5.6)
-🔹 [LIGA] Recife SC 1 - 0 Sampaio Real Club
-🔹 [LIGA] Cruzeiro do Sul AC 2 - 0 Costa de Ouro FC
-🔹 [LIGA] Sport Zênite 3 - 0 Vanguardas S.A.
-🔹 [LIGA] Atlético Progresso 0 - 3 Inter Estelar
-🔹 [LIGA] União Imperial 1 - 1 Delta Futebol
-🔹 [LIGA] Porto Alegre City 2 - 0 Força Central AC
-🔹 [LIGA] Real Metrópole S.A. 1 - 0 Goiás Unido
-🔹 [LIGA] Belo Horizonte FC 1 - 0 Cavalaria Alvinegra
-🔹 [LIGA] Maranhão AC 5 - 2 Serra Alta FC
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 13 ---
-🔹 [LIGA] Mestres do Norte FC 0 - 1 Recife SC
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10853k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Cruzeiro do Sul AC
-⏱️ 7' - CHANCE REAL! ⚠️ O ataque do Cruzeiro do Sul AC carimba o travessão em bomba de longa distância!
-⏱️ 37' - CHANCE REAL! ⚠️ O ataque do Cruzeiro do Sul AC carimba o travessão em bomba de longa distância!
-⏱️ 43' - CHANCE REAL! ⚠️ O ataque do Cruzeiro do Sul AC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 51' - GOL! ⚽ Contra-ataque cirúrgico do Cruzeiro do Sul AC morrendo no canto do goleiro! [Boca do Rio FC 0 x 1]
-⏱️ 54' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 1]
-🏁 PLACAR FINAL: Boca do Rio FC 1 x 1 Cruzeiro do Sul AC (ELO: -6.4)
-🔹 [LIGA] Sampaio Real Club 1 - 2 Sport Zênite
-🔹 [LIGA] Costa de Ouro FC 1 - 1 Atlético Progresso
-🔹 [LIGA] Vanguardas S.A. 0 - 3 União Imperial
-🔹 [LIGA] Inter Estelar 1 - 1 Porto Alegre City
-🔹 [LIGA] Delta Futebol 0 - 1 Real Metrópole S.A.
-🔹 [LIGA] Força Central AC 1 - 0 Belo Horizonte FC
-🔹 [LIGA] Goiás Unido 1 - 0 Maranhão AC
-🔹 [LIGA] Cavalaria Alvinegra 2 - 0 Serra Alta FC
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 14 ---
-🔹 [LIGA] Cruzeiro do Sul AC 0 - 0 Mestres do Norte FC
-🔹 [LIGA] Sport Zênite 1 - 0 Recife SC
-⚽ [JOGO EM DESTAQUE] Atlético Progresso vs Boca do Rio FC
-⏱️ 32' - CHANCE REAL! ⚠️ O ataque do Atlético Progresso carimba o travessão em bomba de longa distância!
-⏱️ 43' - CHANCE REAL! ⚠️ O ataque do Atlético Progresso obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 53' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Atlético Progresso 0 x 1]
-⏱️ 78' - CHANCE REAL! ⚠️ O ataque do Atlético Progresso carimba o travessão em bomba de longa distância!
-🏁 PLACAR FINAL: Atlético Progresso 0 x 1 Boca do Rio FC (ELO: -3.4)
-🔹 [LIGA] União Imperial 1 - 0 Sampaio Real Club
-🔹 [LIGA] Porto Alegre City 4 - 2 Costa de Ouro FC
-🔹 [LIGA] Real Metrópole S.A. 0 - 0 Vanguardas S.A.
-🔹 [LIGA] Belo Horizonte FC 0 - 0 Inter Estelar
-🔹 [LIGA] Maranhão AC 2 - 1 Delta Futebol
-🔹 [LIGA] Serra Alta FC 0 - 2 Força Central AC
-🔹 [LIGA] Cavalaria Alvinegra 0 - 0 Goiás Unido
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 15 ---
-🔹 [LIGA] Mestres do Norte FC 1 - 2 Sport Zênite
-🔹 [LIGA] Cruzeiro do Sul AC 1 - 0 Atlético Progresso
-🔹 [LIGA] Recife SC 1 - 1 União Imperial
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10853k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Porto Alegre City
-⏱️ 18' - GOL! ⚽ Contra-ataque cirúrgico do Porto Alegre City morrendo no canto do goleiro! [Boca do Rio FC 0 x 1]
-⏱️ 43' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 44' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 1]
-⏱️ 70' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 2 x 1]
-⏱️ 73' - CHANCE REAL! ⚠️ O ataque do Porto Alegre City aparece livre de marcação, mas cabeceia torto para fora.
-🏁 PLACAR FINAL: Boca do Rio FC 2 x 1 Porto Alegre City (ELO: +3.9)
-🔹 [LIGA] Sampaio Real Club 0 - 2 Real Metrópole S.A.
-🔹 [LIGA] Costa de Ouro FC 2 - 2 Belo Horizonte FC
-🔹 [LIGA] Vanguardas S.A. 2 - 1 Maranhão AC
-🔹 [LIGA] Inter Estelar 3 - 1 Serra Alta FC
-🔹 [LIGA] Delta Futebol 2 - 0 Cavalaria Alvinegra
-🔹 [LIGA] Força Central AC 2 - 1 Goiás Unido
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 16 ---
-🔹 [LIGA] Atlético Progresso 2 - 0 Mestres do Norte FC
-🔹 [LIGA] União Imperial 0 - 1 Sport Zênite
-🔹 [LIGA] Porto Alegre City 0 - 1 Cruzeiro do Sul AC
-🔹 [LIGA] Real Metrópole S.A. 0 - 1 Recife SC
-⚽ [JOGO EM DESTAQUE] Belo Horizonte FC vs Boca do Rio FC
-⏱️ 8' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Belo Horizonte FC 0 x 1]
-⏱️ 29' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 35' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Belo Horizonte FC 0 x 2]
-⏱️ 43' - CHANCE REAL! ⚠️ O ataque do Belo Horizonte FC aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 48' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 51' - CHANCE REAL! ⚠️ O ataque do Belo Horizonte FC aparece livre de marcação, mas cabeceia torto para fora.
-🏁 PLACAR FINAL: Belo Horizonte FC 0 x 2 Boca do Rio FC (ELO: -1.2)
-🔹 [LIGA] Maranhão AC 1 - 1 Sampaio Real Club
-🔹 [LIGA] Serra Alta FC 0 - 2 Costa de Ouro FC
-🔹 [LIGA] Cavalaria Alvinegra 2 - 0 Vanguardas S.A.
-🔹 [LIGA] Goiás Unido 3 - 1 Inter Estelar
-🔹 [LIGA] Força Central AC 0 - 3 Delta Futebol
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 17 ---
-🔹 [LIGA] Mestres do Norte FC 0 - 0 União Imperial
-🔹 [LIGA] Atlético Progresso 2 - 0 Porto Alegre City
-🔹 [LIGA] Sport Zênite 1 - 0 Real Metrópole S.A.
-🔹 [LIGA] Cruzeiro do Sul AC 2 - 0 Belo Horizonte FC
-🔹 [LIGA] Recife SC 1 - 0 Maranhão AC
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10854k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Serra Alta FC
-⏱️ 3' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 17' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 35' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-⏱️ 49' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 2 x 0]
-⏱️ 60' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 3 x 0]
-⏱️ 81' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC aparece livre de marcação, mas cabeceia torto para fora.
-🏁 PLACAR FINAL: Boca do Rio FC 3 x 0 Serra Alta FC (ELO: +0.3)
-🔹 [LIGA] Sampaio Real Club 1 - 0 Cavalaria Alvinegra
-🔹 [LIGA] Costa de Ouro FC 0 - 1 Goiás Unido
-🔹 [LIGA] Vanguardas S.A. 1 - 0 Força Central AC
-🔹 [LIGA] Inter Estelar 2 - 1 Delta Futebol
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 18 ---
-🔹 [LIGA] Porto Alegre City 1 - 3 Mestres do Norte FC
-🔹 [LIGA] Real Metrópole S.A. 2 - 1 União Imperial
-🔹 [LIGA] Belo Horizonte FC 0 - 4 Atlético Progresso
-🔹 [LIGA] Maranhão AC 1 - 0 Sport Zênite
-🔹 [LIGA] Serra Alta FC 0 - 1 Cruzeiro do Sul AC
-🔹 [LIGA] Cavalaria Alvinegra 2 - 1 Recife SC
-⚽ [JOGO EM DESTAQUE] Goiás Unido vs Boca do Rio FC
-⏱️ 10' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-⏱️ 13' - CHANCE REAL! ⚠️ O ataque do Goiás Unido carimba o travessão em bomba de longa distância!
-⏱️ 24' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Goiás Unido 1 x 1]
-⏱️ 36' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 62' - GOL! ⚽ O ataque do Goiás Unido infiltra com velocidade e estufa a rede! [Goiás Unido 1 x 0]
-⏱️ 85' - CHANCE REAL! ⚠️ O ataque do Goiás Unido aparece livre de marcação, mas cabeceia torto para fora.
-🏁 PLACAR FINAL: Goiás Unido 1 x 1 Boca do Rio FC (ELO: +10.0)
-🔹 [LIGA] Força Central AC 2 - 0 Sampaio Real Club
-🔹 [LIGA] Delta Futebol 0 - 0 Costa de Ouro FC
-🔹 [LIGA] Inter Estelar 1 - 1 Vanguardas S.A.
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 19 ---
-🔹 [LIGA] Mestres do Norte FC 1 - 0 Real Metrópole S.A.
-🔹 [LIGA] Porto Alegre City 4 - 0 Belo Horizonte FC
-🔹 [LIGA] União Imperial 1 - 1 Maranhão AC
-🔹 [LIGA] Atlético Progresso 1 - 0 Serra Alta FC
-🔹 [LIGA] Sport Zênite 1 - 0 Cavalaria Alvinegra
-🔹 [LIGA] Cruzeiro do Sul AC 2 - 0 Goiás Unido
-🔹 [LIGA] Recife SC 4 - 1 Força Central AC
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10853k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Delta Futebol
-⏱️ 14' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-⏱️ 17' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-⏱️ 20' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 2 x 0]
-⏱️ 26' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 3 x 0]
-⏱️ 28' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 4 x 0]
-⏱️ 43' - CHANCE REAL! ⚠️ O ataque do Delta Futebol tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-🏁 PLACAR FINAL: Boca do Rio FC 4 x 0 Delta Futebol (ELO: +1.3)
-🔹 [LIGA] Sampaio Real Club 1 - 2 Inter Estelar
-🔹 [LIGA] Costa de Ouro FC 1 - 2 Vanguardas S.A.
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 20 ---
-🔹 [LIGA] Belo Horizonte FC 1 - 2 Mestres do Norte FC
-🔹 [LIGA] Maranhão AC 0 - 0 Real Metrópole S.A.
-🔹 [LIGA] Serra Alta FC 1 - 1 Porto Alegre City
-🔹 [LIGA] Cavalaria Alvinegra 0 - 0 União Imperial
-🔹 [LIGA] Goiás Unido 2 - 2 Atlético Progresso
-🔹 [LIGA] Força Central AC 0 - 1 Sport Zênite
-🔹 [LIGA] Delta Futebol 2 - 3 Cruzeiro do Sul AC
-🔹 [LIGA] Inter Estelar 0 - 0 Recife SC
-⚽ [JOGO EM DESTAQUE] Vanguardas S.A. vs Boca do Rio FC
-⏱️ 31' - CHANCE REAL! ⚠️ O ataque do Vanguardas S.A. carimba o travessão em bomba de longa distância!
-⏱️ 46' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Vanguardas S.A. 0 x 2]
-⏱️ 62' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Vanguardas S.A. 0 x 3]
-⏱️ 81' - CHANCE REAL! ⚠️ O ataque do Vanguardas S.A. carimba o travessão em bomba de longa distância!
-⏱️ 85' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Vanguardas S.A. 0 x 1]
-🏁 PLACAR FINAL: Vanguardas S.A. 0 x 3 Boca do Rio FC (ELO: -2.3)
-🔹 [LIGA] Costa de Ouro FC 3 - 1 Sampaio Real Club
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 21 ---
-🔹 [LIGA] Mestres do Norte FC 3 - 0 Maranhão AC
-🔹 [LIGA] Belo Horizonte FC 1 - 1 Serra Alta FC
-🔹 [LIGA] Real Metrópole S.A. 1 - 1 Cavalaria Alvinegra
-🔹 [LIGA] Porto Alegre City 2 - 0 Goiás Unido
-🔹 [LIGA] União Imperial 0 - 0 Força Central AC
-🔹 [LIGA] Atlético Progresso 1 - 0 Delta Futebol
-🔹 [LIGA] Sport Zênite 1 - 1 Inter Estelar
-🔹 [LIGA] Cruzeiro do Sul AC 2 - 2 Vanguardas S.A.
-🔹 [LIGA] Recife SC 2 - 0 Costa de Ouro FC
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10853k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Sampaio Real Club
-⏱️ 4' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-⏱️ 30' - CHANCE REAL! ⚠️ O ataque do Sampaio Real Club tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 44' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 73' - CHANCE REAL! ⚠️ O ataque do Sampaio Real Club carimba o travessão em bomba de longa distância!
-⏱️ 77' - CHANCE REAL! ⚠️ O ataque do Sampaio Real Club obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-🏁 PLACAR FINAL: Boca do Rio FC 1 x 0 Sampaio Real Club (ELO: +1.1)
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 22 ---
-🔹 [LIGA] Serra Alta FC 1 - 2 Mestres do Norte FC
-🔹 [LIGA] Cavalaria Alvinegra 1 - 1 Maranhão AC
-🔹 [LIGA] Goiás Unido 2 - 0 Belo Horizonte FC
-🔹 [LIGA] Força Central AC 0 - 0 Real Metrópole S.A.
-🔹 [LIGA] Delta Futebol 1 - 1 Porto Alegre City
-🔹 [LIGA] Inter Estelar 1 - 2 União Imperial
-🔹 [LIGA] Vanguardas S.A. 3 - 4 Atlético Progresso
-🔹 [LIGA] Costa de Ouro FC 0 - 1 Sport Zênite
-🔹 [LIGA] Sampaio Real Club 0 - 2 Cruzeiro do Sul AC
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10853k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Recife SC
-⏱️ 24' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-⏱️ 35' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 41' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 46' - CHANCE REAL! ⚠️ O ataque do Recife SC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-🏁 PLACAR FINAL: Boca do Rio FC 1 x 0 Recife SC (ELO: +3.7)
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 23 ---
-🔹 [LIGA] Mestres do Norte FC 2 - 0 Cavalaria Alvinegra
-🔹 [LIGA] Serra Alta FC 2 - 6 Goiás Unido
-🔹 [LIGA] Maranhão AC 2 - 0 Força Central AC
-🔹 [LIGA] Belo Horizonte FC 1 - 0 Delta Futebol
-🔹 [LIGA] Real Metrópole S.A. 1 - 2 Inter Estelar
-🔹 [LIGA] Porto Alegre City 1 - 0 Vanguardas S.A.
-🔹 [LIGA] União Imperial 0 - 0 Costa de Ouro FC
-🔹 [LIGA] Atlético Progresso 1 - 0 Sampaio Real Club
-⚽ [JOGO EM DESTAQUE] Sport Zênite vs Boca do Rio FC
-⏱️ 20' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Sport Zênite 0 x 1]
-⏱️ 20' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 51' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Sport Zênite 0 x 2]
-⏱️ 51' - CHANCE REAL! ⚠️ O ataque do Sport Zênite carimba o travessão em bomba de longa distância!
-⏱️ 59' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-⏱️ 83' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-🏁 PLACAR FINAL: Sport Zênite 0 x 2 Boca do Rio FC (ELO: -5.3)
-🔹 [LIGA] Cruzeiro do Sul AC 2 - 3 Recife SC
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 24 ---
-🔹 [LIGA] Goiás Unido 1 - 1 Mestres do Norte FC
-🔹 [LIGA] Força Central AC 1 - 0 Cavalaria Alvinegra
-🔹 [LIGA] Delta Futebol 3 - 0 Serra Alta FC
-🔹 [LIGA] Inter Estelar 2 - 1 Maranhão AC
-🔹 [LIGA] Vanguardas S.A. 0 - 2 Belo Horizonte FC
-🔹 [LIGA] Costa de Ouro FC 1 - 2 Real Metrópole S.A.
-🔹 [LIGA] Sampaio Real Club 0 - 3 Porto Alegre City
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10853k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs União Imperial
-⏱️ 7' - GOL! ⚽ Contra-ataque cirúrgico do União Imperial morrendo no canto do goleiro! [Boca do Rio FC 0 x 1]
-⏱️ 17' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-⏱️ 28' - CHANCE REAL! ⚠️ O ataque do União Imperial tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 42' - CHANCE REAL! ⚠️ O ataque do União Imperial aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 56' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 1]
-⏱️ 59' - CHANCE REAL! ⚠️ O ataque do União Imperial tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-🏁 PLACAR FINAL: Boca do Rio FC 1 x 1 União Imperial (ELO: -9.8)
-🔹 [LIGA] Recife SC 0 - 2 Atlético Progresso
-🔹 [LIGA] Cruzeiro do Sul AC 1 - 0 Sport Zênite
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 25 ---
-🔹 [LIGA] Mestres do Norte FC 4 - 1 Força Central AC
-🔹 [LIGA] Goiás Unido 0 - 0 Delta Futebol
-🔹 [LIGA] Cavalaria Alvinegra 1 - 3 Inter Estelar
-🔹 [LIGA] Serra Alta FC 0 - 0 Vanguardas S.A.
-🔹 [LIGA] Maranhão AC 2 - 0 Costa de Ouro FC
-🔹 [LIGA] Belo Horizonte FC 2 - 2 Sampaio Real Club
-⚽ [JOGO EM DESTAQUE] Real Metrópole S.A. vs Boca do Rio FC
-⏱️ 19' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 28' - CHANCE REAL! ⚠️ O ataque do Real Metrópole S.A. tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 34' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Real Metrópole S.A. 0 x 1]
-⏱️ 47' - CHANCE REAL! ⚠️ O ataque do Real Metrópole S.A. tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 83' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-🏁 PLACAR FINAL: Real Metrópole S.A. 0 x 1 Boca do Rio FC (ELO: -3.0)
-🔹 [LIGA] Porto Alegre City 0 - 0 Recife SC
-🔹 [LIGA] União Imperial 0 - 2 Cruzeiro do Sul AC
-🔹 [LIGA] Atlético Progresso 2 - 0 Sport Zênite
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 26 ---
-🔹 [LIGA] Delta Futebol 1 - 5 Mestres do Norte FC
-🔹 [LIGA] Inter Estelar 2 - 0 Força Central AC
-🔹 [LIGA] Vanguardas S.A. 1 - 1 Goiás Unido
-🔹 [LIGA] Costa de Ouro FC 1 - 0 Cavalaria Alvinegra
-🔹 [LIGA] Sampaio Real Club 3 - 1 Serra Alta FC
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10853k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Maranhão AC
-⏱️ 13' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 3 x 0]
-⏱️ 14' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 2 x 0]
-⏱️ 18' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 27' - CHANCE REAL! ⚠️ O ataque do Maranhão AC carimba o travessão em bomba de longa distância!
-⏱️ 36' - CHANCE REAL! ⚠️ O ataque do Maranhão AC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 65' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-⏱️ 81' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-🏁 PLACAR FINAL: Boca do Rio FC 3 x 0 Maranhão AC (ELO: +1.9)
-🔹 [LIGA] Recife SC 4 - 0 Belo Horizonte FC
-🔹 [LIGA] Cruzeiro do Sul AC 1 - 2 Real Metrópole S.A.
-🔹 [LIGA] Sport Zênite 1 - 3 Porto Alegre City
-🔹 [LIGA] Atlético Progresso 0 - 2 União Imperial
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 27 ---
-🔹 [LIGA] Mestres do Norte FC 1 - 0 Inter Estelar
-🔹 [LIGA] Delta Futebol 2 - 0 Vanguardas S.A.
-🔹 [LIGA] Força Central AC 1 - 1 Costa de Ouro FC
-🔹 [LIGA] Goiás Unido 0 - 1 Sampaio Real Club
-⚽ [JOGO EM DESTAQUE] Cavalaria Alvinegra vs Boca do Rio FC
-⏱️ 2' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Cavalaria Alvinegra 0 x 1]
-⏱️ 4' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Cavalaria Alvinegra 0 x 3]
-⏱️ 21' - CHANCE REAL! ⚠️ O ataque do Cavalaria Alvinegra obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 32' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Cavalaria Alvinegra 0 x 2]
-⏱️ 38' - CHANCE REAL! ⚠️ O ataque do Cavalaria Alvinegra carimba o travessão em bomba de longa distância!
-⏱️ 50' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC carimba o travessão em bomba de longa distância!
-⏱️ 52' - CHANCE REAL! ⚠️ O ataque do Cavalaria Alvinegra tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-🏁 PLACAR FINAL: Cavalaria Alvinegra 0 x 3 Boca do Rio FC (ELO: -2.0)
-🔹 [LIGA] Serra Alta FC 0 - 3 Recife SC
-🔹 [LIGA] Maranhão AC 0 - 3 Cruzeiro do Sul AC
-🔹 [LIGA] Belo Horizonte FC 0 - 3 Sport Zênite
-🔹 [LIGA] Real Metrópole S.A. 0 - 1 Atlético Progresso
-🔹 [LIGA] Porto Alegre City 1 - 0 União Imperial
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 28 ---
-🔹 [LIGA] Vanguardas S.A. 0 - 0 Mestres do Norte FC
-🔹 [LIGA] Costa de Ouro FC 1 - 1 Inter Estelar
-🔹 [LIGA] Sampaio Real Club 0 - 3 Delta Futebol
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10854k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Força Central AC
-⏱️ 3' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 2 x 0]
-⏱️ 38' - CHANCE REAL! ⚠️ O ataque do Força Central AC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 51' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 54' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-⏱️ 60' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 75' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC aparece livre de marcação, mas cabeceia torto para fora.
-🏁 PLACAR FINAL: Boca do Rio FC 2 x 0 Força Central AC (ELO: +0.7)
-🔹 [LIGA] Recife SC 2 - 2 Goiás Unido
-🔹 [LIGA] Cruzeiro do Sul AC 2 - 0 Cavalaria Alvinegra
-🔹 [LIGA] Sport Zênite 3 - 0 Serra Alta FC
-🔹 [LIGA] Atlético Progresso 4 - 0 Maranhão AC
-🔹 [LIGA] União Imperial 0 - 2 Belo Horizonte FC
-🔹 [LIGA] Porto Alegre City 1 - 0 Real Metrópole S.A.
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 29 ---
-🔹 [LIGA] Mestres do Norte FC 1 - 0 Costa de Ouro FC
-🔹 [LIGA] Vanguardas S.A. 0 - 2 Sampaio Real Club
-⚽ [JOGO EM DESTAQUE] Inter Estelar vs Boca do Rio FC
-⏱️ 9' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 18' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Inter Estelar 0 x 2]
-⏱️ 24' - CHANCE REAL! ⚠️ O ataque do Inter Estelar aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 27' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Inter Estelar 0 x 1]
-⏱️ 83' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 86' - CHANCE REAL! ⚠️ O ataque do Inter Estelar obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-🏁 PLACAR FINAL: Inter Estelar 0 x 2 Boca do Rio FC (ELO: -3.9)
-🔹 [LIGA] Delta Futebol 0 - 2 Recife SC
-🔹 [LIGA] Força Central AC 1 - 4 Cruzeiro do Sul AC
-🔹 [LIGA] Goiás Unido 0 - 0 Sport Zênite
-🔹 [LIGA] Cavalaria Alvinegra 2 - 1 Atlético Progresso
-🔹 [LIGA] Serra Alta FC 0 - 2 União Imperial
-🔹 [LIGA] Maranhão AC 1 - 1 Porto Alegre City
-🔹 [LIGA] Belo Horizonte FC 1 - 0 Real Metrópole S.A.
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 30 ---
-🔹 [LIGA] Sampaio Real Club 0 - 2 Mestres do Norte FC
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10854k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Costa de Ouro FC
-⏱️ 17' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 21' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-⏱️ 55' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 60' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 2 x 0]
-⏱️ 76' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 78' - CHANCE REAL! ⚠️ O ataque do Costa de Ouro FC aparece livre de marcação, mas cabeceia torto para fora.
-🏁 PLACAR FINAL: Boca do Rio FC 2 x 0 Costa de Ouro FC (ELO: +1.0)
-🔹 [LIGA] Recife SC 4 - 0 Vanguardas S.A.
-🔹 [LIGA] Cruzeiro do Sul AC 1 - 1 Inter Estelar
-🔹 [LIGA] Sport Zênite 3 - 0 Delta Futebol
-🔹 [LIGA] Atlético Progresso 3 - 2 Força Central AC
-🔹 [LIGA] União Imperial 1 - 1 Goiás Unido
-🔹 [LIGA] Porto Alegre City 1 - 2 Cavalaria Alvinegra
-🔹 [LIGA] Real Metrópole S.A. 2 - 1 Serra Alta FC
-🔹 [LIGA] Belo Horizonte FC 0 - 1 Maranhão AC
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 31 ---
-⚽ [JOGO EM DESTAQUE] Mestres do Norte FC vs Boca do Rio FC
-⏱️ 36' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Mestres do Norte FC 1 x 1]
-⏱️ 45' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 56' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 87' - GOL! ⚽ O ataque do Mestres do Norte FC infiltra com velocidade e estufa a rede! [Mestres do Norte FC 1 x 0]
-🏁 PLACAR FINAL: Mestres do Norte FC 1 x 1 Boca do Rio FC (ELO: +4.6)
-🔹 [LIGA] Sampaio Real Club 0 - 4 Recife SC
-🔹 [LIGA] Costa de Ouro FC 1 - 3 Cruzeiro do Sul AC
-🔹 [LIGA] Vanguardas S.A. 1 - 2 Sport Zênite
-🔹 [LIGA] Inter Estelar 2 - 0 Atlético Progresso
-🔹 [LIGA] Delta Futebol 0 - 2 União Imperial
-🔹 [LIGA] Força Central AC 2 - 0 Porto Alegre City
-🔹 [LIGA] Goiás Unido 3 - 0 Real Metrópole S.A.
-🔹 [LIGA] Cavalaria Alvinegra 1 - 2 Belo Horizonte FC
-🔹 [LIGA] Serra Alta FC 0 - 0 Maranhão AC
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 32 ---
-🔹 [LIGA] Recife SC 0 - 0 Mestres do Norte FC
-⚽ [JOGO EM DESTAQUE] Cruzeiro do Sul AC vs Boca do Rio FC
-⏱️ 18' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Cruzeiro do Sul AC 0 x 3]
-⏱️ 20' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Cruzeiro do Sul AC 0 x 2]
-⏱️ 24' - GOL! ⚽ Contra-ataque cirúrgico do Boca do Rio FC morrendo no canto do goleiro! [Cruzeiro do Sul AC 0 x 1]
-⏱️ 31' - CHANCE REAL! ⚠️ O ataque do Boca do Rio FC aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 45' - CHANCE REAL! ⚠️ O ataque do Cruzeiro do Sul AC carimba o travessão em bomba de longa distância!
-🏁 PLACAR FINAL: Cruzeiro do Sul AC 0 x 3 Boca do Rio FC (ELO: -8.5)
-🔹 [LIGA] Sport Zênite 1 - 0 Sampaio Real Club
-🔹 [LIGA] Atlético Progresso 2 - 1 Costa de Ouro FC
-🔹 [LIGA] União Imperial 1 - 4 Vanguardas S.A.
-🔹 [LIGA] Porto Alegre City 1 - 0 Inter Estelar
-🔹 [LIGA] Real Metrópole S.A. 1 - 4 Delta Futebol
-🔹 [LIGA] Belo Horizonte FC 1 - 2 Força Central AC
-🔹 [LIGA] Maranhão AC 2 - 1 Goiás Unido
-🔹 [LIGA] Serra Alta FC 1 - 1 Cavalaria Alvinegra
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-🚀 --- INICIANDO SIMULAÇÃO COMPLETA DA RODADA 33 ---
-🔹 [LIGA] Mestres do Norte FC 1 - 2 Cruzeiro do Sul AC
-🔹 [LIGA] Recife SC 2 - 2 Sport Zênite
-🏟️ Bilheteria da Rodada: Sua Arena de Mandante lucrou +Cr$ 10855k.
-⚽ [JOGO EM DESTAQUE] Boca do Rio FC vs Atlético Progresso
-⏱️ 6' - CHANCE REAL! ⚠️ O ataque do Atlético Progresso aparece livre de marcação, mas cabeceia torto para fora.
-⏱️ 24' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 1 x 0]
-⏱️ 42' - CHANCE REAL! ⚠️ O ataque do Atlético Progresso obriga o goleiro a operar um verdadeiro milagre elástico na linha!
-⏱️ 52' - CHANCE REAL! ⚠️ O ataque do Atlético Progresso tenta o drible na área e cai pedindo pênalti, mas o juiz manda seguir.
-⏱️ 71' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 3 x 0]
-⏱️ 81' - GOL! ⚽ O ataque do Boca do Rio FC infiltra com velocidade e estufa a rede! [Boca do Rio FC 2 x 0]
-🏁 PLACAR FINAL: Boca do Rio FC 3 x 0 Atlético Progresso (ELO: +2.6)
-🔹 [LIGA] Sampaio Real Club 0 - 2 União Imperial
-🔹 [LIGA] Costa de Ouro FC 0 - 2 Porto Alegre City
-🔹 [LIGA] Vanguardas S.A. 0 - 2 Real Metrópole S.A.
-🔹 [LIGA] Inter Estelar 1 - 3 Belo Horizonte FC
-🔹 [LIGA] Delta Futebol 0 - 3 Maranhão AC
-🔹 [LIGA] Força Central AC 3 - 1 Serra Alta FC
-🔹 [LIGA] Goiás Unido 0 - 2 Cavalaria Alvinegra
-📺 Direitos de Transmissão: Creditado +Cr$ 150k fixos de Cotas de TV.
-📉 Custos de Operação: Descontado Cr$ 184k em manutenção de plantel e infraestrutura.
-🏋️ Centro de Treinamento: Rotina semanal concluída aplicando foco [physio].
-Resumo Financeiro e Técnico
-Conta Bancária
-Cr$ 326471k
-Força ELO
-1402
-Posição Atual: 1º Lugar
-Custos Operacionais/Rodada: Cr$ 184k
-Mentalidade Ativa: Gegenpressing Alemão (Pressão no Bloco Alto)
-Limpar Tudo (Reset Geral)
