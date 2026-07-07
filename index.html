@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FutManager Ultra PRO - Smart AI Edition</title>
+    <title>FutManager Pro - Elite Edition</title>
     <style>
         :root {
             --bg-main: #090d16;
@@ -59,26 +59,25 @@
         .fixture-item { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; text-align: center; padding: 10px; background: var(--bg-main); border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--border); }
         .score-badge { background: var(--border); padding: 4px 10px; border-radius: 4px; font-weight: bold; min-width: 45px; display: inline-block; }
 
-        .console { background: #020617; padding: 15px; border-radius: 8px; font-family: monospace; height: 230px; overflow-y: auto; color: #34d399; font-size: 12px; border: 1px solid var(--border); line-height: 1.6; }
-        
-        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .console { background: #020617; padding: 15px; border-radius: 8px; font-family: monospace; height: 180px; overflow-y: auto; color: #34d399; font-size: 12px; border: 1px solid var(--border); line-height: 1.6; }
         .badge { padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; }
         .badge-pos { background: #4b5563; color: white; }
         .badge-starter { background: #065f46; color: #a7f3d0; }
         .badge-bench { background: #9a3412; color: #ffedd5; }
+        .market-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-top: 15px; }
     </style>
 </head>
 <body>
 
 <div class="container" id="setup-screen">
     <div class="welcome-panel">
-        <h1 style="color: var(--accent-blue); margin-bottom: 10px; font-size: 32px;">⚽ FutManager Smart AI</h1>
-        <p style="color: var(--text-muted); margin-bottom: 25px;">Gerencie elencos sob um motor tático realista, contra uma IA ativa que poupa e treina atletas.</p>
+        <h1 style="color: var(--accent-blue); margin-bottom: 10px; font-size: 32px;">⚽ FutManager Tycoon</h1>
+        <p style="color: var(--text-muted); margin-bottom: 25px;">Gerencie finanças, estádio e mercado enquanto enfrenta uma Inteligência Artificial competitiva.</p>
         
         <div style="max-width: 450px; margin: 0 auto; text-align: left;">
-            <label style="font-weight: bold;">Escolha o seu clube para iniciar:</label>
+            <label style="font-weight: bold;">Escolha seu clube:</label>
             <select id="select-user-team" style="margin-bottom: 20px; font-size: 16px;"></select>
-            <button class="btn btn-success" style="width: 100%; padding: 14px; justify-content: center;" onclick="startGame(false)">Carregar Novo Jogo</button>
+            <button class="btn btn-success" style="width: 100%; padding: 14px; justify-content: center;" onclick="startGame(false)">Iniciar Carreira</button>
             <button class="btn" id="btn-load-save" style="width: 100%; padding: 14px; margin-top: 10px; background-color: #4b5563; justify-content: center; display: none;" onclick="startGame(true)">Carregar Jogo Salvo</button>
         </div>
     </div>
@@ -99,8 +98,9 @@
     <nav class="nav-tabs">
         <button class="tab-btn active" onclick="switchTab('tab-dashboard')">Escritório</button>
         <button class="tab-btn" onclick="switchTab('tab-squad')">Gerenciar Elenco</button>
+        <button class="tab-btn" onclick="switchTab('tab-market')">Mercado de Transferências</button>
         <button class="tab-btn" onclick="switchTab('tab-table')">Classificação & Tabela</button>
-        <button class="tab-btn" onclick="switchTab('tab-tactics')">Departamento Médico</button>
+        <button class="tab-btn" onclick="switchTab('tab-stadium')">Estádio & Finanças</button>
         <button class="tab-btn" onclick="switchTab('tab-custom')">Editor de Clubes</button>
     </nav>
 
@@ -113,45 +113,49 @@
                     <button class="btn btn-success" onclick="playNextMatch()">Simular Próximo Jogo</button>
                     <button class="btn" style="background-color: #4b5563;" onclick="playRound()">Simular Rodada Inteira</button>
                 </div>
-                
-                <h3 style="margin: 25px 0 10px 0;">Transmissões e Inteligência de Campo</h3>
+                <h3 style="margin: 25px 0 10px 0;">Relatórios do Painel</h3>
                 <div class="console" id="game-console"></div>
             </div>
 
             <div class="card">
                 <h2 style="margin-bottom: 15px;">Status Operacional</h2>
-                <div class="stats-row" style="grid-template-columns: 1fr;">
-                    <div class="stat-box">Força ELO do Clube <div class="stat-val" id="card-elo">1500</div></div>
+                <div class="stats-row" style="grid-template-columns: 1fr; gap: 10px;">
+                    <div class="stat-box">Saldo Bancário <div class="stat-val" id="card-finances" style="color: var(--accent);">Cr$ 100.000</div></div>
+                    <div class="stat-box">Força ELO <div class="stat-val" id="card-elo">1500</div></div>
                 </div>
-                <div class="stat-box" style="margin-bottom: 10px;">Posição Atual: <span id="card-position" style="font-weight: bold;">-</span></div>
-                <div class="stat-box" style="margin-bottom: 15px;">Mentalidade Ativa: <span id="card-tactic" style="font-weight: bold; color: var(--accent);">Equilibrada</span></div>
-                <button class="btn btn-danger" style="width: 100%; justify-content: center;" onclick="resetAllData()">Limpar Cache (Reset Geral)</button>
+                <div class="stat-box" style="margin-bottom: 10px;">Posição: <span id="card-position" style="font-weight: bold;">-</span></div>
+                <div style="margin-top: 15px;">
+                    <label style="font-weight: bold; font-size: 12px;">Mentalidade Tática:</label>
+                    <select id="tactic-select" onchange="updateTactics()">
+                        <option value="balanced">Equilibrada</option>
+                        <option value="attacking">Ataque Total (++Desgaste)</option>
+                        <option value="defensive">Retranca Sólida</option>
+                    </select>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="tab-squad" class="tab-content">
         <div class="card">
-            <div class="flex-between" style="margin-bottom: 15px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
                 <h2>Gestão do Elenco</h2>
                 <button class="btn" onclick="autoSquadSelection()">Auto-Escalar Melhores</button>
             </div>
-            <p style="color: var(--text-muted); margin-bottom: 15px;">Cada clique de treino consome **20% de Stamina** e concede **+1 ponto fixo** no fundamento escolhido (Teto: 99).</p>
             <table id="squad-table">
                 <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>Idade</th>
-                        <th>Posição</th>
-                        <th>Ataque</th>
-                        <th>Defesa</th>
-                        <th>Stamina (Energia)</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
+                    <tr><th>Nome</th><th>Idade</th><th>Posição</th><th>ATA</th><th>DEF</th><th>Stamina</th><th>Status</th><th>Ações</th></tr>
                 </thead>
                 <tbody></tbody>
             </table>
+        </div>
+    </div>
+
+    <div id="tab-market" class="tab-content">
+        <div class="card">
+            <h2>Jogadores Disponíveis no Mercado</h2>
+            <p style="color: var(--text-muted);">Novas opções surgem a cada rodada concluída.</p>
+            <div class="market-grid" id="market-list"></div>
         </div>
     </div>
 
@@ -173,21 +177,20 @@
         </div>
     </div>
 
-    <div id="tab-tactics" class="tab-content">
-        <div class="card">
-            <h2>Estratégia & Fisioterapia Humana</h2>
-            <div style="margin-bottom: 20px;">
-                <label style="font-weight: bold;">Mentalidade de Jogo:</label>
-                <select id="tactic-select" onchange="updateTactics()">
-                    <option value="balanced">Equilibrada (Foco no ELO Padrão)</option>
-                    <option value="attacking">Ataque Total (+Gols Pró, ++Desgaste Físico)</option>
-                    <option value="defensive">Retranca Sólida (Jogo truncado, -Gols Sofridos)</option>
-                </select>
+    <div id="tab-stadium" class="tab-content">
+        <div class="manager-grid">
+            <div class="card">
+                <h2>Estrutura da Arena</h2>
+                <div class="stat-box" style="margin: 15px 0; text-align: left;">
+                    <div>Nível de Expansão Atual: <strong id="txt-stadium-level">1</strong></div>
+                    <div style="color: var(--text-muted); font-size: 12px; margin-top: 5px;">Níveis maiores aumentam drasticamente a receita de bilheteria em jogos como mandante.</div>
+                </div>
+                <button class="btn btn-success" id="btn-upgrade-stadium" onclick="upgradeStadium()">Expandir Arena (Cr$ 80.000)</button>
             </div>
-            <div style="padding: 20px; background: var(--bg-main); border-radius: 8px; border: 1px solid var(--border);">
-                <h3>Recuperação de Plantel Manual</h3>
-                <p style="color: var(--text-muted); margin-top: 5px; margin-bottom: 15px;">Você pode acionar o DM interno a cada 5 rodadas para revigorar o elenco (+40% Stamina global).</p>
-                <button class="btn btn-success" id="btn-user-physio" onclick="triggerUserPhysio()">Chamar Fisioterapia Humana</button>
+            <div class="card">
+                <h2>Departamento Médico (DM)</h2>
+                <p style="color: var(--text-muted); margin-bottom: 15px;">Pague uma clínica particular de recuperação para restaurar instantaneamente +40% de energia de todo o elenco.</p>
+                <button class="btn" style="width: 100%; justify-content: center;" onclick="payPhysio()">Contratar Sessão (Cr$ 25.000)</button>
             </div>
         </div>
     </div>
@@ -196,7 +199,7 @@
         <div class="card">
             <h2>Editor de Equipes</h2>
             <div id="editor-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 20px;"></div>
-            <button class="btn btn-success" onclick="applyCustomization()">Salvar Alterações Globais</button>
+            <button class="btn btn-success" onclick="applyCustomization()">Salvar Alterações</button>
         </div>
     </div>
 </div>
@@ -206,25 +209,24 @@
     const lastNames = ["Silva", "Santos", "Oliveira", "Souza", "Rodrigues", "Ferreira", "Almeida", "Costa", "Carvalho", "Gomes", "Martins", "Araújo", "Ribeiro", "Melo"];
     const positions = ["GOL", "DEF", "DEF", "DEF", "DEF", "MEI", "MEI", "MEI", "MEI", "ATA", "ATA", "GOL", "DEF", "MEI", "ATA"];
 
-    function generateRandomPlayerName() {
-        return firstNames[Math.floor(Math.random() * firstNames.length)] + " " + lastNames[Math.floor(Math.random() * lastNames.length)];
-    }
+    function genPlayerName() { return firstNames[Math.floor(Math.random() * firstNames.length)] + " " + lastNames[Math.floor(Math.random() * lastNames.length)]; }
 
     let userTeamId = null;
     let season = 1;
     let currentRound = 0;
     let currentMatchIndex = 0;
     let currentTactic = 'balanced';
+    let finances = 100000;
+    let stadiumLevel = 1;
     let teams = [];
     let fixtures = [];
-    let userPhysioCooldown = 0;
+    let marketPlayers = [];
 
-    // Contadores de Eventos Randômicos da IA
     let nextAiPhysioRound = [];
     let nextAiNewPlayerRound = [];
 
-    function createInitialDatabase() {
-        const baseTeams = [
+    function createDatabase() {
+        const base = [
             { id: 1, name: "Mestres do Norte", elo: 1650 },
             { id: 2, name: "Atlético Progresso", elo: 1580 },
             { id: 3, name: "União Imperial", elo: 1520 },
@@ -235,17 +237,17 @@
             { id: 8, name: "Cavalaria Alvinegra", elo: 1400 }
         ];
 
-        teams = baseTeams.map(t => {
+        teams = base.map(t => {
             let squad = [];
             for(let i=0; i<15; i++) {
-                let skillBase = Math.round(t.elo / 20) + Math.floor(Math.random() * 15 - 7);
+                let skill = Math.round(t.elo / 20) + Math.floor(Math.random() * 14 - 7);
                 squad.push({
                     id: i + 1,
-                    name: generateRandomPlayerName(),
+                    name: genPlayerName(),
                     age: Math.floor(Math.random() * 18) + 18,
                     position: positions[i],
-                    attack: Math.max(30, Math.min(99, positions[i] === 'ATA' ? skillBase + 10 : (positions[i]==='MEI'? skillBase: skillBase - 10))),
-                    defense: Math.max(30, Math.min(99, positions[i] === 'DEF' ? skillBase + 10 : (positions[i]==='GOL'? skillBase + 15: skillBase - 10))),
+                    attack: Math.max(30, Math.min(99, positions[i] === 'ATA' ? skill + 10 : (positions[i]==='MEI'? skill: skill - 10))),
+                    defense: Math.max(30, Math.min(99, positions[i] === 'DEF' ? skill + 10 : (positions[i]==='GOL'? skill + 15: skill - 10))),
                     stamina: 100,
                     starter: i < 11
                 });
@@ -253,23 +255,22 @@
             return { ...t, p:0, j:0, v:0, e:0, d:0, gp:0, gc:0, players: squad };
         });
 
-        // Setup inicial dos timers randômicos de IA
         teams.forEach(t => {
-            nextAiPhysioRound[t.id] = Math.floor(Math.random() * 5) + 4; // 4 a 8
-            nextAiNewPlayerRound[t.id] = Math.floor(Math.random() * 3) + 3; // 3 a 5
+            nextAiPhysioRound[t.id] = Math.floor(Math.random() * 5) + 4;
+            nextAiNewPlayerRound[t.id] = Math.floor(Math.random() * 3) + 3;
         });
 
         generateFixtures();
+        generateMarket();
     }
 
     function generateFixtures() {
         let pool = [...teams];
         const numTeams = pool.length;
-        const totalRounds = (numTeams - 1) * 2;
         fixtures = [];
         let turnos = [];
 
-        for (let r = 0; r < totalRounds / 2; r++) {
+        for (let r = 0; r < numTeams - 1; r++) {
             let roundMatches = [];
             for (let m = 0; m < numTeams / 2; m++) {
                 let home = pool[m]; let away = pool[numTeams - 1 - m];
@@ -283,188 +284,168 @@
         fixtures = [...turnos, ...returnos];
     }
 
+    function generateMarket() {
+        marketPlayers = [];
+        const posPool = ["GOL", "DEF", "MEI", "ATA"];
+        for(let i=0; i<4; i++) {
+            let pos = posPool[Math.floor(Math.random() * posPool.length)];
+            let skill = 65 + Math.floor(Math.random() * 25);
+            marketPlayers.push({
+                id: Date.now() + i,
+                name: genPlayerName(),
+                age: Math.floor(Math.random() * 12) + 19,
+                position: pos,
+                attack: Math.max(40, Math.min(99, pos === 'ATA' ? skill + 8 : (pos==='MEI'? skill: skill - 12))),
+                defense: Math.max(40, Math.min(99, pos === 'DEF' ? skill + 8 : (pos==='GOL'? skill + 12: skill - 12))),
+                price: skill * Math.floor(Math.random() * 400 + 600)
+            });
+        }
+    }
+
     function checkSaveOnLoad() {
+        if(localStorage.getItem('FM_TYCOON_SAVE')) document.getElementById('btn-load-save').style.display = 'block';
+        createDatabase();
         const select = document.getElementById('select-user-team');
         select.innerHTML = '';
-        if(localStorage.getItem('FM_SMART_AI_SAVE')) document.getElementById('btn-load-save').style.display = 'block';
-        createInitialDatabase(); 
         teams.forEach(t => select.innerHTML += `<option value="${t.id}">${t.name}</option>`);
         buildEditor();
     }
 
     function startGame(useSave) {
-        if(useSave && localStorage.getItem('FM_SMART_AI_SAVE')) {
-            loadGameData();
+        if(useSave && localStorage.getItem('FM_TYCOON_SAVE')) {
+            const data = JSON.parse(localStorage.getItem('FM_TYCOON_SAVE'));
+            userTeamId = data.userTeamId; season = data.season; currentRound = data.currentRound;
+            currentMatchIndex = data.currentMatchIndex; currentTactic = data.currentTactic;
+            finances = data.finances; stadiumLevel = data.stadiumLevel; teams = data.teams;
+            fixtures = data.fixtures; marketPlayers = data.marketPlayers || [];
+            nextAiPhysioRound = data.nextAiPhysioRound || []; nextAiNewPlayerRound = data.nextAiNewPlayerRound || [];
+            document.getElementById('tactic-select').value = currentTactic;
         } else {
             userTeamId = parseInt(document.getElementById('select-user-team').value);
-            saveGameData();
+            saveGame();
         }
         document.getElementById('setup-screen').style.display = 'none';
         document.getElementById('main-game').style.display = 'block';
-        updateTactics();
         updateUI();
     }
 
-    function saveGameData() {
-        const payload = { userTeamId, season, currentRound, currentMatchIndex, currentTactic, teams, fixtures, userPhysioCooldown, nextAiPhysioRound, nextAiNewPlayerRound };
-        localStorage.setItem('FM_SMART_AI_SAVE', JSON.stringify(payload));
+    function saveGame() {
+        const data = { userTeamId, season, currentRound, currentMatchIndex, currentTactic, finances, stadiumLevel, teams, fixtures, marketPlayers, nextAiPhysioRound, nextAiNewPlayerRound };
+        localStorage.setItem('FM_TYCOON_SAVE', JSON.stringify(data));
     }
 
-    function loadGameData() {
-        const data = JSON.parse(localStorage.getItem('FM_SMART_AI_SAVE'));
-        userTeamId = data.userTeamId; season = data.season; currentRound = data.currentRound;
-        currentMatchIndex = data.currentMatchIndex; currentTactic = data.currentTactic; teams = data.teams; fixtures = data.fixtures;
-        userPhysioCooldown = data.userPhysioCooldown || 0;
-        nextAiPhysioRound = data.nextAiPhysioRound || [];
-        nextAiNewPlayerRound = data.nextAiNewPlayerRound || [];
-        document.getElementById('tactic-select').value = currentTactic;
-    }
-
-    // MECÂNICA 1: Rodízio Inteligente da IA (Anti-Zumbi)
+    // COMPORTAMENTO IA 1: Rodízio Inteligente (Anti-Zumbi)
     function executeAiSquadRotation(team) {
         if (team.id === userTeamId) return;
-
         team.players.forEach(p => {
             if (p.starter && p.stamina < 70) {
-                // Busca um reserva apto na mesma posição com melhor stamina
                 let bestReserve = team.players
                     .filter(r => !r.starter && r.position === p.position && r.stamina > p.stamina)
                     .sort((a, b) => b.stamina - a.stamina)[0];
-
-                if (bestReserve) {
-                    p.starter = false;
-                    bestReserve.starter = true;
-                }
+                if (bestReserve) { p.starter = false; bestReserve.starter = true; }
             }
         });
     }
 
-    // MECÂNICA 2: Treinamento de Base da IA
+    // COMPORTAMENTO IA 2: Treinar 2 reservas
     function executeAiTraining(team) {
         if (team.id === userTeamId) return;
-
-        // Seleciona reservas disponíveis
         let reserves = team.players.filter(p => !p.starter);
         if (reserves.length < 2) return;
-
-        // Embaralha e escolhe exatamente 2
         reserves.sort(() => 0.5 - Math.random());
-        let targets = reserves.slice(0, 2);
-
-        targets.forEach(p => {
-            if (p.position === 'GOL' || p.position === 'DEF') {
-                if (p.defense < 99) p.defense++;
-            } else {
-                if (p.attack < 99) p.attack++;
-            }
+        reserves.slice(0, 2).forEach(p => {
+            if (p.position === 'GOL' || p.position === 'DEF') { if (p.defense < 99) p.defense++; }
+            else { if (p.attack < 99) p.attack++; }
         });
     }
 
-    // MECÂNICA 3: Eventos Periódicos da IA (Fisioterapia e Reforços da base)
-    function executeAiPeriodicEvents(team, currentRoundNumber) {
+    // COMPORTAMENTO IA 3: Eventos da IA para não estagnar
+    function executeAiPeriodicEvents(team, roundNum) {
         if (team.id === userTeamId) return;
-
-        // Verificação de Fisioterapia da IA (Ganha a cada 4-8 rodadas)
-        if (currentRoundNumber >= nextAiPhysioRound[team.id]) {
+        if (roundNum >= nextAiPhysioRound[team.id]) {
             team.players.forEach(p => p.stamina = Math.min(100, p.stamina + 40));
-            nextAiPhysioRound[team.id] = currentRoundNumber + Math.floor(Math.random() * 5) + 4;
-            logGame(`⚕️ IA: Fisioterapeutas do **${team.name}** realizaram uma clínica de recuperação.`);
+            nextAiPhysioRound[team.id] = roundNum + Math.floor(Math.random() * 5) + 4;
+            logGame(`⚕️ DM: O time do **${team.name}** realizou tratamento físico em seus atletas.`);
         }
-
-        // Verificação de Novo Atleta da IA (Ganha a cada 3-5 rodadas)
-        if (currentRoundNumber >= nextAiNewPlayerRound[team.id]) {
+        if (roundNum >= nextAiNewPlayerRound[team.id]) {
             if (team.players.length < 18) {
-                let pos = positions[Math.floor(Math.random() * positions.length)];
+                let pos = ["GOL", "DEF", "MEI", "ATA"][Math.floor(Math.random() * 4)];
                 team.players.push({
-                    id: Date.now() + Math.floor(Math.random() * 10000),
-                    name: generateRandomPlayerName() + " (Base)",
-                    age: 18,
-                    position: pos,
-                    attack: Math.floor(Math.random() * 30) + 55,
-                    defense: Math.floor(Math.random() * 30) + 55,
-                    stamina: 100,
-                    starter: false
+                    id: Date.now() + Math.floor(Math.random() * 1000),
+                    name: genPlayerName() + " (Base)", age: 18, position: pos,
+                    attack: Math.floor(Math.random() * 25) + 60, defense: Math.floor(Math.random() * 25) + 60,
+                    stamina: 100, starter: false
                 });
-                logGame(`👶 IA: O time do **${team.name}** promoveu uma promessa da base.`);
             }
-            nextAiNewPlayerRound[team.id] = currentRoundNumber + Math.floor(Math.random() * 3) + 3;
+            nextAiNewPlayerRound[team.id] = roundNum + Math.floor(Math.random() * 3) + 3;
         }
     }
 
     function playNextMatch() {
         if (currentRound >= fixtures.length) return;
-
         let round = fixtures[currentRound];
         let match = round[currentMatchIndex];
 
         let hTeam = teams.find(t => t.id === match.home);
         let aTeam = teams.find(t => t.id === match.away);
 
-        // Aplica gerenciamento automatizado de elenco nas equipes da CPU antes do pontapé inicial
         executeAiSquadRotation(hTeam);
         executeAiSquadRotation(aTeam);
 
         if(hTeam.id === userTeamId || aTeam.id === userTeamId) {
-            let userObj = hTeam.id === userTeamId ? hTeam : aTeam;
-            let starterCount = userObj.players.filter(p => p.starter).length;
-            if(starterCount !== 11) {
-                alert(`Erro: Você escalou ${starterCount} jogadores. Ajuste para exatamente 11 titulares na aba do elenco.`);
+            let uObj = hTeam.id === userTeamId ? hTeam : aTeam;
+            if(uObj.players.filter(p => p.starter).length !== 11) {
+                alert("Você precisa ter exatamente 11 titulares escalados!");
                 switchTab('tab-squad');
                 return;
             }
         }
 
-        const computeTeamSquadBonus = (team) => {
+        const getBonus = (team) => {
             let starters = team.players.filter(p => p.starter);
-            let avgAttack = starters.reduce((acc, p) => acc + (p.attack * (p.stamina/100)), 0) / 11;
-            let avgDefense = starters.reduce((acc, p) => acc + (p.defense * (p.stamina/100)), 0) / 11;
-            return { attBonus: avgAttack * 2.5, defBonus: avgDefense * 2.5 };
+            let att = starters.reduce((acc, p) => acc + (p.attack * (p.stamina/100)), 0) / 11;
+            let def = starters.reduce((acc, p) => acc + (p.defense * (p.stamina/100)), 0) / 11;
+            return { att: att * 2.5, def: def * 2.5 };
         };
 
-        let hBonus = computeTeamSquadBonus(hTeam);
-        let aBonus = computeTeamSquadBonus(aTeam);
+        let hB = getBonus(hTeam); let aB = getBonus(aTeam);
+        let calcHomeElo = hTeam.elo + 50 + (hB.att - aB.def);
+        let calcAwayElo = aTeam.elo + (aB.att - hB.def);
 
-        let calculatedHomeElo = hTeam.elo + 50 + (hBonus.attBonus - aBonus.defBonus);
-        let calculatedAwayElo = aTeam.elo + (aBonus.attBonus - hBonus.defBonus);
-
-        let expHome = 1 / (1 + Math.pow(10, (calculatedAwayElo - calculatedHomeElo) / 400));
-        let expAway = 1 - expHome;
-
-        let lambdaHome = 1.2 + (expHome - 0.5) * 2.0;
-        let lambdaAway = 1.2 + (expAway - 0.5) * 2.0;
+        let expH = 1 / (1 + Math.pow(10, (calcAwayElo - calcHomeElo) / 400));
+        let lambdaH = 1.2 + (expH - 0.5) * 2.0;
+        let lambdaA = 1.2 + ((1 - expH) - 0.5) * 2.0;
 
         if(hTeam.id === userTeamId || aTeam.id === userTeamId) {
-            if(currentTactic === 'attacking') {
-                if(hTeam.id === userTeamId) { lambdaHome += 0.5; lambdaAway += 0.2; } else { lambdaAway += 0.5; lambdaHome += 0.2; }
-            } else if(currentTactic === 'defensive') {
-                if(hTeam.id === userTeamId) { lambdaHome -= 0.2; lambdaAway -= 0.5; } else { lambdaAway -= 0.2; lambdaHome -= 0.5; }
-            }
+            if(currentTactic === 'attacking') { if(hTeam.id === userTeamId) { lambdaH += 0.5; lambdaA += 0.2; } else { lambdaA += 0.5; lambdaH += 0.2; } }
+            else if(currentTactic === 'defensive') { if(hTeam.id === userTeamId) { lambdaH -= 0.2; lambdaA -= 0.5; } else { lambdaA -= 0.2; lambdaH -= 0.5; } }
         }
 
-        const rollPoisson = (l) => {
+        const poisson = (l) => {
             let L = Math.exp(-Math.max(0.1, l)), k = 0, p = 1.0;
-            do { k++; p *= Math.random(); } while (p > L);
-            return k - 1;
+            do { k++; p *= Math.random(); } while (p > L); return k - 1;
         };
 
-        match.homeScore = rollPoisson(lambdaHome);
-        match.awayScore = rollPoisson(lambdaAway);
+        match.homeScore = poisson(lambdaH);
+        match.awayScore = poisson(lambdaA);
         match.simulated = true;
 
-        hTeam.j++; aTeam.j++;
-        hTeam.gp += match.homeScore; hTeam.gc += match.awayScore;
-        aTeam.gp += match.awayScore; aTeam.gc += match.homeScore;
+        hTeam.j++; aTeam.j++; hTeam.gp += match.homeScore; hTeam.gc += match.awayScore; aTeam.gp += match.awayScore; aTeam.gc += match.homeScore;
 
         if (match.homeScore > match.awayScore) { hTeam.p += 3; hTeam.v++; aTeam.d++; }
         else if (match.homeScore < match.awayScore) { aTeam.p += 3; aTeam.v++; hTeam.d++; }
         else { hTeam.p += 1; aTeam.p += 1; hTeam.e++; aTeam.e++; }
 
-        let actualHomeRes = match.homeScore > match.awayScore ? 1 : (match.homeScore === match.awayScore ? 0.5 : 0);
-        let eloDelta = 24 * (actualHomeRes - expHome);
-        hTeam.elo += eloDelta;
-        aTeam.elo -= eloDelta;
+        let resH = match.homeScore > match.awayScore ? 1 : (match.homeScore === match.awayScore ? 0.5 : 0);
+        let delta = 24 * (resH - expH); hTeam.elo += delta; aTeam.elo -= delta;
 
-        // Desgaste físico geral
+        // SISTEMA DE RECEITA DO HUMANO (Mandante)
+        if(hTeam.id === userTeamId) {
+            let cashGained = 25000 + (stadiumLevel * 20000) + Math.round(hTeam.elo * 15);
+            finances += cashGained;
+            logGame(`💰 BILHETERIA: Seu estádio gerou **Cr$ ${cashGained.toLocaleString()}** em receitas domésticas.`);
+        }
+
         hTeam.players.forEach(p => { 
             if(p.starter) p.stamina = Math.max(0, p.stamina - (hTeam.id === userTeamId && currentTactic === 'attacking' ? 18 : 12)); 
             else p.stamina = Math.min(100, p.stamina + 20); 
@@ -474,104 +455,107 @@
             else p.stamina = Math.min(100, p.stamina + 20); 
         });
 
-        let isUserMatch = (hTeam.id === userTeamId || aTeam.id === userTeamId);
         let msg = `[R${currentRound+1}] ${hTeam.name} ${match.homeScore} x ${match.awayScore} ${aTeam.name}`;
-        logGame(isUserMatch ? `⭐ RESULTADO: ${msg}` : msg);
+        logGame((hTeam.id === userTeamId || aTeam.id === userTeamId) ? `⭐ **${msg}**` : msg);
 
         currentMatchIndex++;
         if (currentMatchIndex >= round.length) {
-            // Executa rotinas de treino e eventos randômicos de fim de rodada para a CPU
-            teams.forEach(t => {
-                executeAiTraining(t);
-                executeAiPeriodicEvents(t, currentRound + 1);
-            });
-
-            if(userPhysioCooldown > 0) userPhysioCooldown--;
-            currentMatchIndex = 0;
-            currentRound++;
-
-            if (currentRound >= fixtures.length) {
-                checkSeasonEnd();
-            }
+            teams.forEach(t => { executeAiTraining(t); executeAiPeriodicEvents(t, currentRound + 1); });
+            currentMatchIndex = 0; currentRound++; generateMarket();
+            if (currentRound >= fixtures.length) checkSeasonEnd();
         }
-
-        saveGameData();
-        updateUI();
+        saveGame(); updateUI();
     }
 
     function playRound() {
         if (currentRound >= fixtures.length) return;
-        let rActive = currentRound;
-        while(currentRound === rActive) {
-            playNextMatch();
-        }
+        let act = currentRound; while(currentRound === act) playNextMatch();
     }
 
     function checkSeasonEnd() {
         let sorted = [...teams].sort((a,b) => b.p - a.p);
-        alert(`Fim da Temporada! Campeão: ${sorted[0].name}`);
-        season++; currentRound = 0; currentMatchIndex = 0; userPhysioCooldown = 0;
-        teams.forEach(t => { 
-            t.p=0; t.j=0; t.v=0; t.e=0; t.d=0; t.gp=0; t.gc=0; 
-            t.players.forEach(p=>p.stamina=100); 
-        });
-        generateFixtures();
-        saveGameData();
-        updateUI();
+        alert(`Fim da Temporada! Campeão da Liga: ${sorted[0].name}`);
+        season++; currentRound = 0; currentMatchIndex = 0;
+        teams.forEach(t => { t.p=0; t.j=0; t.v=0; t.e=0; t.d=0; t.gp=0; t.gc=0; t.players.forEach(p=>p.stamina=100); });
+        generateFixtures(); generateMarket(); saveGame(); updateUI();
     }
 
-    function togglePlayerStarter(playerId) {
+    function togglePlayerStarter(pid) {
         let myTeam = teams.find(t => t.id === userTeamId);
-        let player = myTeam.players.find(p => p.id === playerId);
-        if (!player.starter) {
-            if(myTeam.players.filter(p => p.starter).length >= 11) {
-                alert("Você já possui 11 titulares em campo!");
-                return;
-            }
-            player.starter = true;
-        } else {
-            player.starter = false;
-        }
-        saveGameData();
-        updateUI();
+        let p = myTeam.players.find(x => x.id === pid);
+        if(!p.starter && myTeam.players.filter(x => x.starter).length >= 11) { alert("Limite máximo de 11 titulares atingido."); return; }
+        p.starter = !p.starter; saveGame(); updateUI();
+    }
+
+    function trainPlayer(pid, stat) {
+        let myTeam = teams.find(t => t.id === userTeamId);
+        let p = myTeam.players.find(x => x.id === pid);
+        if(p.stamina < 20) { alert("Jogador cansado demais para treinar!"); return; }
+        if(stat === 'attack' && p.attack < 99) { p.attack++; p.stamina -= 20; }
+        if(stat === 'defense' && p.defense < 99) { p.defense++; p.stamina -= 20; }
+        saveGame(); updateUI();
     }
 
     function autoSquadSelection() {
         let myTeam = teams.find(t => t.id === userTeamId);
         myTeam.players.forEach(p => p.starter = false);
-        const pickBest = (pos, count) => {
-            let pool = myTeam.players.filter(p => p.position === pos).sort((a,b) => ((b.attack + b.defense) * b.stamina) - ((a.attack + a.defense) * a.stamina));
+        const pick = (pos, count) => {
+            let pool = myTeam.players.filter(p => p.position === pos).sort((a,b) => ((b.attack+b.defense)*b.stamina) - ((a.attack+a.defense)*a.stamina));
             for(let i=0; i<count; i++) { if(pool[i]) pool[i].starter = true; }
         };
-        pickBest("GOL", 1); pickBest("DEF", 4); pickBest("MEI", 4); pickBest("ATA", 2);
-        saveGameData(); updateUI();
+        pick("GOL", 1); pick("DEF", 4); pick("MEI", 4); pick("ATA", 2);
+        saveGame(); updateUI();
     }
 
-    function trainPlayer(playerId, stat) {
+    // MERCADO: Comprar jogador (Humano gasta saldo)
+    function buyPlayer(mid) {
+        let p = marketPlayers.find(x => x.id === mid);
+        if(finances < p.price) { alert("Falta verba em caixa!"); return; }
         let myTeam = teams.find(t => t.id === userTeamId);
-        let p = myTeam.players.find(p => p.id === playerId);
-        if (p.stamina < 20) { alert("Stamina insuficiente para treinar!"); return; }
-
-        if (stat === 'attack' && p.attack < 99) { p.attack++; p.stamina -= 20; }
-        else if (stat === 'defense' && p.defense < 99) { p.defense++; p.stamina -= 20; }
+        if(myTeam.players.length >= 18) { alert("Elenco lotado! Limite de 18 atletas."); return; }
         
-        saveGameData(); updateUI();
+        finances -= p.price;
+        marketPlayers = marketPlayers.filter(x => x.id !== mid);
+        myTeam.players.push({ ...p, stamina: 100, starter: false });
+        
+        logGame(`💼 MERCADO: Você assinou com **${p.name}** por Cr$ ${p.price.toLocaleString()}.`);
+        saveGame(); updateUI();
     }
 
-    function triggerUserPhysio() {
-        if(userPhysioCooldown > 0) { alert(`Aguarde mais ${userPhysioCooldown} rodadas.`); return; }
+    // MERCADO: Vender jogador reserva (Humano arrecada saldo)
+    function sellPlayer(pid) {
+        let myTeam = teams.find(t => t.id === userTeamId);
+        if(myTeam.players.length <= 12) { alert("Você não pode vender mais ninguém. Elenco mínimo é de 12 atletas."); return; }
+        let p = myTeam.players.find(x => x.id === pid);
+        if(p.starter) { alert("Tire o jogador dos titulares antes de vendê-lo."); return; }
+
+        let value = Math.round((p.attack + p.defense) * 450);
+        finances += value;
+        myTeam.players = myTeam.players.filter(x => x.id !== pid);
+
+        logGame(`💸 MERCADO: **${p.name}** foi vendido por Cr$ ${value.toLocaleString()}.`);
+        saveGame(); updateUI();
+    }
+
+    // ESTÁDIO: Upgrade pago
+    function upgradeStadium() {
+        if(finances < 80000) { alert("Saldo bancário insuficiente."); return; }
+        finances -= 80000; stadiumLevel++;
+        logGame(`🏟️ INFRAESTRUTURA: Estádio expandido para o Nível ${stadiumLevel}.`);
+        saveGame(); updateUI();
+    }
+
+    // DM: Sessão profissional paga
+    function payPhysio() {
+        if(finances < 25000) { alert("Saldo insuficiente para cobrir as despesas médicas."); return; }
+        finances -= 25000;
         let myTeam = teams.find(t => t.id === userTeamId);
         myTeam.players.forEach(p => p.stamina = Math.min(100, p.stamina + 40));
-        userPhysioCooldown = 5;
-        saveGameData(); updateUI();
-        logGame("⚕️ DM: Fisioterapia aplicada ao seu elenco (+40% Stamina).");
+        logGame("⚕️ CLINICA: Elenco totalmente revigorado no DM (+40% Energia).");
+        saveGame(); updateUI();
     }
 
-    function updateTactics() {
-        currentTactic = document.getElementById('tactic-select').value;
-        document.getElementById('card-tactic').innerText = document.getElementById('tactic-select').options[document.getElementById('tactic-select').selectedIndex].text;
-        saveGameData();
-    }
+    function updateTactics() { currentTactic = document.getElementById('tactic-select').value; saveGame(); }
 
     function buildEditor() {
         const c = document.getElementById('editor-container'); c.innerHTML = '';
@@ -582,10 +566,9 @@
 
     function applyCustomization() {
         teams.forEach(t => {
-            t.name = document.getElementById(`ed-name-${t.id}`).value;
-            t.elo = parseInt(document.getElementById(`ed-elo-${t.id}`).value);
+            t.name = document.getElementById(`ed-name-${t.id}`).value; t.elo = parseInt(document.getElementById(`ed-elo-${t.id}`).value);
         });
-        saveGameData(); updateUI(); alert("Alterações de clubes salvas!");
+        saveGame(); updateUI(); alert("Configurações aplicadas!");
     }
 
     function switchTab(id) {
@@ -598,10 +581,12 @@
 
     function updateUI() {
         let myTeam = teams.find(t => t.id === userTeamId);
-        document.getElementById('header-manager-title').innerText = `Clube: ${myTeam.name}`;
+        document.getElementById('header-manager-title').innerText = `Gestão: ${myTeam.name}`;
         document.getElementById('display-season').innerText = `Temporada ${season}`;
         document.getElementById('display-round').innerText = `Rodada ${currentRound + 1} / ${fixtures.length}`;
         document.getElementById('card-elo').innerText = Math.round(myTeam.elo);
+        document.getElementById('card-finances').innerText = `Cr$ ${finances.toLocaleString()}`;
+        document.getElementById('txt-stadium-level').innerText = stadiumLevel;
 
         let sorted = [...teams].sort((a,b) => (b.p !== a.p) ? (b.p - a.p) : ((b.gp - b.gc) - (a.gp - a.gc)));
         document.getElementById('card-position').innerText = `${sorted.findIndex(t => t.id === userTeamId) + 1}º Lugar`;
@@ -622,15 +607,27 @@
                 <td><span class="badge ${p.starter?'badge-starter':'badge-bench'}">${p.starter?'Titular':'Reserva'}</span></td>
                 <td>
                     <div style="display:flex; gap:4px;">
-                        <button class="btn" style="padding:4px 6px; font-size:11px;" onclick="togglePlayerStarter(${p.id})">Status</button>
+                        <button class="btn" style="padding:4px 6px; font-size:11px;" onclick="togglePlayerStarter(${p.id})">Inverter</button>
                         <button class="btn btn-success" style="padding:4px 6px; font-size:11px;" onclick="trainPlayer(${p.id}, 'attack')">+ATA</button>
                         <button class="btn btn-success" style="padding:4px 6px; font-size:11px; background-color: var(--accent-blue);" onclick="trainPlayer(${p.id}, 'defense')">+DEF</button>
+                        ${!p.starter ? `<button class="btn btn-danger" style="padding:4px 6px; font-size:11px;" onclick="sellPlayer(${p.id})">$</button>` : ''}
                     </div>
                 </td>`;
         });
 
-        document.getElementById('btn-user-physio').innerText = userPhysioCooldown > 0 ? `DM em Cooldown (${userPhysioCooldown} Rds)` : "Chamar Fisioterapia Humana";
-        document.getElementById('btn-user-physio').disabled = userPhysioCooldown > 0;
+        let mList = document.getElementById('market-list'); mList.innerHTML = '';
+        marketPlayers.forEach(p => {
+            mList.innerHTML += `
+                <div class="card" style="margin-bottom:0; background: var(--bg-main);">
+                    <h3>${p.name}</h3>
+                    <div style="margin: 8px 0; font-size:12px; color:var(--text-muted);">Posição: <span class="badge badge-pos">${p.position}</span> | Idade: ${p.age} anos</div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:12px;"><span>Ataque: <strong>${p.attack}</strong></span><span>Defesa: <strong>${p.defense}</strong></span></div>
+                    <div class="flex-between">
+                        <span style="color:var(--accent); font-weight:bold;">Cr$ ${p.price.toLocaleString()}</span>
+                        <button class="btn btn-success" style="padding:6px 12px; font-size:12px;" onclick="buyPlayer(${p.id})">Contratar</button>
+                    </div>
+                </div>`;
+        });
 
         let tRound = currentRound >= fixtures.length ? fixtures.length - 1 : currentRound;
         let roundMatches = fixtures[tRound];
@@ -642,7 +639,7 @@
                 let h = teams.find(t => t.id === uMatch.home); let a = teams.find(t => t.id === uMatch.away);
                 document.getElementById('next-match-preview').innerHTML = `<div class=\"fixture-item\"><div><strong>${h.name}</strong></div><div class=\"score-badge\">VS</div><div><strong>${a.name}</strong></div></div>`;
             } else {
-                document.getElementById('next-match-preview').innerHTML = `<p style=\"color:var(--text-muted)\">Aguardando virada de rodada...</p>`;
+                document.getElementById('next-match-preview').innerHTML = `<p style=\"color:var(--text-muted)\">Aguardando início do próximo giro...</p>`;
             }
             roundMatches.forEach(m => {
                 let h = teams.find(t => t.id === m.home); let a = teams.find(t => t.id === m.away);
@@ -651,13 +648,7 @@
         }
     }
 
-    function logGame(m) {
-        let c = document.getElementById('game-console'); c.innerHTML += `<div>${m}</div>`; c.scrollTop = c.scrollHeight;
-    }
-
-    function resetAllData() {
-        if(confirm("Apagar save atual?")) { localStorage.clear(); window.location.reload(); }
-    }
+    function logGame(m) { let c = document.getElementById('game-console'); c.innerHTML += `<div>${m}</div>`; c.scrollTop = c.scrollHeight; }
 
     checkSaveOnLoad();
 </script>
