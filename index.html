@@ -390,8 +390,9 @@
     <div id="tab-custom" class="tab-content">
         <div class="card">
             <h2>Editor Global de Franquias</h2>
-            <div id="editor-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-top: 20px; margin-bottom: 20px;"></div>
-            <button class="btn btn-success" onclick="applyCustomization()">Salvar Alterações Base</button>
+            <p style="color: var(--text-muted); margin-bottom: 15px;">Ajuste o nome e o poderio tático (ELO) de qualquer franquia da liga em tempo real.</p>
+            <div id="editor-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 10px; margin-bottom: 25px;"></div>
+            <button class="btn btn-success" style="width: 100%; padding: 16px; font-size: 16px;" onclick="applyCustomization()">Salvar Alterações Base</button>
         </div>
     </div>
 </div>
@@ -401,7 +402,6 @@
     let dynamicModalQueue = [];
     let isModalShowing = false;
 
-    // Dispara modal personalizado com estilos condicionados
     function queueModal(title, text, quote = "", type = "info", callback = null) {
         dynamicModalQueue.push({ title, text, quote, type, callback });
         processModalQueue();
@@ -429,7 +429,6 @@
         const btn = document.getElementById('d-modal-btn');
         const box = overlay.querySelector('.modal-box');
         
-        // Estilização baseada no "type"
         if (modalData.type === 'danger') {
             iconEl.innerText = "🚨";
             box.style.borderTop = "4px solid var(--accent-red)";
@@ -474,7 +473,7 @@
     function getReputationTier(rep) {
         if (rep <= -10) return -3;
         if (rep <= -8) return -2;
-        if (rep <= -4) return -1; // Ajustado para -4 conforme instrução
+        if (rep <= -4) return -1; 
         if (rep >= 10) return 2;
         if (rep >= 5) return 1;
         return 0;
@@ -655,18 +654,30 @@
     }
 
     function playNextMatch() {
-        if (currentRound >= fixtures.length) return;
-        aiSquadRotation();
+        // Correção de loop de partidas/evitar bugs visuais 
+        if (currentRound >= fixtures.length || !fixtures[currentRound]) {
+            checkSeasonEnd();
+            return;
+        }
 
         let round = fixtures[currentRound];
+        if (currentMatchIndex >= round.length) {
+            currentMatchIndex = 0; 
+            currentRound++;
+            return playNextMatch(); 
+        }
+
+        aiSquadRotation();
+
         let match = round[currentMatchIndex];
-        let hTeam = teams.find(t => t.id === match.home), aTeam = teams.find(t => t.id === match.away);
+        let hTeam = teams.find(t => t.id === match.home);
+        let aTeam = teams.find(t => t.id === match.away);
         let isUserMatch = hTeam.id === userTeamId || aTeam.id === userTeamId;
 
         if(isUserMatch) {
             let userT = hTeam.id === userTeamId ? hTeam : aTeam;
             if(userT.players.filter(p => p.starter).length !== 11) {
-                queueModal("Erro de Regulamento", `O ${userT.name} está com escalação irregular. Ajuste para exatamente 11 titulares na aba Vestiário.`, "", "warn");
+                queueModal("Erro de Regulamento", `Sua equipe (${userT.name}) está com escalação irregular. Ajuste para exatamente 11 titulares na aba Vestiário antes de continuar.`, "A matemática não tolera 10 ou 12 homens em campo.", "warn");
                 switchTab('tab-squad'); return;
             }
         }
@@ -734,11 +745,10 @@
             
             if (reputation <= -4 && finances >= 200) {
                 finances -= 200; stadiumLevel++;
-                queueModal("Intervenção Corporativa Ativa", "Como você está sob embargo financeiro, o Conselho apreendeu automaticamente Cr$ 200k do seu caixa e expandiu o Estádio para o Nível " + stadiumLevel + ".", "O dinheiro da bilheteria é do clube, não para financiar seus fracassos no mercado.", "warn");
+                queueModal("Intervenção Corporativa Ativa", `Como você está sob embargo financeiro, o Conselho apreendeu automaticamente Cr$ 200k do seu caixa e expandiu o Estádio para o Nível ${stadiumLevel}.`, "O dinheiro da bilheteria é do clube, não para financiar seus fracassos.", "warn");
             }
         }
 
-        // Fan Reactions
         if (isUserMatch) {
             let userG = hTeam.id === userTeamId ? match.homeScore : match.awayScore;
             let oppG = hTeam.id === userTeamId ? match.awayScore : match.homeScore;
@@ -813,17 +823,16 @@
         reputation = Math.max(-10, Math.min(10, reputation + repChg));
         let currentTier = getReputationTier(reputation);
 
-        // Modais Narrativos Baseados em Mudança de Tier
         if (currentTier === -3) { // Game Over (-10)
             queueModal("DEMITIDO POR JUSTA CAUSA", "Seu desempenho foi catastrófico. O clube está em frangalhos e a torcida pede sua cabeça. Segurança, acompanhe-o até a saída.", "Suma da minha sala e nunca mais pise neste clube.", "danger", () => {
                 localStorage.clear(); window.location.reload();
             });
-            return; // Impede salvar
+            return; 
         } else if (currentTier < previousRepTier) {
             if (currentTier === -2) { // Limbo Tático (-8)
                 queueModal("Intervenção Tática", "Sua teimosia afundou nossa equipe. A partir de agora, as configurações táticas do clube estão travadas pelo conselho desportivo.", "Chega de invenções na beira do campo. Jogue o feijão com arroz.", "danger");
             } else if (currentTier === -1) { // Bloqueio Financeiro (-4)
-                queueModal("Embargo Orçamentário", "Devido a resultados medíocres, o Conselho Financeiro assumiu o controle. Você está proibido de comprar, vender ou gerir obras. Foque apenas no treino.", "Se você não sabe usar nosso dinheiro, nós usaremos em tijolos.", "warn");
+                queueModal("Embargo Orçamentário", "Devido a resultados medíocres, o Conselho Financeiro assumiu o controle. Você está proibido de gerir as finanças.", "Se você não sabe usar nosso dinheiro, nós usaremos em tijolos.", "warn");
             }
         } else if (currentTier > previousRepTier) {
             if (currentTier === 0 && previousRepTier < 0) {
@@ -837,7 +846,6 @@
 
         previousRepTier = currentTier;
 
-        // Movimentações Geopolíticas
         let moves = [];
         for (let div = 1; div <= 5; div++) {
             let dT = teams.filter(t => t.division === div).sort((a,b) => (b.p !== a.p) ? (b.p - a.p) : ((b.gp - b.gc) - (a.gp - a.gc)));
@@ -890,9 +898,21 @@
 
     function trainPlayer(pId, stat) {
         let p = teams.find(t => t.id === userTeamId).players.find(p => p.id === pId);
-        if (p.stamina < 20) { alert("Sem fôlego físico para o treino."); return; }
-        if (p[stat] >= 99) { alert("Atributo no limite!"); return; }
-        p[stat]++; p.stamina -= 20;
+        if (p.stamina < 20) { 
+            queueModal("Treino Abortado", "O atleta não tem energia (⚡) suficiente. Risco altíssimo de lesão muscular.", "A exaustão é o inimigo da perfeição.", "warn");
+            return; 
+        }
+        if (p[stat] >= 99) { 
+            queueModal("Limite Físico", "Este atleta atingiu seu potencial genético máximo neste atributo.", "Ele já joga no ápice.", "info");
+            return; 
+        }
+        
+        p[stat]++; 
+        p.stamina -= 20;
+        
+        let attrName = stat === 'attack' ? 'Ataque' : 'Defesa';
+        queueModal("Sessão Concluída", `O atleta ${p.name} evoluiu +1 em ${attrName}. Energia gasta: 20%.`, "O esforço no treino poupa sangue no jogo.", "success");
+        
         saveGameData(); updateUI();
     }
 
@@ -900,46 +920,69 @@
         if (reputation <= -4) { queueModal("Negado", "O mercado foi selado pelo Conselho. Sob embargo, você não gasta dinheiro.", "", "warn"); return; }
         let ply = marketPlayers.find(p => p.id === mId);
         let fPrice = staffScout ? Math.round(ply.price * 0.85) : ply.price;
-        if(finances < fPrice) { alert("Crédito bloqueado por insuficiência."); return; }
+        if(finances < fPrice) { queueModal("Caixa Insuficiente", "O clube não dispõe de capital para esta contratação.", "", "danger"); return; }
+        
         let mT = teams.find(t => t.id === userTeamId);
-        if(mT.players.length >= 18) { alert("Elenco lotado."); return; }
-        finances -= fPrice; marketPlayers = marketPlayers.filter(p => p.id !== mId);
+        if(mT.players.length >= 18) { queueModal("Elenco Cheio", "Você já possui 18 atletas. Venda alguém antes de contratar.", "", "warn"); return; }
+        
+        finances -= fPrice; 
+        marketPlayers = marketPlayers.filter(p => p.id !== mId);
         mT.players.push({ id: Date.now(), name: ply.name, age: ply.age, position: ply.position, attack: ply.attack, defense: ply.defense, stamina: 100, starter: false });
+        
         triggerFanReaction("happy", `BEM VINDO ${ply.name.toUpperCase()}!! Craque de bola!`);
+        queueModal("Reforço Assinado", `O atleta ${ply.name} assinou contrato e já se apresentou ao clube pela taxa de Cr$ ${fPrice}k.`, "Um grande ativo para o nosso plantel.", "success");
+        
         saveGameData(); updateUI();
     }
 
     function sellPlayer(pId) {
         if (reputation <= -4) { queueModal("Negado", "A Diretoria travou a venda de patrimônio do clube.", "", "warn"); return; }
         let mT = teams.find(t => t.id === userTeamId);
-        if(mT.players.length <= 12) { alert("Risco de W.O. Elenco muito pequeno."); return; }
+        if(mT.players.length <= 12) { queueModal("Risco de W.O.", "Elenco muito curto! Você precisa de ao menos 12 jogadores.", "", "warn"); return; }
+        
         let ply = mT.players.find(p => p.id === pId);
         let payout = Math.round((ply.attack + ply.defense) * 1.2);
-        finances += payout; mT.players = mT.players.filter(p => p.id !== pId);
+        
+        finances += payout; 
+        mT.players = mT.players.filter(p => p.id !== pId);
+        
+        queueModal("Ativo Negociado", `O jogador ${ply.name} foi vendido com sucesso. O valor de Cr$ ${payout}k já foi depositado nos cofres do clube.`, "Dinheiro novo, novos problemas.", "info");
+        
         saveGameData(); updateUI();
     }
 
     function hireStaff(type) {
-        if (reputation <= -4) { alert("Contratações bloqueadas pelo conselho financeiro."); return; }
-        if (type === 'physical' && !staffPhysical && finances >= 150) { finances -= 150; staffPhysical = true; }
-        else if (type === 'tactical' && !staffTactical && finances >= 180) { finances -= 180; staffTactical = true; }
-        else if (type === 'scout' && !staffScout && finances >= 120) { finances -= 120; staffScout = true; }
-        else { alert("Falha na negociação. Verifique fundos."); return; }
+        if (reputation <= -4) { queueModal("Negado", "Contratações bloqueadas pelo conselho financeiro.", "", "warn"); return; }
+        
+        let name = "", price = 0;
+        if (type === 'physical' && !staffPhysical && finances >= 150) { finances -= 150; staffPhysical = true; name = "Preparador Físico"; price = 150; }
+        else if (type === 'tactical' && !staffTactical && finances >= 180) { finances -= 180; staffTactical = true; name = "Auxiliar Técnico"; price = 180; }
+        else if (type === 'scout' && !staffScout && finances >= 120) { finances -= 120; staffScout = true; name = "Olheiro Chefe"; price = 120; }
+        else { queueModal("Caixa Insuficiente", "Verifique os fundos do clube antes de tentar contratar a comissão.", "", "danger"); return; }
+        
+        queueModal("Comissão Técnica", `Você fechou contrato com um novo ${name} por Cr$ ${price}k. Os bônus passivos já estão ativos.`, "Construir uma dinastia exige uma grande equipe.", "success");
         saveGameData(); updateUI();
     }
 
     function upgradeStadium() {
-        if (reputation <= -4) { alert("Sob intervenção fiscal. Operação manual negada."); return; }
-        if(finances < 200) { alert("Falta capital de giro."); return; }
-        finances -= 200; stadiumLevel++;
+        if (reputation <= -4) { queueModal("Negado", "Sob intervenção fiscal, expansões de infraestrutura manuais são negadas.", "", "warn"); return; }
+        if(finances < 200) { queueModal("Caixa Insuficiente", "O clube não dispõe de capital para expansão de estádio (Custo: Cr$ 200k).", "", "danger"); return; }
+        
+        finances -= 200; 
+        stadiumLevel++;
+        queueModal("Obras Concluídas", `As reformas terminaram! A Arena foi expandida para o Nível ${stadiumLevel}. Maior capacidade de bilheteria atingida.`, "Infraestrutura é a chave para o domínio absoluto.", "success");
+        
         saveGameData(); updateUI();
     }
 
     function buyPhysio() {
-        if (reputation <= -4) { alert("Contas bloqueadas. DM trancado."); return; }
-        if(finances < 100) { alert("Caixa insuficiente."); return; }
+        if (reputation <= -4) { queueModal("Negado", "Contas bloqueadas. DM trancado.", "", "warn"); return; }
+        if(finances < 100) { queueModal("Caixa Insuficiente", "Faltam recursos para a intervenção médica intensiva.", "", "danger"); return; }
+        
         finances -= 100;
         teams.find(t => t.id === userTeamId).players.forEach(p => p.stamina = Math.min(100, p.stamina + 40));
+        
+        queueModal("Departamento Médico", "O Choque Fisioterápico foi aplicado em todo o plantel. Eles recuperaram expressivos 40% de energia (⚡).", "Ciência esportiva trabalhando a nosso favor.", "success");
         saveGameData(); updateUI();
     }
 
@@ -986,7 +1029,7 @@
         let repBox = document.getElementById('box-reputation');
         repBox.className = "stat-box " + (reputation >= 5 ? "green" : (reputation <= -4 ? "red" : "warn"));
 
-        // Bloqueios UI (Baseados no limite -4)
+        // Bloqueios UI
         if (reputation <= -8) { document.getElementById('tactic-select').value = 'balanced'; document.getElementById('tactic-select').disabled = true; } 
         else { document.getElementById('tactic-select').disabled = false; }
         
@@ -1081,8 +1124,35 @@
         }
     }
 
-    function buildEditor() { /* Omitted extra polish here for brevity, basic functionality preserved */ }
-    function applyCustomization() { /* Omitted extra polish here for brevity, basic functionality preserved */ }
+    // --- Módulo do Editor Corrigido ---
+    function buildEditor() {
+        const c = document.getElementById('editor-container'); 
+        c.innerHTML = '';
+        
+        teams.sort((a,b) => a.id - b.id).forEach(t => {
+            c.innerHTML += `
+                <div style="background:rgba(0,0,0,0.3); padding:15px; border-radius:12px; border:1px solid var(--border-glass);">
+                    <strong style="font-size:11px;color:var(--text-muted);text-transform:uppercase;">Série ${String.fromCharCode(64 + t.division)}</strong>
+                    <input type="text" id="ed-name-${t.id}" value="${t.name}">
+                    <input type="number" id="ed-elo-${t.id}" value="${Math.round(t.elo)}" style="margin-top:8px">
+                </div>`;
+        });
+    }
+
+    function applyCustomization() {
+        teams.forEach(t => {
+            let inputName = document.getElementById(`ed-name-${t.id}`);
+            let inputElo = document.getElementById(`ed-elo-${t.id}`);
+            if (inputName && inputElo) {
+                t.name = inputName.value;
+                t.elo = parseInt(inputElo.value);
+            }
+        });
+        
+        queueModal("Sistema Atualizado", "As customizações do editor (Nomes e Força ELO) foram perfeitamente integradas à base de dados oficial da Liga.", "", "success");
+        saveGameData(); 
+        updateUI(); 
+    }
 
     checkSaveOnLoad();
 </script>
