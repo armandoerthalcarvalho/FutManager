@@ -398,6 +398,15 @@
 </div>
 
 <script>
+    function logGame(message) {
+    const consoleEl = document.getElementById('game-console');
+    if (consoleEl) {
+        const div = document.createElement('div');
+        div.innerHTML = message;
+        consoleEl.appendChild(div);
+        consoleEl.scrollTop = consoleEl.scrollHeight; // Faz o scroll automático para a última mensagem
+    }
+}
     /* ----- SISTEMA DE NARRATIVA E MODAIS IMERSIVOS ----- */
     let dynamicModalQueue = [];
     let isModalShowing = false;
