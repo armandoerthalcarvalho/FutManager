@@ -534,7 +534,7 @@
                     stamina: 100, starter: i < 11
                 });
             }
-            hallOfFame[id] = { titles: 0, vices: 0 };
+            hallOfFame[id] = { titulos: 0, vices: 0 };
             teams.push({ id, name, elo: baseElo, division: div, p:0, j:0, v:0, e:0, d:0, gp:0, gc:0, players: squad });
         });
         generateFixtures(); generateMarket();
@@ -810,9 +810,9 @@
             if (uIdx !== -1) userFinalRank = uIdx + 1;
 
             if (div === 1) {
-                if (!hallOfFame[dTeams[0].id]) hallOfFame[dTeams[0].id] = { titles: 0, vices: 0 };
-                if (!hallOfFame[dTeams[1].id]) hallOfFame[dTeams[1].id] = { titles: 0, vices: 0 };
-                hallOfFame[dTeams[0].id].titles++; hallOfFame[dTeams[1].id].vices++;
+                if (!hallOfFame[dTeams[0].id]) hallOfFame[dTeams[0].id] = { titulos: 0, vices: 0 };
+                if (!hallOfFame[dTeams[1].id]) hallOfFame[dTeams[1].id] = { titulos: 0, vices: 0 };
+                hallOfFame[dTeams[0].id].titulos++; hallOfFame[dTeams[1].id].vices++;
                 pastSeasons.push({ season: season, champion: dTeams[0].name, vice: dTeams[1].name });
                 if(dTeams[0].id === userTeamId) queueModal("Campeão da Elite!", "Você conquistou o título máximo do Futebol Nacional!", "", "success");
             }
@@ -1062,14 +1062,14 @@ function renderHallOfFame() {
 
         return {
             name: team ? team.name : key, 
-            titles: hallOfFame[key].titles || 0,
+            titulos: hallOfFame[key].titulos || 0,
             vices: hallOfFame[key].vices || 0
         };
     });
 
     // Filtra equipas sem histórico e ordena por Títulos, seguido de Vices
-    hofList = hofList.filter(t => t.titles > 0 || t.vices > 0)
-                     .sort((a, b) => b.titles - a.titles || b.vices - a.vices);
+    hofList = hofList.filter(t => t.titulos > 0 || t.vices > 0)
+                     .sort((a, b) => b.titulos - a.titulos || b.vices - a.vices);
 
     // 4. Se não houver dados, exibe uma mensagem amigável de estado vazio
     if (hofList.length === 0) {
@@ -1102,7 +1102,7 @@ function renderHallOfFame() {
         tableHTML += `
             <tr style="border-bottom: 1px solid var(--border-glass); font-size: 14px; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
                 <td style="padding: 14px 8px; color: var(--text-main); font-weight: 600;">${t.name}</td>
-                <td style="padding: 14px 8px; text-align: center; color: var(--accent-warn); font-weight: 800; font-size: 16px;">${t.titles}</td>
+                <td style="padding: 14px 8px; text-align: center; color: var(--accent-warn); font-weight: 800; font-size: 16px;">${t.titulos}</td>
                 <td style="padding: 14px 8px; text-align: center; color: var(--text-muted); font-weight: 600;">${t.vices}</td>
             </tr>
         `;
