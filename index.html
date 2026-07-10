@@ -816,6 +816,8 @@
                 pastSeasons.push({ season: season, champion: dTeams[0].name, vice: dTeams[1].name });
                 if(dTeams[0].id === userTeamId) queueModal("Campeão da Elite!", "Você conquistou o título máximo do Futebol Nacional!", "", "success");
             }
+            localStorage.setItem('futpro_hof', JSON.stringify(hallOfFame));
+            
             let baseP = (6 - div) * 40; 
             dTeams.forEach((t, idx) => {
                 let payout = baseP + ((8 - idx) * 10);
@@ -1030,6 +1032,86 @@
         Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(id))?.classList.add('active');
     }
 
+    // --- RENDERIZADOR ULTRA-ROBUSTO DA GALERIA DA FAMA ---
+function renderHallOfFame() {
+    // 1. Procura dinamicamente por qualquer contentor da Galeria da Fama no seu HTML
+    let hofContainer = document.getElementById('hof-table') || 
+                       document.getElementById('hof-list') || 
+                       document.getElementById('tab-hof') || 
+                       document.getElementById('hof') ||
+                       document.querySelector('.tab-content[id*="hof"]') ||
+                       document.querySelector('.tab-content[id*="galeria"]');
+
+    if (!hofContainer) return; // Salvaguarda caso a aba ainda não tenha sido criada
+
+    // 2. Garante a persistência e recuperação segura dos dados do localStorage
+    if (typeof hallOfFame === 'undefined' || !hallOfFame || Object.keys(hallOfFame).length === 0) {
+        window.hallOfFame = JSON.parse(localStorage.getItem('futpro_hof')) || {};
+    }
+
+    // 3. Normaliza os dados (suporta nativamente chaves por ID ou por Nome da Equipa)
+    let hofList = Object.keys(hallOfFame).map(key => {
+        let team = null;
+        
+        if (!isNaN(key)) {
+            team = teams.find(t => t.id === parseInt(key));
+        }
+        if (!team) {
+            team = teams.find(t => t.name.toLowerCase() === key.toLowerCase());
+        }
+
+        return {
+            name: team ? team.name : key, 
+            titles: hallOfFame[key].titles || 0,
+            vices: hallOfFame[key].vices || 0
+        };
+    });
+
+    // Filtra equipas sem histórico e ordena por Títulos, seguido de Vices
+    hofList = hofList.filter(t => t.titles > 0 || t.vices > 0)
+                     .sort((a, b) => b.titles - a.titles || b.vices - a.vices);
+
+    // 4. Se não houver dados, exibe uma mensagem amigável de estado vazio
+    if (hofList.length === 0) {
+        hofContainer.innerHTML = `
+            <div style="text-align:center; padding: 40px; color: var(--text-muted);">
+                <h2 style="color: var(--text-main); margin-bottom: 10px;">🏆 Galeria da Fama</h2>
+                <p>Nenhuma equipa conquistou títulos ou vices ainda. Termine uma temporada para inaugurar o pódio!</p>
+            </div>`;
+        return;
+    }
+
+    // 5. Injeta uma tabela moderna alinhada com o design "Executive Pro"
+    let tableHTML = `
+        <div style="padding: 20px; background: var(--bg-panel); border-radius: 12px; border: 1px solid var(--border-glass); box-shadow: var(--glow-blue); margin-top: 15px;">
+            <h2 style="color: var(--text-main); margin-bottom: 20px; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+                🏆 Galeria da Fama (Histórico Alargado)
+            </h2>
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border-glass); color: var(--text-muted); font-size: 13px;">
+                        <th style="padding: 12px 8px;">Equipa</th>
+                        <th style="padding: 12px 8px; text-align: center; color: var(--accent-warn);">🏆 Títulos</th>
+                        <th style="padding: 12px 8px; text-align: center; color: var(--text-muted);">🥈 Vices</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    hofList.forEach(t => {
+        tableHTML += `
+            <tr style="border-bottom: 1px solid var(--border-glass); font-size: 14px; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+                <td style="padding: 14px 8px; color: var(--text-main); font-weight: 600;">${t.name}</td>
+                <td style="padding: 14px 8px; text-align: center; color: var(--accent-warn); font-weight: 800; font-size: 16px;">${t.titles}</td>
+                <td style="padding: 14px 8px; text-align: center; color: var(--text-muted); font-weight: 600;">${t.vices}</td>
+            </tr>
+        `;
+    });
+
+    tableHTML += `</tbody></table></div>`;
+    hofContainer.innerHTML = tableHTML;
+}
+
     function updateUI() {
         let mT = teams.find(t => t.id === userTeamId);
         document.getElementById('header-team-status').innerText = `Franquia: ${mT.name} | Série ${String.fromCharCode(64 + mT.division)}`;
@@ -1141,35 +1223,7 @@
             });
         }
     }
-
-    // --- Atualização da Galeria da Fama (Hall of Fame) ---
-        let hofTableBody = document.querySelector('#hof-table tbody');
-        if (hofTableBody) {
-            hofTableBody.innerHTML = '';
-            
-            // Mapeia o objeto hallOfFame, vincula aos nomes dos times e filtra apenas os que têm títulos ou vices
-            let hofList = Object.keys(hallOfFame)
-                .map(id => {
-                    let team = teams.find(t => t.id === parseInt(id));
-                    return {
-                        name: team ? team.name : 'Franquia Desconhecida',
-                        titles: hallOfFame[id].titles || 0,
-                        vices: hallOfFame[id].vices || 0
-                    };
-                })
-                .filter(t => t.titles > 0 || t.vices > 0) // Remove times zerados da lista
-                .sort((a, b) => b.titles - a.titles || b.vices - a.vices); // Ordena por Títulos, depois Vices
-
-            // Insere os dados na tabela
-            hofList.forEach(t => {
-                let tr = hofTableBody.insertRow();
-                tr.innerHTML = `
-                    <td><strong>${t.name}</strong></td>
-                    <td style="color: var(--accent-warn); font-weight: 800;">${t.titles}</td>
-                    <td style="color: var(--text-muted);">${t.vices}</td>
-                `;
-            });
-        }
+    renderHallOfFame();
 
     // --- Módulo do Editor Corrigido ---
     function buildEditor() {
