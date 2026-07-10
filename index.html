@@ -1132,6 +1132,35 @@
         }
     }
 
+    // --- Atualização da Galeria da Fama (Hall of Fame) ---
+        let hofTableBody = document.querySelector('#hof-table tbody');
+        if (hofTableBody) {
+            hofTableBody.innerHTML = '';
+            
+            // Mapeia o objeto hallOfFame, vincula aos nomes dos times e filtra apenas os que têm títulos ou vices
+            let hofList = Object.keys(hallOfFame)
+                .map(id => {
+                    let team = teams.find(t => t.id === parseInt(id));
+                    return {
+                        name: team ? team.name : 'Franquia Desconhecida',
+                        titles: hallOfFame[id].titles || 0,
+                        vices: hallOfFame[id].vices || 0
+                    };
+                })
+                .filter(t => t.titles > 0 || t.vices > 0) // Remove times zerados da lista
+                .sort((a, b) => b.titles - a.titles || b.vices - a.vices); // Ordena por Títulos, depois Vices
+
+            // Insere os dados na tabela
+            hofList.forEach(t => {
+                let tr = hofTableBody.insertRow();
+                tr.innerHTML = `
+                    <td><strong>${t.name}</strong></td>
+                    <td style="color: var(--accent-warn); font-weight: 800;">${t.titles}</td>
+                    <td style="color: var(--text-muted);">${t.vices}</td>
+                `;
+            });
+        }
+
     // --- Módulo do Editor Corrigido ---
     function buildEditor() {
         const c = document.getElementById('editor-container'); 
