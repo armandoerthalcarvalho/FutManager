@@ -629,9 +629,38 @@
         let modalQueue = [];
         let isModalActive = false;
 
-        const firstNames = ["Alisson", "Gabriel", "Lucas", "Rodrigo", "Marcos", "Bruno", "Vinicius", "Mateus", "Vitor", "Diego", "Arthur", "Thiago", "Ederson", "Guilherme", "Felipe", "Gustavo"];
-        const lastNames = ["Silva", "Santos", "Oliveira", "Souza", "Rodrigues", "Ferreira", "Alves", "Pereira", "Lima", "Gomes", "Costa", "Ribeiro", "Martins", "Carvalho", "Almeida", "Lopes"];
+        const firstNames = [
+    "Alisson", "Gabriel", "Lucas", "Rodrigo", "Marcos", "Bruno", "Vinicius", "Matheus",
+    "Vitor", "Diego", "Arthur", "Thiago", "Ederson", "Guilherme", "Felipe", "Gustavo",
+    "João", "Pedro", "Miguel", "Enzo", "Rafael", "Leonardo", "Henrique", "Caio",
+    "Murilo", "Eduardo", "André", "Carlos", "Daniel", "Matheus", "Samuel", "Nicolas",
+    "Igor", "Renato", "Alex", "Victor", "José", "Antônio", "Fernando", "Ricardo",
+    "Otávio", "Cauã", "Luan", "Nathan", "Yuri", "Cristian", "Cristiano", "Júlio",
+    "Alan", "Wesley", "Jean", "Fábio", "Roberto", "Paulo", "Marcelo", "Leandro",
+    "Adriano", "Jonathan", "Breno", "César", "Davi", "Elias", "Emerson", "Erick",
+    "Francisco", "Geovane", "Heitor", "Isaac", "Jair", "Jefferson", "Jonas", "Kaique",
+    "Kevin", "Luiz", "Maurício", "Noah", "Pablo", "Raul", "Sandro", "Tales",
+    "Tomás", "Valter", "William", "Yago", "Augusto", "Benício", "Bernardo", "Cássio",
+    "Cláudio", "Douglas", "Emanuel", "Fabrício", "Hugo", "Joaquim", "Kelvin", "Lorenzo",
+    "Márcio", "Ruan", "Sérgio", "Túlio"
+];
 
+const lastNames = [
+    "Silva", "Santos", "Oliveira", "Souza", "Rodrigues", "Ferreira", "Alves", "Pereira",
+    "Lima", "Gomes", "Costa", "Ribeiro", "Martins", "Carvalho", "Almeida", "Lopes",
+    "Barbosa", "Rocha", "Dias", "Monteiro", "Mendes", "Cardoso", "Teixeira", "Correia",
+    "Azevedo", "Moreira", "Nogueira", "Freitas", "Moura", "Castro", "Campos", "Rezende",
+    "Machado", "Melo", "Batista", "Vieira", "Farias", "Araújo", "Borges", "Cavalcante",
+    "Pinto", "Cunha", "Tavares", "Andrade", "Peixoto", "Coelho", "Aguiar", "Barros",
+    "Neves", "Bezerra", "Leite", "Duarte", "Franco", "Fonseca", "Macedo", "Sales",
+    "Pacheco", "Assis", "Queiroz", "Amaral", "Siqueira", "Xavier", "Brandão", "Bittencourt",
+    "Vasconcelos", "Bueno", "Porto", "Camargo", "Moraes", "Lacerda", "Ramos", "Rezende",
+    "Paiva", "Prado", "Valente", "Guimarães", "Barreto", "Santana", "Pinheiro", "Abreu",
+    "Nascimento", "Cordeiro", "Miranda", "Severino", "Sampaio", "Motta", "Cruz", "Veloso",
+    "Magalhães", "Drummond", "Figueiredo", "Maia", "Bastos", "Viana", "Arruda", "Noronha",
+    "Pimentel", "Saraiva", "Beltrão", "Guerra"
+];
+        
         function poissonRandom(lambda) {
             let L = Math.exp(-lambda);
             let k = 0;
