@@ -704,16 +704,16 @@ const lastNames = [
             const pos = positionStr || positions[Math.floor(Math.random() * positions.length)];
             const age = Math.floor(Math.random() * 18) + 17; 
             
-            let minS = 58; let maxS = 70;
-            if (tier === 'modesto') { minS = 45; maxS = 56; }
-            if (tier === 'elite') { minS = 75; maxS = 86; }
+            let minS = 54; let maxS = 66;
+            if (tier === 'modesto') { minS = 41; maxS = 52; }
+            if (tier === 'elite') { minS = 71; maxS = 82; }
             
             let att = Math.floor(Math.random() * (maxS - minS)) + minS;
             let def = Math.floor(Math.random() * (maxS - minS)) + minS;
 
-            if (pos === 'GOL') { att = Math.floor(att * 0.15); def = Math.max(def, minS + 10); }
-            if (pos === 'DEF') { att = Math.floor(att * 0.25); }
-            if (pos === 'ATA') { def = Math.floor(def * 0.15); }
+            if (pos === 'GOL') { att = Math.floor(att * 0.2); def = Math.min(Math.floor(def * 1.5), 95); }
+            if (pos === 'DEF') { att = Math.floor(att * 0.4); def = Math.min(Math.floor(def * 1.4), 90);}
+            if (pos === 'ATA') { def = Math.floor(def * 0.4); att = Math.min(Math.floor(att * 1.4), 90);}
 
             const p = {
                 id: Math.floor(Math.random() * 900000) + 100000,
