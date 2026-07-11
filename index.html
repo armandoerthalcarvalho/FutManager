@@ -851,31 +851,94 @@ const lastNames = [
                 location.reload();
             }
         }
+        
+function generateSeasonFixtures() {
+    fixtures = [];
 
-        function generateSeasonFixtures() {
-            fixtures = [];
-            for (let div = 1; div <= 5; div++) {
-                let divTeams = teams.filter(t => t.division === div);
-                let numTeams = divTeams.length;
-                let roundsTotal = (numTeams - 1) * 2;
-                let pool = [...divTeams];
-                
-                for (let r = 0; r < roundsTotal; r++) {
-                    for (let i = 0; i < numTeams / 2; i++) {
-                        let home = pool[i];
-                        let away = pool[numTeams - 1 - i];
-                        if (r >= numTeams - 1) {
-                            let temp = home; home = away; away = temp;
-                        }
-                        fixtures.push({
-                            division: div, round: r + 1, homeId: home.id, awayId: away.id,
-                            played: false, homeScore: 0, awayScore: 0
-                        });
-                    }
-                    pool.splice(1, 0, pool.pop());
-                }
-            }
+    for (let div = 1; div <= 5; div++) {
+
+        const divTeams = teams.filter(t => t.division === div);
+
+        const n = divTeams.length;
+
+        if (n % 2 !== 0) {
+            console.error("A divisão precisa ter número par de clubes.");
+            continue;
         }
+
+        const roundsPerTurn = n - 1;
+        const totalRounds = roundsPerTurn * 2;
+
+        let rotation = [...divTeams];
+
+        const firstTurn = [];
+
+        // ---------- PRIMEIRO TURNO ----------
+        for (let round = 0; round < roundsPerTurn; round++) {
+
+            const matches = [];
+
+            for (let i = 0; i < n / 2; i++) {
+
+                let home = rotation[i];
+                let away = rotation[n - 1 - i];
+
+                // Alternância de mando
+                if ((round + i) % 2 === 1) {
+                    [home, away] = [away, home];
+                }
+
+                matches.push({
+                    homeId: home.id,
+                    awayId: away.id
+                });
+            }
+
+            firstTurn.push(matches);
+
+            // Rotação (Circle Method)
+            const fixed = rotation[0];
+            const moving = rotation.slice(1);
+
+            moving.unshift(moving.pop());
+
+            rotation = [fixed, ...moving];
+        }
+
+        // ---------- SEGUNDO TURNO ----------
+        for (let round = 0; round < totalRounds; round++) {
+
+            const sourceRound =
+                round < roundsPerTurn
+                    ? firstTurn[round]
+                    : firstTurn[round - roundsPerTurn];
+
+            sourceRound.forEach(match => {
+
+                let homeId, awayId;
+
+                if (round < roundsPerTurn) {
+                    homeId = match.homeId;
+                    awayId = match.awayId;
+                } else {
+                    // Inverte apenas o confronto correspondente
+                    homeId = match.awayId;
+                    awayId = match.homeId;
+                }
+
+                fixtures.push({
+                    division: div,
+                    round: round + 1,
+                    homeId,
+                    awayId,
+                    played: false,
+                    homeScore: 0,
+                    awayScore: 0
+                });
+            });
+        }
+    }
+}
 
         function generateMarket() {
             marketPlayers = [];
