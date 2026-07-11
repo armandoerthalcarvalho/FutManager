@@ -425,12 +425,12 @@
 
     <div class="main-container">
         <nav id="main-navigation" style="display: none;">
-            <button class="nav-btn active" onclick="switchView('dashboard')">Painel Executivo</button>
-            <button class="nav-btn" onclick="switchView('tactics')">Gestão Tática</button>
-            <button class="nav-btn" onclick="switchView('training')">Centro de Treino</button>
-            <button class="nav-btn" onclick="switchView('market')">Mercado de Passes</button>
-            <button class="nav-btn" onclick="switchView('finances')">Diretoria & Finanças</button>
-            <button class="nav-btn" onclick="switchView('editor')">Central Custom</button>
+            <button class="nav-btn active" onclick="switchView('dashboard', this)">Painel Executivo</button>
+            <button class="nav-btn" onclick="switchView('tactics', this)">Gestão Tática</button>
+            <button class="nav-btn" onclick="switchView('training', this)">Centro de Treino</button>
+            <button class="nav-btn" onclick="switchView('market', this)">Mercado de Passes</button>
+            <button class="nav-btn" onclick="switchView('finances', this)">Diretoria & Finanças</button>
+            <button class="nav-btn" onclick="switchView('editor' this)">Central Custom</button>
             <div style="margin-top:auto; padding:10px; display:flex; flex-direction:column; gap:8px;">
                 <button class="btn" style="font-size:11px; padding:6px;" onclick="saveGame()">Salvar Estado</button>
                 <button class="btn" style="font-size:11px; padding:6px; background:rgba(239,68,68,0.2)" onclick="resetGame()">Resetar Base</button>
@@ -1646,18 +1646,16 @@ const lastNames = [
             buildEditor();
         }
 
-        function switchView(viewId) {
+        function switchView(viewId, clickedButton = null) {
             document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            
+
             const targetPanel = document.getElementById(`view-${viewId}`);
-            if(targetPanel) targetPanel.classList.add('active');
-            
-            // Ativa o botão correspondente se o clique foi gerado na navegação
-            if(event && event.target && event.target.classList.contains('nav-btn')) {
-                event.target.classList.add('active');
+            if (targetPanel) targetPanel.classList.add('active');
+            if (clickedButton) {
+                clickedButton.classList.add('active');
             }
-        }
+            }
 
         function logConsole(msg) {
             const c = document.getElementById('game-console');
