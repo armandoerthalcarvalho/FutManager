@@ -689,7 +689,7 @@ const lastNames = [
         function calculatePayroll() {
             let baseOperational = 10000;
             let squadPayroll = squad.reduce((acc, p) => {
-                let salary = Math.pow((p.attack + p.defense) / 2, 2.2);
+                let salary = Math.pow((p.attack + p.defense) / 10, 2.5);
                 return acc + salary;
             }, 0);
             let staffCost = 0;
