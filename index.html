@@ -675,7 +675,7 @@ const lastNames = [
         function calculatePlayerValue(p) {
             const avgStat = (p.attack + p.defense) / 2;
             const baseFactor = 22000; 
-            const capabilityExponent = Math.pow(avgStat / 40, 5.0) * baseFactor;
+            const capabilityExponent = Math.pow(avgStat / 40, 8) * baseFactor;
             
             let ageMultiplier = 1.0;
             if (p.age <= 22) {
@@ -683,19 +683,19 @@ const lastNames = [
             } else if (p.age >= 30) {
                 ageMultiplier = Math.max(0.05, 1.0 - (p.age - 29) * 0.16); 
             }
-            return Math.round(Math.max(45000, capabilityExponent * ageMultiplier));
+            return Math.round(Math.max(5000, capabilityExponent * ageMultiplier));
         }
 
         function calculatePayroll() {
-            let baseOperational = 100000;
+            let baseOperational = 10000;
             let squadPayroll = squad.reduce((acc, p) => {
-                let salary = Math.pow((p.attack + p.defense) / 2, 1.8) * 45;
+                let salary = Math.pow((p.attack + p.defense) / 2, 3) * 2.2;
                 return acc + salary;
             }, 0);
             let staffCost = 0;
-            if (staff.coach) staffCost += 60000;
-            if (staff.fitness) staffCost += 45000;
-            if (staff.commercial) staffCost += 55000;
+            if (staff.coach) staffCost += 30000;
+            if (staff.fitness) staffCost += 20000;
+            if (staff.commercial) staffCost += 25000;
             return Math.round(baseOperational + squadPayroll + staffCost);
         }
 
@@ -708,12 +708,12 @@ const lastNames = [
             if (tier === 'modesto') { minS = 41; maxS = 52; }
             if (tier === 'elite') { minS = 71; maxS = 82; }
             
-            let att = Math.floor(Math.random() * (maxS - minS)) + minS;
-            let def = Math.floor(Math.random() * (maxS - minS)) + minS;
+            let att = Math.floor(Math.random() * (maxS + 1 - minS)) + minS;
+            let def = Math.floor(Math.random() * (maxS + 1 - minS)) + minS;
 
-            if (pos === 'GOL') { att = Math.floor(att * 0.2); def = Math.min(Math.floor(def * 1.5), 95); }
-            if (pos === 'DEF') { att = Math.floor(att * 0.4); def = Math.min(Math.floor(def * 1.4), 90);}
-            if (pos === 'ATA') { def = Math.floor(def * 0.4); att = Math.min(Math.floor(att * 1.4), 90);}
+            if (pos === 'GOL') { att = Math.floor(att * 0.1); def = Math.min(Math.floor(def * 1.25), 99); }
+            if (pos === 'DEF') { att = Math.floor(att * 0.5); def = Math.min(Math.floor(def * 1.2), 99);}
+            if (pos === 'ATA') { def = Math.floor(def * 0.5); att = Math.min(Math.floor(att * 1.2), 99);}
 
             const p = {
                 id: Math.floor(Math.random() * 900000) + 100000,
@@ -988,7 +988,7 @@ const lastNames = [
             let lossFactor = staff.fitness ? 0.75 : 1.0;
             squad.forEach(p => {
                 if (lineupSlots.includes(p.id)) {
-                    p.stamina = Math.max(15, p.stamina - Math.round((Math.floor(Math.random() * 8) + 14) * lossFactor));
+                    p.stamina = Math.max(15, p.stamina - Math.round((Math.floor(Math.random() * 8) + 8) * lossFactor));
                 } else {
                     p.stamina = Math.min(100, p.stamina + 20);
                 }
@@ -1033,11 +1033,11 @@ const lastNames = [
             if (currentRound % 5 === 0) {
                 teams.forEach(t => {
                     if (t.id !== userTeamId) {
-                        t.baseAttack += Math.floor(Math.random() * 2) + 1;
-                        t.baseDefense += Math.floor(Math.random() * 2) + 1;
+                        t.baseAttack = Math.min(99, t.baseAttack + Math.floor(Math.random() * 3.5) - 1);
+                        t.baseDefense = Math.min(99, t.baseDefense + Math.floor(Math.random() * 3.5) - 1);
                     }
                 });
-                logConsole("Janela de Evolução Tecnológica: Equipes da IA otimizaram seus parâmetros de elenco.");
+                logConsole("Janela de Evolução Tecnológica: Equipes da IA possivelmente otimizaram seus parâmetros de elenco, ou talvez investimentos que não vão se pagar");
             }
 
             // Disparar modais corporativos
