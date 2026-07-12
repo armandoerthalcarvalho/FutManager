@@ -309,16 +309,19 @@
         }
         .stamina-fill { height: 100%; background: var(--accent-green); }
 
+        /* SUBSTITUA A CLASSE .tactical-field POR ESTA: */
         .tactical-field {
             background: radial-gradient(circle at center, #1b4d3e 0%, #0d261f 100%);
             border: 2px solid rgba(255,255,255,0.1);
             border-radius: 12px;
-            padding: 20px;
+            padding: 20px 15px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            min-height: 480px;
-            justify-content: space-around;
+            gap: 12px;                  /* Espaçamento uniforme entre as linhas táticas */
+            min-height: 580px;          /* Altura expandida para suportar formações de 5 ou 6 linhas */
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
         }
 
         .tactical-row {
@@ -1624,109 +1627,127 @@ function openSlotSelectorModal(slotIndex) {
             closeModal(); saveGame(); renderTacticalField(); renderBenchAndRoster();
         }
 
-function renderTacticalField() {
-    const container = document.getElementById('tactical-field-dom');
-    container.innerHTML = "";
-    const layout = formationsConfig[currentFormation];
-    
-    const rows = {
-    GOL: [],
-    DEF: [],
-    MEI: [],
-    ATA: []
-};
+        function renderTacticalField() {
+            const container = document.getElementById('tactical-field-dom');
+            container.innerHTML = "";
+            
+            // Garante que o campo tático seja o ponto de ancoragem relativo e tenha boa altura operacional
+            container.style.position = "relative";
+            container.style.minHeight = "540px"; 
 
-layout.forEach((subPos, idx) => {
+            const layout = formationsConfig[currentFormation];
+            
+            // 1. Mapeamento analítico de ocorrências para distribuição horizontal simétrica de peças centrais
+            const counts = {};
+            layout.forEach(pos => {
+                counts[pos] = (counts[pos] || 0) + 1;
+            });
 
-    const info = subposData[subPos];
+            // Rastreador dinâmico de índice interno para posições duplicadas/triplicadas
+            const currentIdxOfPos = {};
 
-    if (!info) {
-        console.error(
-            `Unknown tactical position "${subPos}" in formation "${currentFormation}".`
-        );
-        return;
-    }
+            // 2. Tabela de Profundidade Vertical Tática (Suavização de Camadas: 0% = Ataque Total, 100% = Linha de Fundo)
+            const subposTopMap = {
+                'GOL': 88,  // Goleiro bem recuado na área
+                'ZAG': 73,  // Defesa central profunda
+                'LE':  67,  // Laterais flutuando suavemente adiantados em relação aos zagueiros
+                'LD':  67,
+                'VOL': 54,  // Primeiro combate / Volante de contenção
+                'MC':  41,  // Meio-campo central clássico
+                'ME':  41,  // Meias abertos alinhados horizontalmente com o MC
+                'MD':  41,
+                'MEI': 27,  // Meia-atacante / Conexão ofensiva
+                'F9':  20,  // Elemento surpresa flutuante
+                'PE':  14,  // Extremos ofensivos paralelos à grande área
+                'PD':  14,
+                'ATA': 10   // Centroavante espetado na última linha
+            };
 
-    rows[info.gen].push(idx);
+            // 3. Processamento individual e plotagem dos 11 slots táticos
+            layout.forEach((subPosName, idx) => {
+                if (!currentIdxOfPos[subPosName]) {
+                    currentIdxOfPos[subPosName] = 0;
+                }
+                const occurrenceIdx = currentIdxOfPos[subPosName];
+                currentIdxOfPos[subPosName]++;
 
-});
+                // Definição da coordenada Vertical (Y)
+                const topPercent = subposTopMap[subPosName] !== undefined ? subposTopMap[subPosName] : 41;
 
-const renderOrder = ['ATA', 'MEI', 'DEF', 'GOL'];
+                // Definição da coordenada Horizontal (X) aplicando o Fator de Lateralidade Amplo
+                let leftPercent = 50; // Padrão centralizado absoluto
 
-renderOrder.forEach(group => {
+                if (subPosName === 'ME' || subPosName === 'PE') {
+                    leftPercent = 15; // Força ancoragem total na ala esquerda do campo
+                } else if (subPosName === 'MD' || subPosName === 'PD') {
+                    leftPercent = 85; // Força ancoragem total na ala direita do campo
+                  
+                } else if (subPosName === 'LE') { leftPercent = 10;}
+                else if (subPosName === 'LD') { leftPercent = 90;}
+                else {
+                    // Algoritmo de dispersão para eixos centrais múltiplos (Zagueiros duplos/trios, MCs, ATAs)
+                    const totalMatches = counts[subPosName];
+                    if (totalMatches === 2) {
+                        // Divisão simétrica de duas peças (ex: dois ZAGs ou dois ATAs)
+                        leftPercent = (occurrenceIdx === 0) ? 34 : 66;
+                    } else if (totalMatches === 3) {
+                        // Divisão harmônica de três peças (ex: três zagueiros da linha de 5 ou 3-4-3)
+                        if (occurrenceIdx === 0) leftPercent = 26;
+                        else if (occurrenceIdx === 1) leftPercent = 50;
+                        else leftPercent = 74;
+                    } else if (totalMatches === 4) {
+                        // Salvaguarda estrutural para linhas com 4 elementos idênticos
+                        if (occurrenceIdx === 0) leftPercent = 20;
+                        else if (occurrenceIdx === 1) leftPercent = 40;
+                        else if (occurrenceIdx === 2) leftPercent = 60;
+                        else leftPercent = 80;
+                    }
+                }
 
-    const indices = rows[group] || [];
+                // Construção de estilos CSS in-line para posicionamento absoluto milimétrico
+                const positionStyle = `position: absolute; top: ${topPercent}%; left: ${leftPercent}%; transform: translate(-50%, -50%); width: 95px; margin: 0; box-sizing: border-box; z-index: 10;`;
 
-    if (indices.length === 0)
-        return;
+                const pId = lineupSlots[idx];
+                const p = squad.find(x => x.id === pId);
 
-    let rowHTML = '<div class="tactical-row">';
+                if (p) {
+                    const requiredGenPos = subposData[subPosName].gen;
+                    const isWrong = p.position !== requiredGenPos;
+                    const borderStyle = isWrong ? "border-color: var(--accent-red) !important; box-shadow: 0 0 10px rgba(255,51,102,0.3);" : "";
+                    
+                    let stamColor = "#ff3366";
+                    if (p.stamina >= 80) stamColor = "#00ff88";
+                    else if (p.stamina >= 60) stamColor = "#ffb703";
+                    else if (p.stamina >= 40) stamColor = "#f97316";
 
-    indices.forEach(idx => {
-
-    const pId = lineupSlots[idx];
-    const p = squad.find(x => x.id === pId);
-
-    if (p) {
-
-        const requiredGenPos = subposData[layout[idx]].gen;
-        const isWrong = p.position !== requiredGenPos;
-        const borderStyle = isWrong ? "border-color:var(--accent-red);" : "";
-
-        let stamColor = "#ff3366";
-        if (p.stamina >= 80) stamColor = "#00ff88";
-        else if (p.stamina >= 60) stamColor = "#ffb703";
-        else if (p.stamina >= 40) stamColor = "#f97316";
-
-        rowHTML += `
-            <div class="tactical-slot filled"
-                 style="${borderStyle}; padding:8px 4px; height:auto;"
-                 onclick="openSlotSelectorModal(${idx})">
-
-                <div style="font-size:9px;color:var(--text-muted);font-weight:800;margin-bottom:4px;">
-                    ${layout[idx]}
-                </div>
-
-                <div style="font-size:11px;font-weight:600;white-space:normal;line-height:1.2;">
-                    ${p.name}
-                </div>
-
-                <div style="font-size:10px;color:var(--accent-blue);margin-top:4px;">
-                    ATA ${p.attack} | DEF ${p.defense}
-                </div>
-
-                <div style="font-size:10px;color:${stamColor};font-weight:bold;margin-top:4px;">
-                    ${p.stamina}% ENG
-                </div>
-
-            </div>`;
-
-    } else {
-
-        rowHTML += `
-            <div class="tactical-slot"
-                 onclick="openSlotSelectorModal(${idx})">
-
-                <div style="font-size:10px;color:var(--text-muted)">
-                    + ${layout[idx]}
-                </div>
-
-                <div style="font-size:9px;color:var(--accent-red)">
-                    Vazio
-                </div>
-
-            </div>`;
-
-    }
-
-});
-
-    rowHTML += '</div>';
-
-    container.innerHTML += rowHTML;
-
-});
-}
+                    container.innerHTML += `
+                        <div class="tactical-slot filled" style="${positionStyle} ${borderStyle} padding:6px 2px; height:auto;" onclick="openSlotSelectorModal(${idx})">
+                            <div style="font-size:9px; color:var(--text-muted); font-weight:800; margin-bottom:2px;">
+                                ${subPosName}
+                            </div>
+                            <div style="font-size:11px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 4px;">
+                                ${p.name}
+                            </div>
+                            <div style="font-size:9px; color:var(--accent-blue); margin-top:2px;">
+                                A${p.attack} | D${p.defense}
+                            </div>
+                            <div style="font-size:9px; color:${stamColor}; font-weight:bold; margin-top:2px;">
+                                ${p.stamina}% ENG
+                            </div>
+                        </div>`;
+                } else {
+                    container.innerHTML += `
+                        <div class="tactical-slot" style="${positionStyle}" onclick="openSlotSelectorModal(${idx})">
+                            <div style="font-size:10px; color:var(--text-muted)">
+                                + ${subPosName}
+                            </div>
+                            <div style="font-size:9px; color:var(--accent-red)">
+                                Vazio
+                            </div>
+                        </div>`;
+                }
+            });
+        }
 
         function renderBenchAndRoster() {
             const container = document.getElementById('bench-container');
