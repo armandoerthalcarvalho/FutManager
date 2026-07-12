@@ -499,7 +499,7 @@
             </div>
 
 <div id="view-tactics" class="view-panel">
-    <h2>Desenvolvimento & Escalação Tática</h2>
+    <h2>Escalação Tática</h2>
     <div style="max-width: 800px; margin: 0 auto;">
         <label style="font-size:12px; color:var(--text-muted); font-weight:600;">Selecione a Estrutura Tática Rígida:</label>
         <select id="formation-selector" class="btn" style="width:100%; margin:8px 0 20px 0; background:var(--bg-input)" onchange="changeFormation(this.value)">
@@ -701,7 +701,7 @@ const lastNames = [
         }
 
         function calculatePayroll() {
-            let baseOperational = 1000;
+            let baseOperational = 10000;
             let squadPayroll = squad.reduce((acc, p) => {
                 let salary = Math.pow((p.attack + p.defense), 4)/50000;
                 return acc + salary;
