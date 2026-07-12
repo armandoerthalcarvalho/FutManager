@@ -720,9 +720,9 @@ const lastNames = [
             const pos = positionStr || positions[Math.floor(Math.random() * positions.length)];
             const age = Math.floor(Math.random() * 18) + 17; 
             
-            let minS = 54; let maxS = 66;
-            if (tier === 'modesto') { minS = 41; maxS = 52; }
-            if (tier === 'elite') { minS = 71; maxS = 82; }
+            let minS = 68; let maxS = 70;
+            if (tier === 'modesto') { minS = 45; maxS = 56; }
+            if (tier === 'elite') { minS = 75; maxS = 88; }
             
             let att = Math.floor(Math.random() * (maxS + 1 - minS)) + minS;
             let def = Math.floor(Math.random() * (maxS + 1 - minS)) + minS;
@@ -795,8 +795,31 @@ function initGame() {
             hasTrainedThisRound = false;
             trainingSlots = Array(3).fill(null);
 
-            const prefixes = ["Atlético", "Real", "União", "Esporte", "Futebol Clube", "Nacional", "Sport", "Grêmio", "Sociedade", "Racing"];
-            const suffixes = ["Carioca", "Paulista", "Gaucho", "Mineiro", "Catarinense", "Nordestino", "Central", "Metropolitano", "Imperial", "Campineiro"];
+const prefixes = [
+    "Atlético", "Real", "União", "Esporte", "Futebol Clube", "Nacional", "Sport", "Grêmio", "Sociedade", "Racing",
+    "Associação", "Clube", "Acadêmico", "Operário", "Ferroviário", "Industrial", "Comercial", "Juventude", "Estrela", "Nova",
+    "Velho", "Santa", "São", "Villa", "Vila", "Internacional", "Independente", "Liberdade", "Vitória", "Fortaleza",
+    "Imperial", "Colonial", "Aliança", "Esperança", "Progresso", "Cruzeiro", "Estrela do Sul", "Estrela do Norte", "Aurora", "Horizonte",
+    "Pioneiros", "Bandeirantes", "Leões", "Águias", "Lobos", "Tigres", "Panteras", "Falcões", "Dragões", "Titãs",
+    "Gigantes", "Guerreiros", "Gladiadores", "Legião", "Centuriões", "Elite", "Prime", "Master", "Elite FC", "Dínamo",
+    "Olympic", "Olympia", "Phoenix", "United", "City", "County", "Rovers", "Wanderers", "Athletic", "Sporting",
+    "River", "Monte", "Vale", "Serra", "Costa", "Litoral", "Capital", "Universitário", "Juvenil", "Renascença",
+    "Diamante", "Cristal", "Atlântica", "Continental", "Poder", "Invicta", "Vanguarda", "Constelação", "Estelar", "Galáctico",
+    "Tempestade", "Furacão", "Trovão", "Relâmpago", "Solar", "Lunar", "Cósmico", "Supremo", "Dinastia", "Império"
+];
+
+const suffixes = [
+    "Carioca", "Paulista", "Gaúcho", "Mineiro", "Catarinense", "Nordestino", "Central", "Metropolitano", "Imperial", "Campineiro",
+    "do Sul", "do Norte", "do Oeste", "do Leste", "da Serra", "do Vale", "da Costa", "da Praia", "da Capital", "Interiorano",
+    "Amazonense", "Pantaneiro", "Serrano", "Litorâneo", "Fluminense", "Brasiliense", "Paranaense", "Goiano", "Baiano", "Pernambucano",
+    "Cearense", "Potiguar", "Paraense", "Acreano", "Rondoniense", "Tocantinense", "Maranhense", "Piauiense", "Capixaba", "Alagoano",
+    "Sergipano", "Mato-Grossense", "Sul-Mato-Grossense", "Rio-Grandense", "Paulistano", "Santista", "Campestre", "Praiano", "Montanhês", "Ribeirinho",
+    "Azul", "Dourado", "Prateado", "Escarlate", "Alvinegro", "Tricolor", "Grená", "Celeste", "Rubro", "Esmeralda",
+    "de Ouro", "de Prata", "de Bronze", "do Futuro", "da Vitória", "da Esperança", "Invicto", "Supremo", "Elite", "Prime",
+    "United", "Athletic", "Sporting", "Rovers", "City", "County", "Dynamos", "Stars", "Warriors", "Legends",
+    "FC", "SC", "EC", "AC", "United FC", "Sport Club", "Atlético Clube", "Esporte Clube", "Futebol Clube", "Soccer Club",
+    "Galáctico", "Estelar", "Cósmico", "Solar", "Lunar", "Intercontinental", "Global", "Internacional", "Master", "Prime"
+];
             
             let idCounter = 1;
             for (let div = 1; div <= 5; div++) {
