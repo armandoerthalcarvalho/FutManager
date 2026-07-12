@@ -835,11 +835,16 @@ function initGame() {
             currentSeason = parsed.currentSeason || 1;
             currentRound = parsed.currentRound;
             finances = parsed.finances;
-            // Garantindo fallback para saves antigos
             staff = parsed.staff || { coach: false, fitness: false, commercial: false, specialist: false, scout: false };
             marketRefreshes = parsed.marketRefreshes !== undefined ? parsed.marketRefreshes : 3;
             squad = parsed.squad;
-            currentFormation = parsed.currentFormation || '4-4-2';
+            
+            // CORREÇÃO: Fallback seguro para saves com strings antigas
+            currentFormation = parsed.currentFormation || '4-4-2 Em linha';
+            if (!formationsConfig[currentFormation]) {
+                currentFormation = '4-4-2 Em linha';
+            }
+            
             lineupSlots = parsed.lineupSlots || Array(11).fill(null);
             userFormHistory = parsed.userFormHistory || [];
             hasTrainedThisRound = parsed.hasTrainedThisRound || false;
@@ -853,12 +858,12 @@ function initGame() {
             return;
         } catch(e) {
             logConsole("Falha de desserialização. Reiniciando fluxo de Onboarding.");
+            currentFormation = '4-4-2 Em linha'; // Garante limpeza de estado no catch
         }
     }
     document.getElementById('main-navigation').style.display = 'none';
     switchView('setup');
 }
-
         function buildFreshDatabase(tier) {
             teams = [];
             let startingDiv = 3;
@@ -944,22 +949,29 @@ const suffixes = [
             logConsole(`Nova governança iniciada em nível corporativo: [${tier.toUpperCase()}]`);
         }
 
-        function autoFillLineup() {
-            lineupSlots = Array(11).fill(null);
-            const reqs = formationsConfig[currentFormation];
-            let usedIds = new Set();
-            
-            for(let i=0; i<reqs.length; i++) {
-                let needed = reqs[i];
-                let found = squad.find(p => p.position === needed && !usedIds.has(p.id));
-                if(!found) found = squad.find(p => !usedIds.has(p.id));
-                if(found) {
-                    lineupSlots[i] = found.id;
-                    usedIds.add(found.id);
-                }
-            }
+function autoFillLineup() {
+    // Escudo extra de segurança
+    if (!formationsConfig[currentFormation]) {
+        currentFormation = '4-4-2 Em linha';
+    }
+    
+    lineupSlots = Array(11).fill(null);
+    const reqs = formationsConfig[currentFormation];
+    let usedIds = new Set();
+    
+    for(let i = 0; i < reqs.length; i++) {
+        let subPos = reqs[i];
+        let genNeeded = subposData[subPos].gen; // Transforma "LD" em "DEF" para a busca
+        
+        let found = squad.find(p => p.position === genNeeded && !usedIds.has(p.id));
+        if(!found) found = squad.find(p => !usedIds.has(p.id));
+        
+        if(found) {
+            lineupSlots[i] = found.id;
+            usedIds.add(found.id);
         }
-
+    }
+}
 function saveGame() {
     const data = { teams, fixtures, marketPlayers, userTeamId, currentSeason, currentRound, finances, staff, squad, currentFormation, lineupSlots, userFormHistory, hasTrainedThisRound, trainingSlots, marketRefreshes };
     localStorage.setItem('FMPRO_SAVE_V3', JSON.stringify(data));
@@ -1439,14 +1451,43 @@ function refreshMarket() {
         }
 
         function initFormationUI() {
-            const famSelect = document.getElementById('family-selector');
-            famSelect.innerHTML = "";
-            for(let fam in formationFamilies) {
-                famSelect.innerHTML += `<option value="${fam}">${fam}</option>`;
-            }
-            updateFormationOptions('4-4-2');
+    const famSelect = document.getElementById('family-selector');
+    if(!famSelect) return;
+    
+    let currentFamily = '4-4-2';
+    for (let fam in formationFamilies) {
+        if (formationFamilies[fam].includes(currentFormation)) {
+            currentFamily = fam;
+            break;
         }
+    }
 
+    if (famSelect.options.length === 0) {
+        for (let fam in formationFamilies) {
+            let isSelected = (fam === currentFamily) ? "selected" : "";
+            famSelect.innerHTML += `<option value="${fam}" ${isSelected}>${fam}</option>`;
+        }
+    } else {
+        famSelect.value = currentFamily;
+    }
+
+    updateFormationOptions(currentFamily, false);
+}
+
+function updateFormationOptions(family, isUserInteraction = true) {
+    const formSelect = document.getElementById('formation-selector');
+    if(!formSelect) return;
+
+    formSelect.innerHTML = "";
+    formationFamilies[family].forEach(form => {
+        let isSelected = (form === currentFormation) ? "selected" : "";
+        formSelect.innerHTML += `<option value="${form}" ${isSelected}>${form}</option>`;
+    });
+
+    if (isUserInteraction) {
+        changeFormation(formationFamilies[family][0]);
+    }
+}
         function updateFormationOptions(family) {
             const formSelect = document.getElementById('formation-selector');
             formSelect.innerHTML = "";
@@ -1529,33 +1570,34 @@ function refreshMarket() {
             renderBenchAndRoster();
         }
 
-        function openSlotSelectorModal(slotIndex) {
-            const requiredPos = formationsConfig[currentFormation][slotIndex];
-            let allocatedPlayerIds = lineupSlots.filter((id, idx) => idx !== slotIndex && id !== null);
+function openSlotSelectorModal(slotIndex) {
+    const requiredSubPos = formationsConfig[currentFormation][slotIndex];
+    const requiredGenPos = subposData[requiredSubPos].gen; // Traz a raiz geral da posição
+    
+    let allocatedPlayerIds = lineupSlots.filter((id, idx) => idx !== slotIndex && id !== null);
 
-            let primaryPlayers = squad.filter(p => p.position === requiredPos && !allocatedPlayerIds.includes(p.id));
-            let secondaryPlayers = squad.filter(p => p.position !== requiredPos && !allocatedPlayerIds.includes(p.id));
+    let primaryPlayers = squad.filter(p => p.position === requiredGenPos && !allocatedPlayerIds.includes(p.id));
+    let secondaryPlayers = squad.filter(p => p.position !== requiredGenPos && !allocatedPlayerIds.includes(p.id));
 
-            let html = `
-                <h3>Escalar Atleta - Posição ${requiredPos}</h3>
-                <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Improvisações de função aplicam penalidade pesada de <strong>-40% no rendimento</strong> do jogador em campo.</p>
-                
-                <h4 style="color:var(--accent-green);">Especialistas Encontrados:</h4>
-                <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px; max-height:160px; overflow-y:auto;">
-                    ${primaryPlayers.map(p => renderPlayerRowForModal(p, slotIndex, false)).join('')}
-                    ${primaryPlayers.length === 0 ? '<p style="font-size:12px; color:var(--text-muted)">Nenhum especialista livre no plantel.</p>' : ''}
-                </div>
+    let html = `
+        <h3>Escalar Atleta - Função Tática: ${requiredSubPos}</h3>
+        <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Improvisações fora da macroárea (<strong>${requiredGenPos}</strong>) aplicam penalidade de <strong>-40% no rendimento</strong> do jogador em campo.</p>
+        
+        <h4 style="color:var(--accent-green);">Especialistas Encontrados:</h4>
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px; max-height:160px; overflow-y:auto;">
+            ${primaryPlayers.map(p => renderPlayerRowForModal(p, slotIndex, false)).join('')}
+            ${primaryPlayers.length === 0 ? '<p style="font-size:12px; color:var(--text-muted)">Nenhum especialista livre no plantel.</p>' : ''}
+        </div>
 
-                <h4 style="color:var(--accent-warn); margin-top:15px;">Outras Opções de Improviso:</h4>
-                <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px; max-height:160px; overflow-y:auto;">
-                    ${secondaryPlayers.map(p => renderPlayerRowForModal(p, slotIndex, true)).join('')}
-                </div>
-                <button class="btn btn-danger" style="width:100%; margin-top:20px;" onclick="unassignSlot(${slotIndex})">Esvaziar Slot</button>
-                <button class="btn" style="width:100%; margin-top:8px;" onclick="closeModal()">Cancelar</button>
-            `;
-            queueModal(html);
-        }
-
+        <h4 style="color:var(--accent-warn); margin-top:15px;">Outras Opções de Improviso:</h4>
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px; max-height:160px; overflow-y:auto;">
+            ${secondaryPlayers.map(p => renderPlayerRowForModal(p, slotIndex, true)).join('')}
+        </div>
+        <button class="btn btn-danger" style="width:100%; margin-top:20px;" onclick="unassignSlot(${slotIndex})">Esvaziar Slot</button>
+        <button class="btn" style="width:100%; margin-top:8px;" onclick="closeModal()">Cancelar</button>
+    `;
+    queueModal(html);
+}
         function renderPlayerRowForModal(p, slotIndex, hasPenalty) {
             let penaltyBadge = hasPenalty ? "<span style='color:var(--accent-red); font-weight:bold;'>[Improviso -40%]</span>" : "";
             return `
