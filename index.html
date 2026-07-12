@@ -431,7 +431,7 @@
             <button class="nav-btn" onclick="switchView('training', this)">Centro de Treino</button>
             <button class="nav-btn" onclick="switchView('market', this)">Mercado de Passes</button>
             <button class="nav-btn" onclick="switchView('finances', this)">Diretoria & Finanças</button>
-            <button class="nav-btn" onclick="switchView('editor' ,this)">Central Custom</button>
+            <button class="nav-btn" onclick="switchView('editor' this)">Central Custom</button>
             <div style="margin-top:auto; padding:10px; display:flex; flex-direction:column; gap:8px;">
                 <button class="btn" style="font-size:11px; padding:6px;" onclick="saveGame()">Salvar Estado</button>
                 <button class="btn" style="font-size:11px; padding:6px; background:rgba(239,68,68,0.2)" onclick="resetGame()">Resetar Base</button>
@@ -502,11 +502,13 @@
     <h2>Escalação Tática</h2>
     <div style="max-width: 800px; margin: 0 auto;">
         <label style="font-size:12px; color:var(--text-muted); font-weight:600;">Selecione a Estrutura Tática Rígida:</label>
-        <select id="formation-selector" class="btn" style="width:100%; margin:8px 0 20px 0; background:var(--bg-input)" onchange="changeFormation(this.value)">
-            <option value="4-4-2">Padrão Equilibrado (4-4-2)</option>
-            <option value="4-3-3">Ofensivo Agressivo (4-3-3)</option>
-            <option value="5-3-2">Controle Defensivo (5-3-2)</option>
-        </select>
+        <div style="display:flex; gap: 10px; margin:8px 0 20px 0;">
+            <select id="family-selector" class="btn" style="flex:1; background:var(--bg-input)" onchange="updateFormationOptions(this.value)">
+            </select>
+            <select id="formation-selector" class="btn" style="flex:2; background:var(--bg-input)" onchange="changeFormation(this.value)">
+            </select>
+            <button class="btn btn-success" style="padding: 12px;" onclick="autoEscalar()">⚡ Auto Escalar</button>
+        </div>
         <div class="tactical-field" id="tactical-field-dom"></div>
     </div>
 </div>
@@ -630,11 +632,83 @@
         let squad = [];
         let userFormHistory = []; // Mantém últimas 3 partidas ('W', 'D', 'L')
         
-        let currentFormation = '4-4-2';
+        let currentFormation = '4-4-2 Em linha';
+        
+        const formationFamilies = {
+            '4-4-2': ['4-4-2 Em linha', '4-4-2 Contenção', '4-4-2 Losango'],
+            '4-1-2-1-2': ['4-1-2-1-2'],
+            '4-3-3': ['4-3-3 Em linha', '4-3-3 Contenção', '4-3-3 Ofensivo', '4-3-3 Falso nove'],
+            '5-3-2': ['5-3-2 Em linha', '5-3-2 Contenção', '5-3-2 Ofensivo'],
+            '4-2-4': ['4-2-4 Em linha', '4-2-4 Contenção', '4-2-4 Ofensivo'],
+            '4-1-1-4': ['4-1-1-4'],
+            '3-3-4': ['3-3-4 Em linha', '3-3-4 Contenção', '3-3-4 Ofensivo'],
+            '3-4-3': ['3-4-3 Em linha', '3-4-3 Contenção', '3-4-3 Ofensivo', '3-4-3 Falso 9'],
+            '3-1-2-1-2': ['3-1-2-1-2'],
+            '5-4-1': ['5-4-1 Em linha', '5-4-1 Contenção', '5-4-1 Ofensivo', '5-4-1 Falso 9'],
+            '5-1-2-1-1': ['5-1-2-1-1'],
+            '4-5-1': ['4-5-1 Em linha', '4-5-1 Contenção', '4-5-1 Ofensivo', '4-5-1 Falso 9'],
+            '4-2-2-1-1': ['4-2-2-1-1'],
+            '4-2-1-2-1': ['4-2-1-2-1 Clássico', '4-2-1-2-1 Falso 9'],
+            '3-5-2': ['3-5-2 Em linha', '3-5-2 Contenção', '3-5-2 Ofensivo'],
+            '3-2-2-1-2': ['3-2-2-1-2']
+        };
+
         const formationsConfig = {
-            '4-4-2': ['GOL', 'DEF', 'DEF', 'DEF', 'DEF', 'MEI', 'MEI', 'MEI', 'MEI', 'ATA', 'ATA'],
-            '4-3-3': ['GOL', 'DEF', 'DEF', 'DEF', 'DEF', 'MEI', 'MEI', 'MEI', 'ATA', 'ATA', 'ATA'],
-            '5-3-2': ['GOL', 'DEF', 'DEF', 'DEF', 'DEF', 'DEF', 'MEI', 'MEI', 'MEI', 'ATA', 'ATA']
+            '4-4-2 Em linha': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'ME', 'MC', 'MC', 'MD', 'ATA', 'ATA'],
+            '4-4-2 Contenção': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'ME', 'VOL', 'VOL', 'MD', 'ATA', 'ATA'],
+            '4-4-2 Losango': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'ME', 'MEI', 'MEI', 'MD', 'ATA', 'ATA'],
+            '4-1-2-1-2': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'VOL', 'MC', 'MC', 'MEI', 'ATA', 'ATA'],
+            '4-3-3 Em linha': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'MC', 'MC', 'MC', 'PE', 'ATA', 'PD'],
+            '4-3-3 Contenção': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'MC', 'VOL', 'MC', 'PE', 'ATA', 'PD'],
+            '4-3-3 Ofensivo': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'MC', 'MEI', 'MC', 'PE', 'ATA', 'PD'],
+            '4-3-3 Falso nove': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'MC', 'VOL', 'MC', 'PE', 'F9', 'PD'],
+            '5-3-2 Em linha': ['GOL', 'LE', 'ZAG', 'ZAG', 'ZAG', 'LD', 'MC', 'MC', 'MC', 'ATA', 'ATA'],
+            '5-3-2 Contenção': ['GOL', 'LE', 'ZAG', 'ZAG', 'ZAG', 'LD', 'MC', 'VOL', 'MC', 'ATA', 'ATA'],
+            '5-3-2 Ofensivo': ['GOL', 'LE', 'ZAG', 'ZAG', 'ZAG', 'LD', 'MC', 'MEI', 'MC', 'ATA', 'ATA'],
+            '4-2-4 Em linha': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'MC', 'MC', 'PE', 'ATA', 'ATA', 'PD'],
+            '4-2-4 Contenção': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'VOL', 'VOL', 'PE', 'ATA', 'ATA', 'PD'],
+            '4-2-4 Ofensivo': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'MEI', 'MEI', 'PE', 'ATA', 'ATA', 'PD'],
+            '4-1-1-4': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'VOL', 'MEI', 'PE', 'ATA', 'ATA', 'PD'],
+            '3-3-4 Em linha': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'MC', 'MC', 'MC', 'PE', 'ATA', 'PD'],
+            '3-3-4 Contenção': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'MC', 'VOL', 'MC', 'PE', 'ATA', 'PD'],
+            '3-3-4 Ofensivo': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'MC', 'MEI', 'MC', 'PE', 'ATA', 'PD'],
+            '3-4-3 Em linha': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'ME', 'MC', 'MC', 'MD', 'PE', 'ATA', 'PD'],
+            '3-4-3 Contenção': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'ME', 'VOL', 'VOL', 'MD', 'PE', 'ATA', 'PD'],
+            '3-4-3 Ofensivo': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'ME', 'MEI', 'MEI', 'MD', 'PE', 'ATA', 'PD'],
+            '3-4-3 Falso 9': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'ME', 'VOL', 'VOL', 'MD', 'PE', 'F9', 'PD'],
+            '3-1-2-1-2': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'VOL', 'MC', 'MC', 'MEI', 'PE', 'ATA', 'PD'],
+            '5-4-1 Em linha': ['GOL', 'LE', 'ZAG', 'ZAG', 'ZAG', 'LD', 'ME', 'MC', 'MC', 'MD', 'ATA'],
+            '5-4-1 Contenção': ['GOL', 'LE', 'ZAG', 'ZAG', 'ZAG', 'LD', 'ME', 'VOL', 'VOL', 'MD', 'ATA'],
+            '5-4-1 Ofensivo': ['GOL', 'LE', 'ZAG', 'ZAG', 'ZAG', 'LD', 'ME', 'MEI', 'MEI', 'MD', 'ATA'],
+            '5-4-1 Falso 9': ['GOL', 'LE', 'ZAG', 'ZAG', 'ZAG', 'LD', 'ME', 'VOL', 'VOL', 'MD', 'F9'],
+            '5-1-2-1-1': ['GOL', 'LE', 'ZAG', 'ZAG', 'ZAG', 'LD', 'VOL', 'MC', 'MC', 'MEI', 'ATA'],
+            '4-5-1 Em linha': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'ME', 'MC', 'MC', 'MC', 'MD', 'ATA'],
+            '4-5-1 Contenção': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'ME', 'MC', 'VOL', 'MC', 'MD', 'ATA'],
+            '4-5-1 Ofensivo': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'ME', 'MC', 'MEI', 'MC', 'MD', 'ATA'],
+            '4-5-1 Falso 9': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'ME', 'MC', 'VOL', 'MC', 'MD', 'F9'],
+            '4-2-2-1-1': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'VOL', 'VOL', 'ME', 'MD', 'MEI', 'ATA'],
+            '4-2-1-2-1 Clássico': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'VOL', 'VOL', 'MC', 'MEI', 'MEI', 'ATA'],
+            '4-2-1-2-1 Falso 9': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'VOL', 'VOL', 'MC', 'MEI', 'MEI', 'F9'],
+            '3-5-2 Em linha': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'ME', 'MC', 'MC', 'MC', 'MD', 'ATA', 'ATA'],
+            '3-5-2 Contenção': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'ME', 'MC', 'VOL', 'MC', 'MD', 'ATA', 'ATA'],
+            '3-5-2 Ofensivo': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'ME', 'MC', 'MEI', 'MC', 'MD', 'ATA', 'ATA'],
+            '3-2-2-1-2': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'VOL', 'VOL', 'MC', 'MC', 'MEI', 'ATA', 'ATA']
+        };
+
+        const subposData = {
+            'GOL': {def: 1.90, att: 0.10, gen: 'GOL'},
+            'ZAG': {def: 1.60, att: 0.40, gen: 'DEF'},
+            'LE':  {def: 1.40, att: 0.60, gen: 'DEF'},
+            'LD':  {def: 1.40, att: 0.60, gen: 'DEF'},
+            'VOL': {def: 1.20, att: 0.80, gen: 'MEI'},
+            'MC':  {def: 1.00, att: 1.00, gen: 'MEI'},
+            'ME':  {def: 1.00, att: 1.00, gen: 'MEI'},
+            'MD':  {def: 1.00, att: 1.00, gen: 'MEI'},
+            'MEI': {def: 0.80, att: 1.20, gen: 'MEI'},
+            'F9':  {def: 0.60, att: 1.40, gen: 'ATA'},
+            'PE':  {def: 0.50, att: 1.50, gen: 'ATA'},
+            'PD':  {def: 0.50, att: 1.50, gen: 'ATA'},
+            'ATA': {def: 0.40, att: 1.60, gen: 'ATA'}
         };
         let lineupSlots = Array(11).fill(null);
         let trainingSlots = Array(3).fill(null); // {playerId, type}
@@ -687,9 +761,14 @@ const lastNames = [
         }
 
         function calculatePlayerValue(p) {
-            const avgStat = (p.attack + p.defense) / 2;
+            let baseVal = 0;
+            if (p.position === 'GOL') baseVal = (p.defense * 0.95) + (p.attack * 0.05);
+            else if (p.position === 'DEF') baseVal = (p.defense * 0.70) + (p.attack * 0.30);
+            else if (p.position === 'MEI') baseVal = (p.defense * 0.50) + (p.attack * 0.50);
+            else if (p.position === 'ATA') baseVal = (p.defense * 0.30) + (p.attack * 0.70);
+
             const baseFactor = 22000; 
-            const capabilityExponent = Math.pow(avgStat / 40, 8) * baseFactor;
+            const capabilityExponent = Math.pow(baseVal / 40, 8) * baseFactor;
             
             let ageMultiplier = 1.0;
             if (p.age <= 22) {
@@ -756,11 +835,16 @@ function initGame() {
             currentSeason = parsed.currentSeason || 1;
             currentRound = parsed.currentRound;
             finances = parsed.finances;
-            // Garantindo fallback para saves antigos
             staff = parsed.staff || { coach: false, fitness: false, commercial: false, specialist: false, scout: false };
             marketRefreshes = parsed.marketRefreshes !== undefined ? parsed.marketRefreshes : 3;
             squad = parsed.squad;
-            currentFormation = parsed.currentFormation || '4-4-2';
+            
+            // CORREÇÃO: Fallback seguro para saves com strings antigas
+            currentFormation = parsed.currentFormation || '4-4-2 Em linha';
+            if (!formationsConfig[currentFormation]) {
+                currentFormation = '4-4-2 Em linha';
+            }
+            
             lineupSlots = parsed.lineupSlots || Array(11).fill(null);
             userFormHistory = parsed.userFormHistory || [];
             hasTrainedThisRound = parsed.hasTrainedThisRound || false;
@@ -774,12 +858,12 @@ function initGame() {
             return;
         } catch(e) {
             logConsole("Falha de desserialização. Reiniciando fluxo de Onboarding.");
+            currentFormation = '4-4-2 Em linha'; // Garante limpeza de estado no catch
         }
     }
     document.getElementById('main-navigation').style.display = 'none';
     switchView('setup');
 }
-
         function buildFreshDatabase(tier) {
             teams = [];
             let startingDiv = 3;
@@ -826,7 +910,8 @@ const suffixes = [
                 for (let i = 0; i < 8; i++) {
                     let n = prefixes[Math.floor(Math.random() * prefixes.length)] + " " + suffixes[Math.floor(Math.random() * suffixes.length)];
                     if (div === startingDiv && i === 0) {
-                        n = "Elite Executive FC (Você)";
+                        let customName = prompt("Bem-vindo Executivo! Qual será o nome corporativo da sua franquia?", "Elite Executive FC");
+                        n = customName ? customName.trim() : "Elite Executive FC";
                         userTeamId = idCounter;
                     }
                     
@@ -864,22 +949,29 @@ const suffixes = [
             logConsole(`Nova governança iniciada em nível corporativo: [${tier.toUpperCase()}]`);
         }
 
-        function autoFillLineup() {
-            lineupSlots = Array(11).fill(null);
-            const reqs = formationsConfig[currentFormation];
-            let usedIds = new Set();
-            
-            for(let i=0; i<reqs.length; i++) {
-                let needed = reqs[i];
-                let found = squad.find(p => p.position === needed && !usedIds.has(p.id));
-                if(!found) found = squad.find(p => !usedIds.has(p.id));
-                if(found) {
-                    lineupSlots[i] = found.id;
-                    usedIds.add(found.id);
-                }
-            }
+function autoFillLineup() {
+    // Escudo extra de segurança
+    if (!formationsConfig[currentFormation]) {
+        currentFormation = '4-4-2 Em linha';
+    }
+    
+    lineupSlots = Array(11).fill(null);
+    const reqs = formationsConfig[currentFormation];
+    let usedIds = new Set();
+    
+    for(let i = 0; i < reqs.length; i++) {
+        let subPos = reqs[i];
+        let genNeeded = subposData[subPos].gen; // Transforma "LD" em "DEF" para a busca
+        
+        let found = squad.find(p => p.position === genNeeded && !usedIds.has(p.id));
+        if(!found) found = squad.find(p => !usedIds.has(p.id));
+        
+        if(found) {
+            lineupSlots[i] = found.id;
+            usedIds.add(found.id);
         }
-
+    }
+}
 function saveGame() {
     const data = { teams, fixtures, marketPlayers, userTeamId, currentSeason, currentRound, finances, staff, squad, currentFormation, lineupSlots, userFormHistory, hasTrainedThisRound, trainingSlots, marketRefreshes };
     localStorage.setItem('FMPRO_SAVE_V3', JSON.stringify(data));
@@ -1031,21 +1123,26 @@ function refreshMarket() {
 
             for (let i = 0; i < 11; i++) {
                 const pId = lineupSlots[i];
-                const expectedPos = config[i];
+                const subPos = config[i];
                 const p = squad.find(x => x.id === pId);
 
                 if (p) {
-                    let penalty = p.position !== expectedPos ? 0.60 : 1.0;
+                    let sData = subposData[subPos];
+                    let penalty = p.position !== sData.gen ? 0.60 : 1.0;
                     let staminaMod = p.stamina / 100;
-                    totalAtt += p.attack * penalty * staminaMod;
-                    totalDef += p.defense * penalty * staminaMod;
+                    
+                    let realAtt = p.attack * sData.att;
+                    let realDef = p.defense * sData.def;
+
+                    totalAtt += realAtt * penalty * staminaMod;
+                    totalDef += realDef * penalty * staminaMod;
                 } else {
                     totalAtt += 8; totalDef += 8;
                 }
             }
             return { attack: totalAtt / 11, defense: totalDef / 11 };
         }
-
+        
         function playRound() {
             let myTeam = teams.find(t => t.id === userTeamId);
             let allCurrentFixtures = fixtures.filter(f => f.round === currentRound && !f.played);
@@ -1353,6 +1450,118 @@ function refreshMarket() {
             logConsole(`Transição concluída. Bem-vindo à Temporada Comercial nº ${currentSeason}.`);
         }
 
+        function initFormationUI() {
+    const famSelect = document.getElementById('family-selector');
+    if(!famSelect) return;
+    
+    let currentFamily = '4-4-2';
+    for (let fam in formationFamilies) {
+        if (formationFamilies[fam].includes(currentFormation)) {
+            currentFamily = fam;
+            break;
+        }
+    }
+
+    if (famSelect.options.length === 0) {
+        for (let fam in formationFamilies) {
+            let isSelected = (fam === currentFamily) ? "selected" : "";
+            famSelect.innerHTML += `<option value="${fam}" ${isSelected}>${fam}</option>`;
+        }
+    } else {
+        famSelect.value = currentFamily;
+    }
+
+    updateFormationOptions(currentFamily, false);
+}
+
+function updateFormationOptions(family, isUserInteraction = true) {
+    const formSelect = document.getElementById('formation-selector');
+    if(!formSelect) return;
+
+    formSelect.innerHTML = "";
+    formationFamilies[family].forEach(form => {
+        let isSelected = (form === currentFormation) ? "selected" : "";
+        formSelect.innerHTML += `<option value="${form}" ${isSelected}>${form}</option>`;
+    });
+
+    if (isUserInteraction) {
+        changeFormation(formationFamilies[family][0]);
+    }
+}
+        function updateFormationOptions(family) {
+            const formSelect = document.getElementById('formation-selector');
+            formSelect.innerHTML = "";
+            formationFamilies[family].forEach(form => {
+                formSelect.innerHTML += `<option value="${form}">${form}</option>`;
+            });
+            changeFormation(formationFamilies[family][0]);
+        }
+
+        function autoEscalar() {
+            let availablePlayers = squad.map(p => ({
+                ...p,
+                effAtt: p.attack * (p.stamina / 100),
+                effDef: p.defense * (p.stamina / 100)
+            }));
+
+            lineupSlots = Array(11).fill(null);
+            let config = formationsConfig[currentFormation];
+            
+            // Descobre quantas vagas de posição GERAL a formação exige
+            let genRequirements = { 'GOL': [], 'DEF': [], 'MEI': [], 'ATA': [] };
+            config.forEach((subPos, idx) => {
+                genRequirements[subposData[subPos].gen].push({ idx, subPos });
+            });
+
+            let usedIds = new Set();
+
+            ['GOL', 'DEF', 'MEI', 'ATA'].forEach(genPos => {
+                let slotsNeeded = genRequirements[genPos];
+                if(slotsNeeded.length === 0) return;
+
+                // Encontra os melhores candidatos nativos
+                let candidates = availablePlayers.filter(p => p.position === genPos && !usedIds.has(p.id));
+                
+                // Pesos básicos para ranquear dentro da posição geral (Regra 3 do Auto Escalar)
+                let wDef, wAtt;
+                if(genPos === 'GOL') { wDef = 1.90; wAtt = 0.10; }
+                else if(genPos === 'DEF') { wDef = 1.40; wAtt = 0.60; }
+                else if(genPos === 'MEI') { wDef = 1.00; wAtt = 1.00; }
+                else { wDef = 0.60; wAtt = 1.40; } // ATA
+
+                candidates.sort((a, b) => {
+                    let scoreA = (a.effDef * wDef) + (a.effAtt * wAtt);
+                    let scoreB = (b.effDef * wDef) + (b.effAtt * wAtt);
+                    return scoreB - scoreA;
+                });
+
+                let selected = candidates.slice(0, slotsNeeded.length);
+                selected.forEach(s => usedIds.add(s.id));
+
+                // Se faltar nativos, busca de fora (Regra 5)
+                if(selected.length < slotsNeeded.length) {
+                    let deficit = slotsNeeded.length - selected.length;
+                    let outsiders = availablePlayers.filter(p => !usedIds.has(p.id));
+                    outsiders.sort((a, b) => ((b.effDef+b.effAtt) - (a.effDef+a.effAtt))); // Escolha genérica por overall
+                    let extra = outsiders.slice(0, deficit);
+                    extra.forEach(e => usedIds.add(e.id));
+                    selected = selected.concat(extra);
+                }
+
+                // Distribui pelas subposições com base na ratio (Regra 4)
+                selected.sort((a, b) => (b.effAtt / Math.max(1, b.effDef)) - (a.effAtt / Math.max(1, a.effDef)));
+                slotsNeeded.sort((a, b) => subposData[b.subPos].att - subposData[a.subPos].att);
+
+                for(let i = 0; i < selected.length; i++) {
+                    lineupSlots[slotsNeeded[i].idx] = selected[i].id;
+                }
+            });
+
+            saveGame();
+            renderTacticalField();
+            renderBenchAndRoster();
+        }
+
         function changeFormation(newForm) {
             currentFormation = newForm;
             autoFillLineup();
@@ -1361,33 +1570,34 @@ function refreshMarket() {
             renderBenchAndRoster();
         }
 
-        function openSlotSelectorModal(slotIndex) {
-            const requiredPos = formationsConfig[currentFormation][slotIndex];
-            let allocatedPlayerIds = lineupSlots.filter((id, idx) => idx !== slotIndex && id !== null);
+function openSlotSelectorModal(slotIndex) {
+    const requiredSubPos = formationsConfig[currentFormation][slotIndex];
+    const requiredGenPos = subposData[requiredSubPos].gen; // Traz a raiz geral da posição
+    
+    let allocatedPlayerIds = lineupSlots.filter((id, idx) => idx !== slotIndex && id !== null);
 
-            let primaryPlayers = squad.filter(p => p.position === requiredPos && !allocatedPlayerIds.includes(p.id));
-            let secondaryPlayers = squad.filter(p => p.position !== requiredPos && !allocatedPlayerIds.includes(p.id));
+    let primaryPlayers = squad.filter(p => p.position === requiredGenPos && !allocatedPlayerIds.includes(p.id));
+    let secondaryPlayers = squad.filter(p => p.position !== requiredGenPos && !allocatedPlayerIds.includes(p.id));
 
-            let html = `
-                <h3>Escalar Atleta - Posição ${requiredPos}</h3>
-                <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Improvisações de função aplicam penalidade pesada de <strong>-40% no rendimento</strong> do jogador em campo.</p>
-                
-                <h4 style="color:var(--accent-green);">Especialistas Encontrados:</h4>
-                <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px; max-height:160px; overflow-y:auto;">
-                    ${primaryPlayers.map(p => renderPlayerRowForModal(p, slotIndex, false)).join('')}
-                    ${primaryPlayers.length === 0 ? '<p style="font-size:12px; color:var(--text-muted)">Nenhum especialista livre no plantel.</p>' : ''}
-                </div>
+    let html = `
+        <h3>Escalar Atleta - Função Tática: ${requiredSubPos}</h3>
+        <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Improvisações fora da macroárea (<strong>${requiredGenPos}</strong>) aplicam penalidade de <strong>-40% no rendimento</strong> do jogador em campo.</p>
+        
+        <h4 style="color:var(--accent-green);">Especialistas Encontrados:</h4>
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px; max-height:160px; overflow-y:auto;">
+            ${primaryPlayers.map(p => renderPlayerRowForModal(p, slotIndex, false)).join('')}
+            ${primaryPlayers.length === 0 ? '<p style="font-size:12px; color:var(--text-muted)">Nenhum especialista livre no plantel.</p>' : ''}
+        </div>
 
-                <h4 style="color:var(--accent-warn); margin-top:15px;">Outras Opções de Improviso:</h4>
-                <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px; max-height:160px; overflow-y:auto;">
-                    ${secondaryPlayers.map(p => renderPlayerRowForModal(p, slotIndex, true)).join('')}
-                </div>
-                <button class="btn btn-danger" style="width:100%; margin-top:20px;" onclick="unassignSlot(${slotIndex})">Esvaziar Slot</button>
-                <button class="btn" style="width:100%; margin-top:8px;" onclick="closeModal()">Cancelar</button>
-            `;
-            queueModal(html);
-        }
-
+        <h4 style="color:var(--accent-warn); margin-top:15px;">Outras Opções de Improviso:</h4>
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px; max-height:160px; overflow-y:auto;">
+            ${secondaryPlayers.map(p => renderPlayerRowForModal(p, slotIndex, true)).join('')}
+        </div>
+        <button class="btn btn-danger" style="width:100%; margin-top:20px;" onclick="unassignSlot(${slotIndex})">Esvaziar Slot</button>
+        <button class="btn" style="width:100%; margin-top:8px;" onclick="closeModal()">Cancelar</button>
+    `;
+    queueModal(html);
+}
         function renderPlayerRowForModal(p, slotIndex, hasPenalty) {
             let penaltyBadge = hasPenalty ? "<span style='color:var(--accent-red); font-weight:bold;'>[Improviso -40%]</span>" : "";
             return `
@@ -1782,6 +1992,7 @@ if(marketHeader) {
             renderTrainingView();
             renderMarket();
             buildEditor();
+            initFormationUI()
         }
 
         function switchView(viewId, clickedButton = null) {
