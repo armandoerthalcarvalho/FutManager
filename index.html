@@ -766,7 +766,7 @@ const lastNames = [
 
         function calculatePlayerValue(p) {
             let baseVal = 0;
-            if (p.position === 'GOL') baseVal = (p.defense * 0.95) + (p.attack * 0.05);
+            if (p.position === 'GOL') baseVal = (p.defense * 0.90) + (p.attack * 0.10);
             else if (p.position === 'DEF') baseVal = (p.defense * 0.70) + (p.attack * 0.30);
             else if (p.position === 'MEI') baseVal = (p.defense * 0.50) + (p.attack * 0.50);
             else if (p.position === 'ATA') baseVal = (p.defense * 0.30) + (p.attack * 0.70);
@@ -803,9 +803,9 @@ const lastNames = [
             const pos = positionStr || positions[Math.floor(Math.random() * positions.length)];
             const age = Math.floor(Math.random() * 18) + 17; 
             
-            let minS = 68; let maxS = 70;
-            if (tier === 'modesto') { minS = 45; maxS = 56; }
-            if (tier === 'elite') { minS = 75; maxS = 88; }
+            let minS = 57; let maxS = 68;
+            if (tier === 'modesto') { minS = 42; maxS = 53; }
+            if (tier === 'elite') { minS = 72; maxS = 85; }
             
             let att = Math.floor(Math.random() * (maxS + 1 - minS)) + minS;
             let def = Math.floor(Math.random() * (maxS + 1 - minS)) + minS;
@@ -1528,7 +1528,7 @@ function updateFormationOptions(family, isUserInteraction = true) {
                 
                 // Pesos básicos para ranquear dentro da posição geral (Regra 3 do Auto Escalar)
                 let wDef, wAtt;
-                if(genPos === 'GOL') { wDef = 1.90; wAtt = 0.10; }
+                if(genPos === 'GOL') { wDef = 1.80; wAtt = 0.20; }
                 else if(genPos === 'DEF') { wDef = 1.40; wAtt = 0.60; }
                 else if(genPos === 'MEI') { wDef = 1.00; wAtt = 1.00; }
                 else { wDef = 0.60; wAtt = 1.40; } // ATA
