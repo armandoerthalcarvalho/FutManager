@@ -1624,14 +1624,17 @@ function openSlotSelectorModal(slotIndex) {
         }
 
 function renderTacticalField() {
-    const container = document.getElementById('tactical-field-dom');
     container.innerHTML = "";
-    const layout = formationsConfig[currentFormation];
-    
-    let rows = { 'GOL': [], 'DEF': [], 'MEI': [], 'ATA': [] };
-    layout.forEach((pos, idx) => { rows[pos].push(idx); });
-
-    const order = ['ATA', 'MEI', 'DEF', 'GOL'];
+        const layout = formationsConfig[currentFormation];
+        let rows = { 'GOL': [], 'DEF': [], 'MEI': [], 'ATA': [] };
+        layout.forEach((pos, idx) => {
+            // Obtém a categoria genérica/macro ('GOL', 'DEF', 'MEI' ou 'ATA') correspondente à subposição
+            const genPos = subposData[pos] ? subposData[pos].gen : pos;
+            if (rows[genPos]) {
+                rows[genPos].push(idx);
+            }
+        });
+        const order = ['ATA', 'MEI', 'DEF', 'GOL'];
     order.forEach(posCategory => {
         let rowHTML = `<div class="tactical-row">`;
         rows[posCategory].forEach(idx => {
