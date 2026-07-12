@@ -1629,42 +1629,103 @@ function renderTacticalField() {
     container.innerHTML = "";
     const layout = formationsConfig[currentFormation];
     
-    let rows = { 'GOL': [], 'DEF': [], 'MEI': [], 'ATA': [] };
-    layout.forEach((pos, idx) => { rows[pos].push(idx); });
+    const rows = {
+    GOL: [],
+    DEF: [],
+    MEI: [],
+    ATA: []
+};
 
-    const order = ['ATA', 'MEI', 'DEF', 'GOL'];
-    order.forEach(posCategory => {
-        let rowHTML = `<div class="tactical-row">`;
-        rows[posCategory].forEach(idx => {
-            let pId = lineupSlots[idx]; let p = squad.find(x => x.id === pId);
-            if(p) {
-                let isWrong = p.position !== layout[idx];
-                let borderStyle = isWrong ? "border-color:var(--accent-red);" : "";
-                
-                // Lógica de Cores da Estamina
-                let stamColor = '#ff3366'; // Red (<= 40)
-                if (p.stamina >= 80) stamColor = '#00ff88'; // Green
-                else if (p.stamina >= 60) stamColor = '#ffb703'; // Yellow
-                else if (p.stamina >= 40) stamColor = '#f97316'; // Orange
+layout.forEach((subPos, idx) => {
 
-                rowHTML += `
-                    <div class="tactical-slot filled" style="${borderStyle}; padding: 8px 4px; height: auto;" onclick="openSlotSelectorModal(${idx})">
-                        <div style="font-size:9px; color:var(--text-muted); font-weight:800; margin-bottom:4px;">${layout[idx]}</div>
-                        <div style="font-size:11px; font-weight:600; white-space:normal; line-height:1.2;">${p.name}</div>
-                        <div style="font-size:10px; color:var(--accent-blue); margin-top:4px;">ATA ${p.attack} | DEF ${p.defense}</div>
-                        <div style="font-size:10px; color:${stamColor}; font-weight:bold; margin-top:4px;">${p.stamina}% ENG</div>
-                    </div>`;
-            } else {
-                rowHTML += `
-                    <div class="tactical-slot" onclick="openSlotSelectorModal(${idx})">
-                        <div style="font-size:10px; color:var(--text-muted)">+ ${layout[idx]}</div>
-                        <div style="font-size:9px; color:var(--accent-red)">Vazio</div>
-                    </div>`;
-            }
-        });
-        rowHTML += `</div>`;
-        container.innerHTML += rowHTML;
-    });
+    const info = subposData[subPos];
+
+    if (!info) {
+        console.error(
+            `Unknown tactical position "${subPos}" in formation "${currentFormation}".`
+        );
+        return;
+    }
+
+    rows[info.gen].push(idx);
+
+});
+
+const renderOrder = ['ATA', 'MEI', 'DEF', 'GOL'];
+
+renderOrder.forEach(group => {
+
+    const indices = rows[group] || [];
+
+    if (indices.length === 0)
+        return;
+
+    let rowHTML = '<div class="tactical-row">';
+
+    indices.forEach(idx => {
+
+    const pId = lineupSlots[idx];
+    const p = squad.find(x => x.id === pId);
+
+    if (p) {
+
+        const requiredGenPos = subposData[layout[idx]].gen;
+        const isWrong = p.position !== requiredGenPos;
+        const borderStyle = isWrong ? "border-color:var(--accent-red);" : "";
+
+        let stamColor = "#ff3366";
+        if (p.stamina >= 80) stamColor = "#00ff88";
+        else if (p.stamina >= 60) stamColor = "#ffb703";
+        else if (p.stamina >= 40) stamColor = "#f97316";
+
+        rowHTML += `
+            <div class="tactical-slot filled"
+                 style="${borderStyle}; padding:8px 4px; height:auto;"
+                 onclick="openSlotSelectorModal(${idx})">
+
+                <div style="font-size:9px;color:var(--text-muted);font-weight:800;margin-bottom:4px;">
+                    ${layout[idx]}
+                </div>
+
+                <div style="font-size:11px;font-weight:600;white-space:normal;line-height:1.2;">
+                    ${p.name}
+                </div>
+
+                <div style="font-size:10px;color:var(--accent-blue);margin-top:4px;">
+                    ATA ${p.attack} | DEF ${p.defense}
+                </div>
+
+                <div style="font-size:10px;color:${stamColor};font-weight:bold;margin-top:4px;">
+                    ${p.stamina}% ENG
+                </div>
+
+            </div>`;
+
+    } else {
+
+        rowHTML += `
+            <div class="tactical-slot"
+                 onclick="openSlotSelectorModal(${idx})">
+
+                <div style="font-size:10px;color:var(--text-muted)">
+                    + ${layout[idx]}
+                </div>
+
+                <div style="font-size:9px;color:var(--accent-red)">
+                    Vazio
+                </div>
+
+            </div>`;
+
+    }
+
+});
+
+    rowHTML += '</div>';
+
+    container.innerHTML += rowHTML;
+
+});
 }
 
         function renderBenchAndRoster() {
