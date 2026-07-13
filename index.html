@@ -681,6 +681,8 @@
                 </div>
             </div>
 
+            <div id="analysis-report"></div>
+
             <button
                 class="btn"
                 onclick="closeTacticalAnalysis()">
@@ -785,7 +787,107 @@
             'ATA': {def: 0.40, att: 1.60, gen: 'ATA'}
         };
         let lineupSlots = Array(11).fill(null);
+        let teamRoles = {
+            captain: null,
+            setPieceTaker: null
+        };
         let trainingSlots = Array(3).fill(null); // {playerId, type}
+
+        function getSubattributePercentModifier(value = 60) {
+            const numericValue = Number.isFinite(value) ? Number(value) : 60;
+            return (numericValue - 60) * 0.2;
+        }
+
+        function getSubattributeMultiplier(value = 60) {
+            return 1 + (getSubattributePercentModifier(value) / 100);
+        }
+
+        function ensurePlayerSubattributes(player) {
+            if (!player) return null;
+            if (player.leadership === undefined || player.leadership === null) {
+                player.leadership = Math.floor(Math.random() * 101);
+            } else {
+                player.leadership = Math.max(0, Math.min(100, Number(player.leadership) || 0));
+            }
+
+            if (player.setPieces === undefined || player.setPieces === null) {
+                const offensiveMultiplier = { GOL: 0.35, DEF: 0.60, MEI: 0.85, ATA: 1.15 }[player.position] || 0.75;
+                player.setPieces = Math.max(0, Math.min(100, Math.round(Math.max(0, player.attack || 0) * offensiveMultiplier)));
+            } else {
+                player.setPieces = Math.max(0, Math.min(100, Number(player.setPieces) || 0));
+            }
+            return player;
+        }
+
+        function normalizeTeamRoles(roles = {}) {
+            const nextRoles = { captain: null, setPieceTaker: null };
+            if (roles && typeof roles === 'object') {
+                nextRoles.captain = roles.captain || null;
+                nextRoles.setPieceTaker = roles.setPieceTaker || null;
+            }
+
+            const squadIds = new Set(squad.map(p => p.id));
+            const lineupIds = new Set(lineupSlots.filter(Boolean));
+
+            if (!squadIds.has(nextRoles.captain) || !lineupIds.has(nextRoles.captain)) {
+                nextRoles.captain = null;
+            }
+            if (!squadIds.has(nextRoles.setPieceTaker) || !lineupIds.has(nextRoles.setPieceTaker)) {
+                nextRoles.setPieceTaker = null;
+            }
+            return nextRoles;
+        }
+
+        function invalidateTeamRoles() {
+            teamRoles = { captain: null, setPieceTaker: null };
+        }
+
+        function hasRequiredTeamRoles() {
+            const captain = squad.find(p => p.id === teamRoles.captain);
+            const setPieceTaker = squad.find(p => p.id === teamRoles.setPieceTaker);
+            return !!captain && !!setPieceTaker && lineupSlots.includes(captain.id) && lineupSlots.includes(setPieceTaker.id);
+        }
+
+        function setCaptain(playerId) {
+            teamRoles = { ...teamRoles, captain: playerId };
+            if (playerId && !lineupSlots.includes(playerId)) {
+                teamRoles.captain = null;
+            }
+            saveGame();
+            renderTacticalField();
+            renderBenchAndRoster();
+            updateTacticalAnalysisModal();
+            closeModal();
+        }
+
+        function setSetPieceTaker(playerId) {
+            teamRoles = { ...teamRoles, setPieceTaker: playerId };
+            if (playerId && !lineupSlots.includes(playerId)) {
+                teamRoles.setPieceTaker = null;
+            }
+            saveGame();
+            renderTacticalField();
+            renderBenchAndRoster();
+            updateTacticalAnalysisModal();
+            closeModal();
+        }
+
+        function openPlayerRoleModal(playerId, slotIndex = null) {
+            const player = squad.find(p => p.id === playerId);
+            if (!player) return;
+            const isStarter = lineupSlots.includes(player.id);
+            const html = `
+                <h3>Funções Táticas</h3>
+                <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">${player.name} (${player.position})</p>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <button class="btn btn-success" onclick="setCaptain(${player.id})">Definir Capitão</button>
+                    <button class="btn btn-success" onclick="setSetPieceTaker(${player.id})">Definir Bola Parada</button>
+                    ${isStarter ? `<button class="btn" onclick="openSlotSelectorModal(${slotIndex})">Trocar Jogador</button>` : ''}
+                </div>
+                <button class="btn" style="width:100%; margin-top:10px;" onclick="closeModal()">Fechar</button>
+            `;
+            showModalContent(html);
+        }
         let hasTrainedThisRound = false;
 
         let modalQueue = [];
@@ -835,22 +937,31 @@ const lastNames = [
         }
 
         function calculatePlayerValue(p) {
+            const player = ensurePlayerSubattributes({ ...p });
             let baseVal = 0;
-            if (p.position === 'GOL') baseVal = (p.defense * 0.90) + (p.attack * 0.10);
-            else if (p.position === 'DEF') baseVal = (p.defense * 0.70) + (p.attack * 0.30);
-            else if (p.position === 'MEI') baseVal = (p.defense * 0.50) + (p.attack * 0.50);
-            else if (p.position === 'ATA') baseVal = (p.defense * 0.30) + (p.attack * 0.70);
+            if (player.position === 'GOL') baseVal = (player.defense * 0.90) + (player.attack * 0.10);
+            else if (player.position === 'DEF') baseVal = (player.defense * 0.70) + (player.attack * 0.30);
+            else if (player.position === 'MEI') baseVal = (player.defense * 0.50) + (player.attack * 0.50);
+            else if (player.position === 'ATA') baseVal = (player.defense * 0.30) + (player.attack * 0.70);
+
+            const setPieceModifier = getSubattributePercentModifier(player.setPieces) / 4;
+            const adjustedAttack = player.attack * (1 + (setPieceModifier / 100));
+            if (player.position === 'GOL') baseVal = (player.defense * 0.90) + (adjustedAttack * 0.10);
+            else if (player.position === 'DEF') baseVal = (player.defense * 0.70) + (adjustedAttack * 0.30);
+            else if (player.position === 'MEI') baseVal = (player.defense * 0.50) + (adjustedAttack * 0.50);
+            else if (player.position === 'ATA') baseVal = (player.defense * 0.30) + (adjustedAttack * 0.70);
 
             const baseFactor = 22000; 
             const capabilityExponent = Math.pow(baseVal / 40, 8) * baseFactor;
             
             let ageMultiplier = 1.0;
-            if (p.age <= 22) {
-                ageMultiplier = 1.6 + (23 - p.age) * 0.3; 
-            } else if (p.age >= 30) {
-                ageMultiplier = Math.max(0.05, 1.0 - (p.age - 29) * 0.16); 
+            if (player.age <= 22) {
+                ageMultiplier = 1.6 + (23 - player.age) * 0.3; 
+            } else if (player.age >= 30) {
+                ageMultiplier = Math.max(0.05, 1.0 - (player.age - 29) * 0.16); 
             }
-            return Math.round(Math.max(5000, capabilityExponent * ageMultiplier));
+            const leadershipMultiplier = getSubattributeMultiplier(player.leadership);
+            return Math.round(Math.max(5000, capabilityExponent * ageMultiplier * leadershipMultiplier));
         }
 
         function calculatePayroll() {
@@ -893,6 +1004,7 @@ const lastNames = [
                 defense: def,
                 stamina: 100
             };
+            ensurePlayerSubattributes(p);
             p.value = calculatePlayerValue(p);
             return p;
         }
@@ -920,6 +1032,11 @@ function initGame() {
             }
             
             lineupSlots = parsed.lineupSlots || Array(11).fill(null);
+            teamRoles = normalizeTeamRoles(parsed.teamRoles || {
+                captain: null,
+                setPieceTaker: null
+            });
+            squad.forEach(ensurePlayerSubattributes);
             userFormHistory = parsed.userFormHistory || [];
             hasTrainedThisRound = parsed.hasTrainedThisRound || false;
             trainingSlots = parsed.trainingSlots || Array(3).fill(null);
@@ -949,9 +1066,10 @@ function initGame() {
             userFormHistory = [];
             currentSeason = 1;
             currentRound = 1;
-            staff = { coach: false, fitness: false, commercial: false };
+            staff = { coach: false, fitness: false, commercial: false, specialist: false, scout: false };
             hasTrainedThisRound = false;
             trainingSlots = Array(3).fill(null);
+            teamRoles = { captain: null, setPieceTaker: null };
 
 const prefixes = [
     "Atlético", "Real", "União", "Esporte", "Futebol Clube", "Nacional", "Sport", "Grêmio", "Sociedade", "Racing",
@@ -1045,10 +1163,28 @@ function autoFillLineup() {
             usedIds.add(found.id);
         }
     }
+    teamRoles = normalizeTeamRoles(teamRoles);
     updateTacticalAnalysisModal();
 }
 function saveGame() {
-    const data = { teams, fixtures, marketPlayers, userTeamId, currentSeason, currentRound, finances, staff, squad, currentFormation, lineupSlots, userFormHistory, hasTrainedThisRound, trainingSlots, marketRefreshes };
+    const data = {
+    teams,
+    fixtures,
+    marketPlayers,
+    userTeamId,
+    currentSeason,
+    currentRound,
+    finances,
+    staff,
+    squad,
+    currentFormation,
+    lineupSlots,
+    teamRoles,
+    userFormHistory,
+    hasTrainedThisRound,
+    trainingSlots,
+    marketRefreshes
+    };
     localStorage.setItem('FMPRO_SAVE_V3', JSON.stringify(data));
 }
 
@@ -1171,6 +1307,14 @@ function refreshMarket() {
     logConsole(`Olheiro acionado. Novos atletas encontrados. (Resta: ${marketRefreshes})`);
 }
 
+        function showModalContent(htmlContent) {
+            const overlay = document.getElementById('global-modal-overlay');
+            const box = document.getElementById('global-modal-box');
+            box.innerHTML = htmlContent;
+            overlay.classList.add('active');
+            isModalActive = true;
+        }
+
         function queueModal(htmlContent) {
             modalQueue.push(htmlContent);
             processModalQueue();
@@ -1178,11 +1322,7 @@ function refreshMarket() {
 
         function processModalQueue() {
             if (isModalActive || modalQueue.length === 0) return;
-            isModalActive = true;
-            const overlay = document.getElementById('global-modal-overlay');
-            const box = document.getElementById('global-modal-box');
-            box.innerHTML = modalQueue.shift();
-            overlay.classList.add('active');
+            showModalContent(modalQueue.shift());
         }
 
         function closeModal() {
@@ -1192,9 +1332,13 @@ function refreshMarket() {
             setTimeout(processModalQueue, 250);
         }
 
-        function calculateUserTeamLiveStats() {
+        function buildTeamContributionBreakdown() {
             let totalAtt = 0; let totalDef = 0;
             const config = formationsConfig[currentFormation];
+            const captain = squad.find(p => p.id === teamRoles.captain);
+            const setPieceTaker = squad.find(p => p.id === teamRoles.setPieceTaker);
+            const leadershipModifier = captain ? getSubattributeMultiplier(captain.leadership) : 1;
+            const contributions = [];
 
             for (let i = 0; i < 11; i++) {
                 const pId = lineupSlots[i];
@@ -1202,6 +1346,7 @@ function refreshMarket() {
                 const p = squad.find(x => x.id === pId);
 
                 if (p) {
+                    ensurePlayerSubattributes(p);
                     let sData = subposData[subPos];
                     let penalty = p.position !== sData.gen ? 0.60 : 1.0;
                     let staminaMod = p.stamina / 100;
@@ -1209,24 +1354,94 @@ function refreshMarket() {
                     let realAtt = p.attack * sData.att;
                     let realDef = p.defense * sData.def;
 
-                    totalAtt += realAtt * penalty * staminaMod;
-                    totalDef += realDef * penalty * staminaMod;
+                    if (setPieceTaker && p.id === setPieceTaker.id) {
+                        const setPieceBonus = getSubattributePercentModifier(p.setPieces);
+                        realAtt += realAtt * (setPieceBonus / 100);
+                    }
+
+                    const contributionAtt = realAtt * penalty * staminaMod;
+                    const contributionDef = realDef * penalty * staminaMod;
+                    contributionAtt && contributionDef;
+                    totalAtt += contributionAtt;
+                    totalDef += contributionDef;
+                    contributions.push({
+                        name: p.name,
+                        attack: contributionAtt,
+                        defense: contributionDef,
+                        id: p.id,
+                        position: p.position,
+                        leadership: p.leadership,
+                        setPieces: p.setPieces,
+                        role: p.id === teamRoles.captain ? 'captain' : (p.id === teamRoles.setPieceTaker ? 'setPiece' : 'normal')
+                    });
                 } else {
                     totalAtt += 8; totalDef += 8;
+                    contributions.push({
+                        name: 'Vazio',
+                        attack: 8,
+                        defense: 8,
+                        id: null,
+                        position: null,
+                        leadership: 60,
+                        setPieces: 60,
+                        role: 'empty'
+                    });
                 }
             }
-            return { attack: totalAtt / 11, defense: totalDef / 11 };
+            return {
+                attack: (totalAtt / 11) * leadershipModifier,
+                defense: (totalDef / 11) * leadershipModifier,
+                leadershipModifier,
+                contributions
+            };
+        }
+
+        function calculateUserTeamLiveStats() {
+            return buildTeamContributionBreakdown();
         }
 
 function updateTacticalAnalysisModal() {
 
-    const stats = calculateUserTeamLiveStats();
+    const stats = buildTeamContributionBreakdown();
 
     document.getElementById("analysis-attack").textContent =
         stats.attack.toFixed(2);
 
     document.getElementById("analysis-defense").textContent =
         stats.defense.toFixed(2);
+
+    const reportContainer = document.getElementById("analysis-report");
+    if (reportContainer) {
+        const rows = stats.contributions.map((entry, idx) => {
+            const roleLabel = entry.role === 'captain' ? 'Capitão' : (entry.role === 'setPiece' ? 'Bola Parada' : '');
+            return `<tr><td>${idx + 1}</td><td>${entry.name}</td><td>${entry.attack.toFixed(2)}</td><td>${entry.defense.toFixed(2)}</td><td>${(entry.attack + entry.defense).toFixed(2)}</td></tr>`;
+        }).join('');
+        const captain = squad.find(p => p.id === teamRoles.captain);
+        const setPieceTaker = squad.find(p => p.id === teamRoles.setPieceTaker);
+        reportContainer.innerHTML = `
+            <div style="margin-top:14px;">
+                <h4 style="color:var(--accent-green); margin-bottom:8px;">Ataque Final</h4>
+                <div style="font-size:24px; font-weight:800; color:var(--accent-green);">${stats.attack.toFixed(2)}</div>
+                <h4 style="color:var(--accent-blue); margin-top:14px; margin-bottom:8px;">Defesa Final</h4>
+                <div style="font-size:24px; font-weight:800; color:var(--accent-blue);">${stats.defense.toFixed(2)}</div>
+            </div>
+            <div style="margin-top:16px;">
+                <h4 style="margin-bottom:8px;">Relatório</h4>
+                <table style="width:100%; font-size:11px;">
+                    <thead><tr><th>#</th><th>Jogador</th><th>ATA</th><th>DEF</th><th>Contrib.</th></tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+            <div style="margin-top:16px;">
+                <h4 style="margin-bottom:8px;">Funções</h4>
+                <div style="font-size:12px; line-height:1.6;">
+                    <div><strong>Capitão</strong>: ${captain ? captain.name : 'Não definido'}</div>
+                    <div>${captain ? `Liderança: ${captain.leadership} | Modificador: ${(getSubattributeMultiplier(captain.leadership) * 100 - 100).toFixed(0)}%` : ''}</div>
+                    <div style="margin-top:8px;"><strong>Bola Parada</strong>: ${setPieceTaker ? setPieceTaker.name : 'Não definido'}</div>
+                    <div>${setPieceTaker ? `Valor: ${setPieceTaker.setPieces} | Bônus ofensivo: ${(getSubattributePercentModifier(setPieceTaker.setPieces)).toFixed(0)}%` : ''}</div>
+                </div>
+            </div>`;
+    }
 }
 
 function openTacticalAnalysis() {
@@ -1250,6 +1465,16 @@ function closeTacticalAnalysis() {
         function playRound() {
             let myTeam = teams.find(t => t.id === userTeamId);
             let allCurrentFixtures = fixtures.filter(f => f.round === currentRound && !f.played);
+
+            if (!hasRequiredTeamRoles()) {
+                const missingHtml = `
+                    <h3>Pré-condição de Partida</h3>
+                    <p style="font-size:12px; color:var(--text-muted); margin-top:8px; line-height:1.6;">Defina Capitão e Batedor de Bola Parada antes de iniciar a rodada.</p>
+                    <button class="btn btn-success" style="width:100%; margin-top:16px;" onclick="closeModal()">Entendido</button>
+                `;
+                queueModal(missingHtml);
+                return;
+            }
 
             if(allCurrentFixtures.length === 0) {
                 logConsole("Inconsistência de calendário capturada.");
@@ -1500,6 +1725,7 @@ function closeTacticalAnalysis() {
 
             // Expulsar aposentados do array principal do elenco
             squad = squad.filter(p => !retiredList.includes(p));
+            teamRoles = normalizeTeamRoles(teamRoles);
 
             let retiredHTML = retiredList.length > 0 
                 ? `<p style="color:var(--accent-red); margin-top:8px;">⚠️ <strong>Aposentadorias Confirmadas (${retiredList.length}):</strong> ${retiredList.map(p => p.name + " (" + p.age + " anos)").join(', ')} deixaram o futebol profissional devido à decadência técnica.</p>`
@@ -1542,6 +1768,7 @@ function closeTacticalAnalysis() {
             generateMarket();
             
             squad.forEach(p => p.stamina = 100);
+            teamRoles = normalizeTeamRoles(teamRoles);
             // Repor elenco emergencialmente caso aposentadorias quebrem o time abaixo de 11 jogadores
             while(squad.length < 11) {
                 squad.push(createProceduralPlayer(null, 'modesto'));
@@ -1662,6 +1889,8 @@ function updateFormationOptions(family, isUserInteraction = true) {
                 updateTacticalAnalysisModal();
             });
 
+            teamRoles = normalizeTeamRoles(teamRoles);
+
             saveGame();
             renderTacticalField();
             renderBenchAndRoster();
@@ -1678,7 +1907,7 @@ function updateFormationOptions(family, isUserInteraction = true) {
 
 function openSlotSelectorModal(slotIndex) {
     const requiredSubPos = formationsConfig[currentFormation][slotIndex];
-    const requiredGenPos = subposData[requiredSubPos].gen; // Traz a raiz geral da posição
+    const requiredGenPos = subposData[requiredSubPos].gen;
     
     let allocatedPlayerIds = lineupSlots.filter((id, idx) => idx !== slotIndex && id !== null);
 
@@ -1702,7 +1931,7 @@ function openSlotSelectorModal(slotIndex) {
         <button class="btn btn-danger" style="width:100%; margin-top:20px;" onclick="unassignSlot(${slotIndex})">Esvaziar Slot</button>
         <button class="btn" style="width:100%; margin-top:8px;" onclick="closeModal()">Cancelar</button>
     `;
-    queueModal(html);
+    showModalContent(html);
 }
         function renderPlayerRowForModal(p, slotIndex, hasPenalty) {
             let penaltyBadge = hasPenalty ? "<span style='color:var(--accent-red); font-weight:bold;'>[Improviso -40%]</span>" : "";
@@ -1710,7 +1939,7 @@ function openSlotSelectorModal(slotIndex) {
                 <div style="background:rgba(255,255,255,0.04); border:1px solid var(--border-glass); padding:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
                     <div>
                         <strong>${p.name}</strong> (${p.age} anos) - <span style="color:var(--accent-blue)">${p.position}</span> ${penaltyBadge}<br>
-                        <span style="font-size:11px; color:var(--text-muted)">ATK: ${p.attack} | DEF: ${p.defense} | ENG: ${p.stamina}%</span>
+                        <span style="font-size:11px; color:var(--text-muted)">ATK: ${p.attack} | DEF: ${p.defense} | L: ${p.leadership || 60} | BP: ${p.setPieces || 60} | ENG: ${p.stamina}%</span>
                     </div>
                     <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="assignPlayerToSlot(${p.id}, ${slotIndex})">Vincular</button>
                 </div>
@@ -1721,11 +1950,13 @@ function openSlotSelectorModal(slotIndex) {
             let oldIndex = lineupSlots.indexOf(playerId);
             if(oldIndex !== -1) lineupSlots[oldIndex] = null;
             lineupSlots[slotIndex] = playerId;
+            teamRoles = normalizeTeamRoles(teamRoles);
             closeModal(); saveGame(); renderTacticalField(); renderBenchAndRoster(); updateTacticalAnalysisModal();
         }
 
         function unassignSlot(slotIndex) {
             lineupSlots[slotIndex] = null;
+            teamRoles = normalizeTeamRoles(teamRoles);
             closeModal(); saveGame(); renderTacticalField(); renderBenchAndRoster(); updateTacticalAnalysisModal();
         }
 
@@ -1823,14 +2054,22 @@ function openSlotSelectorModal(slotIndex) {
                     else if (p.stamina >= 60) stamColor = "#ffb703";
                     else if (p.stamina >= 40) stamColor = "#f97316";
 
+                    const captainBadge = teamRoles.captain === p.id ? '<span style="display:inline-flex; align-items:center; gap:2px; margin-left:4px; padding:1px 4px; border-radius:999px; background:rgba(0, 210, 255, 0.18); color:var(--accent-blue); font-size:8px; font-weight:800;">C</span>' : '';
+                    const setPieceBadge = teamRoles.setPieceTaker === p.id ? '<span style="display:inline-flex; align-items:center; gap:2px; margin-left:4px; padding:1px 4px; border-radius:999px; background:rgba(0, 255, 136, 0.18); color:var(--accent-green); font-size:8px; font-weight:800;">BP</span>' : '';
+                    const subattributeBadges = `
+                        <div style="display:flex; gap:4px; margin-top:4px; flex-wrap:wrap; justify-content:center;">
+                            <span style="font-size:8px; padding:1px 4px; border-radius:999px; background:rgba(255,255,255,0.08); color:var(--accent-blue);">L:${p.leadership || 60}</span>
+                            <span style="font-size:8px; padding:1px 4px; border-radius:999px; background:rgba(255,255,255,0.08); color:var(--accent-green);">BP:${p.setPieces || 60}</span>
+                        </div>`;
                     container.innerHTML += `
-                        <div class="tactical-slot filled" style="${positionStyle} ${borderStyle} padding:6px 2px; height:auto;" onclick="openSlotSelectorModal(${idx})">
+                        <div class="tactical-slot filled" style="${positionStyle} ${borderStyle} padding:6px 2px; height:auto;" onclick="openPlayerRoleModal(${p.id}, ${idx})">
                             <div style="font-size:9px; color:var(--text-muted); font-weight:800; margin-bottom:2px;">
                                 ${subPosName}
                             </div>
-                            <div style="font-size:11px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 4px;">
-                                ${p.name}
+                            <div style="font-size:11px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 4px; display:flex; align-items:center; justify-content:center;">
+                                ${p.name}${captainBadge}${setPieceBadge}
                             </div>
+                            ${subattributeBadges}
                             <div style="font-size:9px; color:var(--accent-blue); margin-top:2px;">
                                 A${p.attack} | D${p.defense}
                             </div>
@@ -1858,8 +2097,13 @@ function openSlotSelectorModal(slotIndex) {
             document.getElementById('squad-count').innerText = squad.length;
 
             squad.forEach(p => {
+                ensurePlayerSubattributes(p);
                 let isStarter = lineupSlots.includes(p.id);
                 let statusLabel = isStarter ? `<span style="color:var(--accent-green); font-size:10px;">[Titular Escalado]</span>` : `<span style="color:var(--text-muted); font-size:10px;">[Disponível para Negociação]</span>`;
+                let roleBadges = [];
+                if (teamRoles.captain === p.id) roleBadges.push('<span style="color:var(--accent-blue); font-size:10px;">C</span>');
+                if (teamRoles.setPieceTaker === p.id) roleBadges.push('<span style="color:var(--accent-green); font-size:10px;">BP</span>');
+                let roleMarkup = roleBadges.length > 0 ? `<div style="margin-top:6px; display:flex; gap:6px;">${roleBadges.join('')}</div>` : '';
                 
                 let actionButton = isStarter 
                     ? `<button class="btn" style="width:100%; font-size:11px; padding:4px; opacity:0.4; cursor:not-allowed;" disabled>Remova de campo para negociar</button>`
@@ -1875,6 +2119,8 @@ function openSlotSelectorModal(slotIndex) {
                             <span>Defesa: <strong>${p.defense}</strong></span>
                             <span>Passe Real: <strong style="color:var(--accent-green)">R$ ${p.value.toLocaleString()}</strong></span>
                         </div>
+                        <div style="font-size:10px; color:var(--text-muted); margin-bottom:6px;">Liderança: ${p.leadership} | Bola Parada: ${p.setPieces}</div>
+                        ${roleMarkup}
                         <div style="font-size:10px; color:var(--text-muted)">Condição Física Atual:</div>
                         <div class="stamina-bar">
                             <div class="stamina-fill" style="width: ${p.stamina}%; background:${p.stamina < 40 ? 'var(--accent-red)': 'var(--accent-green)'}"></div>
@@ -1897,6 +2143,7 @@ function openSlotSelectorModal(slotIndex) {
             finances.cash += p.value;
             logConsole(`Passe liquidado: ${p.name} vendido por R$ ${p.value.toLocaleString()}`);
             squad.splice(pIndex, 1);
+            teamRoles = normalizeTeamRoles(teamRoles);
             saveGame(); renderAll();
         }
 
@@ -2056,6 +2303,7 @@ ${eligiblePlayers.map(p => {
             const container = document.getElementById('market-container');
             container.innerHTML = "";
             marketPlayers.forEach((p, idx) => {
+                ensurePlayerSubattributes(p);
                 container.innerHTML += `
                     <div class="player-card">
                         <span class="player-badge badge-${p.position.toLowerCase()}">${p.position}</span>
@@ -2064,6 +2312,8 @@ ${eligiblePlayers.map(p => {
                         <div style="font-size:12px; margin:8px 0; display:flex; flex-direction:column; gap:4px;">
                             <div>Fator Ofensivo: <strong>${p.attack}</strong></div>
                             <div>Fator Defensivo: <strong>${p.defense}</strong></div>
+                            <div>Liderança: <strong>${p.leadership}</strong></div>
+                            <div>Bola Parada: <strong>${p.setPieces}</strong></div>
                             <div style="color:var(--accent-green); font-weight:600; margin-top:4px;">Passe: R$ ${p.value.toLocaleString()}</div>
                         </div>
                         <button class="btn btn-success" style="width:100%; font-size:12px; padding:8px;" onclick="buyPlayer(${idx})">Assinar Contrato</button>
@@ -2073,6 +2323,8 @@ ${eligiblePlayers.map(p => {
 
         function buyPlayer(marketIdx) {
             let p = marketPlayers[marketIdx];
+            if (!p) return;
+            ensurePlayerSubattributes(p);
             if (squad.length >= 30) {
                 alert("Teto Máximo Excedido: O limite corporativo é estável em 30 atletas alocados.");
                 return;
