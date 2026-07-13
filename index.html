@@ -416,7 +416,7 @@
 <body>
 
     <header>
-        <div class="logo">FUTMANAGER ULTRA PRO</div>
+        <div class="logo">FUTMANAGER PRO</div>
         <div class="hud-stats">
             <div class="hud-item">Clube: <span id="hud-club">-</span></div>
             <div class="hud-item">Temporada: <span id="hud-season">1</span></div>
@@ -506,13 +506,31 @@
     <h2>Escalação Tática</h2>
     <div style="max-width: 800px; margin: 0 auto;">
         <label style="font-size:12px; color:var(--text-muted); font-weight:600;">Selecione a Estrutura Tática Rígida:</label>
-        <div style="display:flex; gap: 10px; margin:8px 0 20px 0;">
-            <select id="family-selector" class="btn" style="flex:1; background:var(--bg-input)" onchange="updateFormationOptions(this.value)">
-            </select>
-            <select id="formation-selector" class="btn" style="flex:2; background:var(--bg-input)" onchange="changeFormation(this.value)">
-            </select>
-            <button class="btn btn-success" style="padding: 12px;" onclick="autoEscalar()">⚡ Auto Escalar</button>
-        </div>
+        <div style="display:flex; gap:10px; margin:8px 0 20px 0;">
+    <select id="family-selector"
+            class="btn"
+            style="flex:1; background:var(--bg-input)"
+            onchange="updateFormationOptions(this.value)">
+    </select>
+
+    <select id="formation-selector"
+            class="btn"
+            style="flex:2; background:var(--bg-input)"
+            onchange="changeFormation(this.value)">
+    </select>
+
+    <button class="btn btn-success"
+            style="padding:12px;"
+            onclick="autoEscalar()">
+        Auto Escalar
+    </button>
+
+    <button class="btn"
+            style="padding:12px;"
+            onclick="openTacticalAnalysis()">
+        Análise Tática
+    </button>
+</div>
         <div class="tactical-field" id="tactical-field-dom"></div>
     </div>
 </div>
@@ -618,9 +636,65 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="global-modal-overlay">
-        <div class="modal-box" id="global-modal-box"></div>
+    <div class="modal-overlay" id="tactical-analysis-modal">
+    <div class="modal-box" style="width:420px;">
+
+        <h2 style="margin-bottom:25px;">
+            Análise Tática
+        </h2>
+
+        <div style="display:flex; flex-direction:column; gap:22px;">
+
+            <div style="text-align:center;">
+                <div style="
+                    color:var(--text-muted);
+                    font-size:12px;
+                    text-transform:uppercase;
+                    letter-spacing:1px;
+                    margin-bottom:8px;">
+                    Força Ofensiva
+                </div>
+
+                <div id="analysis-attack"
+                     style="
+                        font-size:42px;
+                        font-weight:800;
+                        color:var(--accent-green);">
+                    0.00
+                </div>
+            </div>
+
+            <hr style="border-color:var(--border-glass);">
+
+            <div style="text-align:center;">
+                <div style="
+                    color:var(--text-muted);
+                    font-size:12px;
+                    text-transform:uppercase;
+                    letter-spacing:1px;
+                    margin-bottom:8px;">
+                    Força Defensiva
+                </div>
+
+                <div id="analysis-defense"
+                     style="
+                        font-size:42px;
+                        font-weight:800;
+                        color:var(--accent-blue);">
+                    0.00
+                </div>
+            </div>
+
+            <button
+                class="btn"
+                onclick="closeTacticalAnalysis()">
+                Fechar
+            </button>
+
+        </div>
+
     </div>
+</div>
 
     <script>
         // --- CONFIGURAÇÃO DO ESTADO CENTRAL ---
@@ -919,8 +993,8 @@ const suffixes = [
                         userTeamId = idCounter;
                     }
                     
-                    let basePowerAtt = 85 - (div * 8) + Math.floor(Math.random() * 5);
-                    let basePowerDef = 83 - (div * 8) + Math.floor(Math.random() * 5);
+                    let basePowerAtt = Math.min(50 - (div * 8) + Math.floor(Math.random() * 60), 95);
+                    let basePowerDef = Math.min(80 - (div * 8) + Math.floor(Math.random() * 20), 95);
 
                     teams.push({
                         id: idCounter,
@@ -975,6 +1049,7 @@ function autoFillLineup() {
             usedIds.add(found.id);
         }
     }
+    updateTacticalAnalysisModal();
 }
 function saveGame() {
     const data = { teams, fixtures, marketPlayers, userTeamId, currentSeason, currentRound, finances, staff, squad, currentFormation, lineupSlots, userFormHistory, hasTrainedThisRound, trainingSlots, marketRefreshes };
@@ -1146,6 +1221,35 @@ function refreshMarket() {
             }
             return { attack: totalAtt / 11, defense: totalDef / 11 };
         }
+
+function updateTacticalAnalysisModal() {
+
+    const stats = calculateUserTeamLiveStats();
+
+    document.getElementById("analysis-attack").textContent =
+        stats.attack.toFixed(2);
+
+    document.getElementById("analysis-defense").textContent =
+        stats.defense.toFixed(2);
+}
+
+function openTacticalAnalysis() {
+
+    updateTacticalAnalysisModal();
+
+    document
+        .getElementById("tactical-analysis-modal")
+        .classList
+        .add("active");
+}
+
+function closeTacticalAnalysis() {
+
+    document
+        .getElementById("tactical-analysis-modal")
+        .classList
+        .remove("active");
+}
         
         function playRound() {
             let myTeam = teams.find(t => t.id === userTeamId);
@@ -1559,6 +1663,7 @@ function updateFormationOptions(family, isUserInteraction = true) {
                 for(let i = 0; i < selected.length; i++) {
                     lineupSlots[slotsNeeded[i].idx] = selected[i].id;
                 }
+                updateTacticalAnalysisModal();
             });
 
             saveGame();
@@ -1572,6 +1677,7 @@ function updateFormationOptions(family, isUserInteraction = true) {
             saveGame();
             renderTacticalField();
             renderBenchAndRoster();
+            updateTacticalAnalysisModal();
         }
 
 function openSlotSelectorModal(slotIndex) {
@@ -1619,12 +1725,12 @@ function openSlotSelectorModal(slotIndex) {
             let oldIndex = lineupSlots.indexOf(playerId);
             if(oldIndex !== -1) lineupSlots[oldIndex] = null;
             lineupSlots[slotIndex] = playerId;
-            closeModal(); saveGame(); renderTacticalField(); renderBenchAndRoster();
+            closeModal(); saveGame(); renderTacticalField(); renderBenchAndRoster(); updateTacticalAnalysisModal();
         }
 
         function unassignSlot(slotIndex) {
             lineupSlots[slotIndex] = null;
-            closeModal(); saveGame(); renderTacticalField(); renderBenchAndRoster();
+            closeModal(); saveGame(); renderTacticalField(); renderBenchAndRoster(); updateTacticalAnalysisModal();
         }
 
         function renderTacticalField() {
@@ -1702,6 +1808,7 @@ function openSlotSelectorModal(slotIndex) {
                         else if (occurrenceIdx === 2) leftPercent = 60;
                         else leftPercent = 80;
                     }
+                    updateTacticalAnalysisModal();
                 }
 
                 // Construção de estilos CSS in-line para posicionamento absoluto milimétrico
@@ -2075,7 +2182,7 @@ if(marketHeader) {
             renderTrainingView();
             renderMarket();
             buildEditor();
-            initFormationUI()
+            initFormationUI();
         }
 
         function switchView(viewId, clickedButton = null) {
