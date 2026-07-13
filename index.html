@@ -787,6 +787,43 @@
             'PD':  {def: 0.50, att: 1.50, gen: 'ATA'},
             'ATA': {def: 0.40, att: 1.60, gen: 'ATA'}
         };
+        
+        // Heuristic helper: given a subPos and a Set of present subpositions, return additive adjustments
+        function getHeuristicAdjForSubpos(subPos, presentSubpos) {
+            let attAdj = 0, defAdj = 0;
+            const has = x => presentSubpos.has(x);
+            if (!has('PE')) {
+                if (subPos === 'ME' || subPos === 'LE') { attAdj += 0.15; defAdj -= 0.15; }
+            }
+            if (!has('PD')) {
+                if (subPos === 'MD' || subPos === 'LD') { attAdj += 0.15; defAdj -= 0.15; }
+            }
+            if (!has('ME')) {
+                if (subPos === 'PE') { defAdj += 0.05; attAdj -= 0.05; }
+                if (subPos === 'LE') { attAdj += 0.15; defAdj -= 0.15; }
+            }
+            if (!has('MD')) {
+                if (subPos === 'PD') { defAdj += 0.05; attAdj -= 0.05; }
+                if (subPos === 'LD') { attAdj += 0.15; defAdj -= 0.15; }
+            }
+            if (!has('LE')) {
+                if (subPos === 'ME' || subPos === 'PE') { attAdj -= 0.10; defAdj += 0.10; }
+            }
+            if (!has('LD')) {
+                if (subPos === 'MD' || subPos === 'PD') { attAdj -= 0.10; defAdj += 0.10; }
+            }
+            if (!has('VOL')) {
+                if (subPos === 'MC') { defAdj += 0.05; attAdj -= 0.05; }
+            }
+            if (!has('MEI')) {
+                if (subPos === 'MC') { defAdj -= 0.05; attAdj += 0.05; }
+            }
+            if (has('F9')) {
+                if (subPos === 'MEI') { attAdj += 0.10; defAdj -= 0.10; }
+                if (['ME','MD','PE','PD'].includes(subPos)) { attAdj += 0.15; defAdj -= 0.15; }
+            }
+            return { attAdj, defAdj };
+        }
         let lineupSlots = Array(11).fill(null);
         let teamRoles = {
             captain: null,
@@ -1468,8 +1505,17 @@ function refreshMarket() {
             const setPieceTaker = squad.find(p => p.id === teamRoles.setPieceTaker);
             const leadershipModifier = captain ? getSubattributeMultiplier(captain.leadership) : 1;
             const contributions = [];
+                    // Determine which sub-positions are present in the current lineup
+                    const presentSubpos = new Set();
+                    for (let i = 0; i < 11; i++) {
+                        const pIdCheck = lineupSlots[i];
+                        const subPosCheck = config[i];
+                        if (pIdCheck && squad.find(x => x.id === pIdCheck)) {
+                            presentSubpos.add(subPosCheck);
+                        }
+                    }
 
-            for (let i = 0; i < 11; i++) {
+                    for (let i = 0; i < 11; i++) {
                 const pId = lineupSlots[i];
                 const subPos = config[i];
                 const p = squad.find(x => x.id === pId);
@@ -1488,17 +1534,71 @@ function refreshMarket() {
                         realAtt += realAtt * (setPieceBonus / 100);
                     }
 
-                    const contributionAtt = realAtt * penalty * staminaMod;
-                    const contributionDef = realDef * penalty * staminaMod;
-                    contributionAtt && contributionDef;
+                    // Heuristic adjustments (accumulative)
+                    let attAdj = 0; // additive multiplier (e.g. +0.15 means *1.15)
+                    let defAdj = 0;
+
+                    // Helper shortcuts for presence checks
+                    const has = x => presentSubpos.has(x);
+
+                    // 1. If no PE, ME and LE present get +0.15 attack / -0.15 defense
+                    if (!has('PE')) {
+                        if (subPos === 'ME' || subPos === 'LE') { attAdj += 0.15; defAdj -= 0.15; }
+                    }
+                    // 2. If no PD, MD and LD present get +0.15 attack / -0.15 defense
+                    if (!has('PD')) {
+                        if (subPos === 'MD' || subPos === 'LD') { attAdj += 0.15; defAdj -= 0.15; }
+                    }
+                    // 3. If no ME, PE defense +0.05 attack -0.05; LE +0.15/-0.15
+                    if (!has('ME')) {
+                        if (subPos === 'PE') { defAdj += 0.05; attAdj -= 0.05; }
+                        if (subPos === 'LE') { attAdj += 0.15; defAdj -= 0.15; }
+                    }
+                    // 4. If no MD, PD defense +0.05 attack -0.05; LD +0.15/-0.15
+                    if (!has('MD')) {
+                        if (subPos === 'PD') { defAdj += 0.05; attAdj -= 0.05; }
+                        if (subPos === 'LD') { attAdj += 0.15; defAdj -= 0.15; }
+                    }
+                    // 5. If no LE, ME and PE attack -0.10 defense +0.10
+                    if (!has('LE')) {
+                        if (subPos === 'ME' || subPos === 'PE') { attAdj -= 0.10; defAdj += 0.10; }
+                    }
+                    // 6. If no LD, MD and PD attack -0.10 defense +0.10
+                    if (!has('LD')) {
+                        if (subPos === 'MD' || subPos === 'PD') { attAdj -= 0.10; defAdj += 0.10; }
+                    }
+                    // 7. If no VOL, all MC defense +0.05 attack -0.05
+                    if (!has('VOL')) {
+                        if (subPos === 'MC') { defAdj += 0.05; attAdj -= 0.05; }
+                    }
+                    // 8. If no MEI, all MC defense -0.05 attack +0.05
+                    if (!has('MEI')) {
+                        if (subPos === 'MC') { defAdj -= 0.05; attAdj += 0.05; }
+                    }
+                    // 9. If there is F9, MEI +0.10/-0.10; ME,MD,PE,PD +0.15/-0.15
+                    if (has('F9')) {
+                        if (subPos === 'MEI') { attAdj += 0.10; defAdj -= 0.10; }
+                        if (['ME','MD','PE','PD'].includes(subPos)) { attAdj += 0.15; defAdj -= 0.15; }
+                    }
+
+                    // Apply adjustments as multiplicative weights, clamp to avoid negative multipliers
+                    const attScale = Math.max(0.01, 1 + attAdj);
+                    const defScale = Math.max(0.01, 1 + defAdj);
+
+                    const contributionAtt = realAtt * penalty * staminaMod * attScale;
+                    const contributionDef = realDef * penalty * staminaMod * defScale;
+                    
                     totalAtt += contributionAtt;
                     totalDef += contributionDef;
+                    // Visual vertical bias: positive => more attack tendency (shift up), negative => defense tendency (shift down)
+                    const verticalBias = (attAdj - defAdj);
                     contributions.push({
                         name: p.name,
                         attack: contributionAtt,
                         defense: contributionDef,
                         id: p.id,
                         position: p.position,
+                        verticalBias,
                         leadership: p.leadership,
                         setPieces: p.setPieces,
                         role: p.id === teamRoles.captain ? 'captain' : (p.id === teamRoles.setPieceTaker ? 'setPiece' : 'normal')
@@ -1965,41 +2065,56 @@ function updateFormationOptions(family, isUserInteraction = true) {
                 let slotsNeeded = genRequirements[genPos];
                 if(slotsNeeded.length === 0) return;
 
-                // Encontra os melhores candidatos nativos
-                let candidates = availablePlayers.filter(p => p.position === genPos && !usedIds.has(p.id));
-                
-                // Pesos básicos para ranquear dentro da posição geral (Regra 3 do Auto Escalar)
-                let wDef, wAtt;
-                if(genPos === 'GOL') { wDef = 1.80; wAtt = 0.20; }
-                else if(genPos === 'DEF') { wDef = 1.40; wAtt = 0.60; }
-                else if(genPos === 'MEI') { wDef = 1.00; wAtt = 1.00; }
-                else { wDef = 0.60; wAtt = 1.40; } // ATA
+                // Greedy selection per sub-position using heuristic-adjusted projected contribution
+                let candidates = availablePlayers.filter(p => !usedIds.has(p.id));
 
-                candidates.sort((a, b) => {
-                    let scoreA = (a.effDef * wDef) + (a.effAtt * wAtt);
-                    let scoreB = (b.effDef * wDef) + (b.effAtt * wAtt);
-                    return scoreB - scoreA;
-                });
-
-                let selected = candidates.slice(0, slotsNeeded.length);
-                selected.forEach(s => usedIds.add(s.id));
-
-                // Se faltar nativos, busca de fora (Regra 5)
-                if(selected.length < slotsNeeded.length) {
-                    let deficit = slotsNeeded.length - selected.length;
-                    let outsiders = availablePlayers.filter(p => !usedIds.has(p.id));
-                    outsiders.sort((a, b) => ((b.effDef+b.effAtt) - (a.effDef+a.effAtt))); // Escolha genérica por overall
-                    let extra = outsiders.slice(0, deficit);
-                    extra.forEach(e => usedIds.add(e.id));
-                    selected = selected.concat(extra);
-                }
-
-                // Distribui pelas subposições com base na ratio (Regra 4)
-                selected.sort((a, b) => (b.effAtt / Math.max(1, b.effDef)) - (a.effAtt / Math.max(1, a.effDef)));
+                // Sort slotsNeeded by attack weight so attacking roles choose first
                 slotsNeeded.sort((a, b) => subposData[b.subPos].att - subposData[a.subPos].att);
 
-                for(let i = 0; i < selected.length; i++) {
-                    lineupSlots[slotsNeeded[i].idx] = selected[i].id;
+                // Track present subpos as we assign
+                const presentSubpos = new Set();
+                // include any already-filled lineup slots
+                for (let li = 0; li < lineupSlots.length; li++) {
+                    const pid = lineupSlots[li];
+                    if (pid) presentSubpos.add(config[li]);
+                }
+
+                for (let sReq of slotsNeeded) {
+                    const targetSub = sReq.subPos;
+                    // Evaluate best candidate for this specific sub-position
+                    let best = null;
+                    let bestScore = -Infinity;
+                    for (let cand of candidates) {
+                        if (usedIds.has(cand.id)) continue;
+                        // projected real att/def for this subPos
+                        const sData = subposData[targetSub];
+                        const penalty = cand.position !== sData.gen ? 0.60 : 1.0;
+                        const staminaMod = cand.stamina / 100;
+                        let realAtt = cand.attack * sData.att;
+                        let realDef = cand.defense * sData.def;
+                        if (teamRoles.setPieceTaker && cand.id === teamRoles.setPieceTaker) {
+                            const setPieceBonus = getSubattributePercentModifier(cand.setPieces);
+                            realAtt += realAtt * (setPieceBonus / 100);
+                        }
+                        // build provisional present set including this subPos
+                        const provPresent = new Set(presentSubpos);
+                        provPresent.add(targetSub);
+                        const heur = getHeuristicAdjForSubpos(targetSub, provPresent);
+                        const attScale = Math.max(0.01, 1 + heur.attAdj);
+                        const defScale = Math.max(0.01, 1 + heur.defAdj);
+                        const contrib = (realAtt * penalty * staminaMod * attScale) + (realDef * penalty * staminaMod * defScale);
+                        if (contrib > bestScore) {
+                            bestScore = contrib;
+                            best = cand;
+                        }
+                    }
+                    if (best) {
+                        lineupSlots[sReq.idx] = best.id;
+                        usedIds.add(best.id);
+                        // mark present and remove candidate from pool
+                        presentSubpos.add(targetSub);
+                        candidates = candidates.filter(c => c.id !== best.id);
+                    }
                 }
                 updateTacticalAnalysisModal();
             });
@@ -2112,6 +2227,9 @@ function openSlotSelectorModal(slotIndex) {
                 'ATA': 10   // Centroavante espetado na última linha
             };
 
+            // Precompute contribution stats to get per-slot vertical bias
+            const statsForRender = buildTeamContributionBreakdown();
+
             // 3. Processamento individual e plotagem dos 11 slots táticos
             layout.forEach((subPosName, idx) => {
                 if (!currentIdxOfPos[subPosName]) {
@@ -2121,7 +2239,13 @@ function openSlotSelectorModal(slotIndex) {
                 currentIdxOfPos[subPosName]++;
 
                 // Definição da coordenada Vertical (Y)
-                const topPercent = subposTopMap[subPosName] !== undefined ? subposTopMap[subPosName] : 41;
+                let topPercent = subposTopMap[subPosName] !== undefined ? subposTopMap[subPosName] : 41;
+                // Apply visual vertical translation based on heuristic bias for this slot
+                const biasEntry = (statsForRender && statsForRender.contributions && statsForRender.contributions[idx]) || null;
+                const bias = biasEntry ? (biasEntry.verticalBias || 0) : 0;
+                // positive bias => more attacking => shift up (smaller top percent)
+                const shift = -bias * 8; // scale factor => ~8% per unit of bias
+                topPercent = Math.max(4, Math.min(92, topPercent + shift));
 
                 // Definição da coordenada Horizontal (X) aplicando o Fator de Lateralidade Amplo
                 let leftPercent = 50; // Padrão centralizado absoluto
