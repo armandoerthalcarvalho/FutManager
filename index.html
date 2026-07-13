@@ -309,20 +309,20 @@
         }
         .stamina-fill { height: 100%; background: var(--accent-green); }
 
-        /* SUBSTITUA A CLASSE .tactical-field POR ESTA: */
-        .tactical-field {
-            background: radial-gradient(circle at center, #1b4d3e 0%, #0d261f 100%);
-            border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 20px 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;                  /* Espaçamento uniforme entre as linhas táticas */
-            min-height: 580px;          /* Altura expandida para suportar formações de 5 ou 6 linhas */
-            justify-content: space-between;
-            position: relative;
-            overflow: hidden;
-        }
+        
+.tactical-field {
+    background: radial-gradient(circle at center, #1b4d3e 0%, #0d261f 100%);
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 750px !important; /* Aumentado drasticamente o tamanho vertical do campo */
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+}
 
         .tactical-row {
             display: flex;
@@ -330,17 +330,18 @@
             gap: 15px;
         }
 
-        .tactical-slot {
-            width: 90px;
-            background: rgba(0,0,0,0.4);
-            border: 1px dashed rgba(255,255,255,0.3);
-            border-radius: 8px;
-            padding: 10px 5px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
+    .tactical-slot {
+    width: 80px !important;        /* Largura reduzida para diminuir o card */
+    min-height: 40px !important;   /* Altura reduzida para diminuir o card */
+    background: rgba(0,0,0,0.4);
+    border: 1px dashed rgba(255,255,255,0.3);
+    border-radius: 8px ;
+    padding: 3px 2px !important;   /* Espaçamento interno menor para caber em telas compactas */
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    overflow: hidden;
+}
         .tactical-slot:hover {
             border-color: var(--accent-blue);
             background: rgba(0, 210, 255, 0.1);
@@ -2039,7 +2040,7 @@ function openSlotSelectorModal(slotIndex) {
                 }
 
                 // Construção de estilos CSS in-line para posicionamento absoluto milimétrico
-                const positionStyle = `position: absolute; top: ${topPercent}%; left: ${leftPercent}%; transform: translate(-50%, -50%); width: 95px; margin: 0; box-sizing: border-box; z-index: 10;`;
+                const positionStyle = `position: absolute; top: ${topPercent}%; left: ${leftPercent}%; transform: translate(-50%, -50%); width: 88px; min-height: 94px; margin: 0; box-sizing: border-box; z-index: 10;`;
 
                 const pId = lineupSlots[idx];
                 const p = squad.find(x => x.id === pId);
@@ -2054,27 +2055,30 @@ function openSlotSelectorModal(slotIndex) {
                     else if (p.stamina >= 60) stamColor = "#ffb703";
                     else if (p.stamina >= 40) stamColor = "#f97316";
 
-                    const captainBadge = teamRoles.captain === p.id ? '<span style="display:inline-flex; align-items:center; gap:2px; margin-left:4px; padding:1px 4px; border-radius:999px; background:rgba(0, 210, 255, 0.18); color:var(--accent-blue); font-size:8px; font-weight:800;">C</span>' : '';
-                    const setPieceBadge = teamRoles.setPieceTaker === p.id ? '<span style="display:inline-flex; align-items:center; gap:2px; margin-left:4px; padding:1px 4px; border-radius:999px; background:rgba(0, 255, 136, 0.18); color:var(--accent-green); font-size:8px; font-weight:800;">BP</span>' : '';
+                    const captainBadge = teamRoles.captain === p.id ? '<div style="position:absolute; top:4px; right:4px; display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:999px; background:rgba(0, 210, 255, 0.18); color:var(--accent-blue); font-size:8px; font-weight:800;">C</div>' : '';
+                    const setPieceBadge = teamRoles.setPieceTaker === p.id ? '<div style="position:absolute; top:4px; left:4px; display:inline-flex; align-items:center; justify-content:center; width:20px; height:16px; border-radius:999px; background:rgba(0, 255, 136, 0.18); color:var(--accent-green); font-size:8px; font-weight:800;">BP</div>' : '';
                     const subattributeBadges = `
                         <div style="display:flex; gap:4px; margin-top:4px; flex-wrap:wrap; justify-content:center;">
                             <span style="font-size:8px; padding:1px 4px; border-radius:999px; background:rgba(255,255,255,0.08); color:var(--accent-blue);">L:${p.leadership || 60}</span>
                             <span style="font-size:8px; padding:1px 4px; border-radius:999px; background:rgba(255,255,255,0.08); color:var(--accent-green);">BP:${p.setPieces || 60}</span>
                         </div>`;
                     container.innerHTML += `
-                        <div class="tactical-slot filled" style="${positionStyle} ${borderStyle} padding:6px 2px; height:auto;" onclick="openPlayerRoleModal(${p.id}, ${idx})">
-                            <div style="font-size:9px; color:var(--text-muted); font-weight:800; margin-bottom:2px;">
-                                ${subPosName}
-                            </div>
-                            <div style="font-size:11px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 4px; display:flex; align-items:center; justify-content:center;">
-                                ${p.name}${captainBadge}${setPieceBadge}
-                            </div>
-                            ${subattributeBadges}
-                            <div style="font-size:9px; color:var(--accent-blue); margin-top:2px;">
-                                A${p.attack} | D${p.defense}
-                            </div>
-                            <div style="font-size:9px; color:${stamColor}; font-weight:bold; margin-top:2px;">
-                                ${p.stamina}% ENG
+                        <div class="tactical-slot filled" style="${positionStyle} ${borderStyle} padding:8px 6px; height:auto; position:absolute;" onclick="openPlayerRoleModal(${p.id}, ${idx})">
+                            <div style="position:relative; display:flex; flex-direction:column; align-items:center; width:100%; min-height:90px;">
+                                ${captainBadge}${setPieceBadge}
+                                <div style="font-size:9px; color:var(--text-muted); font-weight:800; margin-top:8px;">
+                                    ${subPosName}
+                                </div>
+                                <div style="font-size:10px; font-weight:600; line-height:1.1; margin-top:6px; padding:0 2px; text-align:center; overflow-wrap:anywhere; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                                    ${p.name}
+                                </div>
+                                ${subattributeBadges}
+                                <div style="font-size:9px; color:var(--accent-blue); margin-top:2px;">
+                                    A${p.attack} | D${p.defense}
+                                </div>
+                                <div style="font-size:9px; color:${stamColor}; font-weight:bold; margin-top:2px;">
+                                    ${p.stamina}% ENG
+                                </div>
                             </div>
                         </div>`;
                 } else {
