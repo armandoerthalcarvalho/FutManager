@@ -1449,13 +1449,22 @@ function generateSeasonFixtures() {
     }
 }
 
+        function normalizeMarketRefreshState() {
+            if (!Number.isFinite(marketRefreshes)) {
+                marketRefreshes = 3;
+            }
+            marketRefreshes = Math.max(0, Math.min(3, Math.floor(Number(marketRefreshes) || 0)));
+        }
+
         function generateMarket() {
+            normalizeMarketRefreshState();
             marketPlayers = [];
             // O mercado gera jogadores adequados ao nível da divisão atual do jogador
             let myTeam = teams.find(t => t.id === userTeamId);
+            let division = myTeam && Number.isFinite(myTeam.division) ? myTeam.division : 1;
             let tier = 'intermediario';
-            if(myTeam.division >= 4) tier = 'modesto';
-            if(myTeam.division === 1) tier = 'elite';
+            if(division >= 4) tier = 'modesto';
+            if(division === 1) tier = 'elite';
 
             for(let i = 0; i < 12; i++) {
                 marketPlayers.push(createProceduralPlayer(null, tier));
@@ -1463,11 +1472,19 @@ function generateSeasonFixtures() {
         }
 
 function refreshMarket() {
+    normalizeMarketRefreshState();
     if (!staff.scout) return alert("Você precisa contratar o Olheiro Mestre para utilizar esta função.");
     if (marketRefreshes <= 0) return alert("Sua cota de rastreamento excedeu (0/3). Aguarde a próxima temporada.");
     
-    marketRefreshes--;
-    generateMarket();
+    const previousRefreshes = marketRefreshes;
+    marketRefreshes = previousRefreshes - 1;
+    try {
+        generateMarket();
+    } catch (error) {
+        marketRefreshes = previousRefreshes;
+        console.error("Erro ao atualizar o mercado:", error);
+        return alert("O olheiro não conseguiu atualizar o mercado neste momento.");
+    }
     saveGame();
     renderAll();
     logConsole(`Olheiro acionado. Novos atletas encontrados. (Resta: ${marketRefreshes})`);
@@ -2608,7 +2625,15 @@ ${sortedPlayers.map(p => {
         }
 
         function hireStaffMember(type, cost) {
-            if(finances.cash < cost) {
+            if (!type || !['coach', 'fitness', 'commercial', 'specialist', 'scout'].includes(type)) {
+                alert("Membro da comissão inválido.");
+                return;
+            }
+            if (staff[type]) {
+                alert("Este membro da comissão já está contratado.");
+                return;
+            }
+            if (finances.cash < cost) {
                 alert("Recursos insuficientes para contratação deste especialista.");
                 return;
             }
