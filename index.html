@@ -677,7 +677,7 @@
                         <div style="font-size: 13px; line-height: 1.6; color: var(--text-muted);">
                             🔵 <strong>Foco Ofensivo:</strong> Chance de aumento em Ataque. Consome <span style="color:var(--accent-red)">25 de Estamina</span>.<br>
                             🟢 <strong>Foco Defensivo:</strong> Chance de aumento em Defesa. Consome <span style="color:var(--accent-red)">25 de Estamina</span>.<br>
-                            🟡 <strong>Intensivo Misto:</strong> Chance sutil em ambos. Consome <span style="color:var(--accent-red)">35 de Estamina</span>.<br>
+                            🟡 <strong>Intensivo Misto:</strong> Chance sutil em ambos. Consome <span style="color:var(--accent-red)">20 de Estamina</span>.<br>
                             <br>
                             <span style="color: var(--accent-warn)">Nota: O limite mínimo para submeter um atleta ao treinamento é de 35% de energia restante.</span>
                         </div>
@@ -2495,26 +2495,36 @@
         }
 
         function renderTrainingView() {
-            const btn = document.getElementById('btn-run-training');
-            if (btn) {
-                btn.disabled = hasTrainedThisRound;
-                btn.style.opacity = hasTrainedThisRound ? '0.4' : '1';
-            }
+    const btn = document.getElementById('btn-run-training');
+    if (btn) {
+        btn.disabled = hasTrainedThisRound;
+        btn.style.opacity = hasTrainedThisRound ? '0.4' : '1';
+    }
 
-            for(let i=0; i<3; i++) {
-                let box = document.getElementById(`t-slot-${i}`);
-                if (!box) continue;
-                let slot = trainingSlots[i];
-                if(slot) {
-                    let p = squad.find(x => x.id === slot.playerId);
-                    box.className = "training-slot-box assigned";
-                    box.innerHTML = `<strong>${p.name}</strong><br><span style="font-size:11px; color:var(--accent-blue)">Foco: ${slot.type.toUpperCase()}</span>`;
-                } else {
-                    box.className = "training-slot-box";
-                    box.innerHTML = `[ Slot ${i+1}: Clique para Alocar Atleta ]`;
-                }
+    for(let i=0; i<3; i++) {
+        let box = document.getElementById(`t-slot-${i}`);
+        if (!box) continue;
+        
+        let slot = trainingSlots[i];
+        
+        if(slot) {
+            let p = squad.find(x => x.id === slot.playerId);
+            // TRAVA DE SEGURANÇA: Verifica se o jogador ainda existe no elenco
+            if (p) {
+                box.className = "training-slot-box assigned";
+                box.innerHTML = `<strong>${p.name}</strong><br><span style="font-size:11px; color:var(--accent-blue)">Foco: ${slot.type.toUpperCase()}</span>`;
+            } else {
+                // Se não existir (ex: aposentou ou foi vendido), limpa o slot
+                trainingSlots[i] = null;
+                box.className = "training-slot-box";
+                box.innerHTML = `[ Slot ${i+1}: Clique para Alocar Atleta ]`;
             }
+        } else {
+            box.className = "training-slot-box";
+            box.innerHTML = `[ Slot ${i+1}: Clique para Alocar Atleta ]`;
         }
+    }
+}
 
         function executeRoundTraining() {
             if(hasTrainedThisRound) return;
@@ -2539,7 +2549,7 @@
                     p.stamina = Math.max(0, p.stamina - 25);
                     if(Math.random() < successChance) defUp = Math.floor(Math.random() * 2) + 1;
                 } else {
-                    p.stamina = Math.max(0, p.stamina - 35);
+                    p.stamina = Math.max(0, p.stamina - 20);
                     if(Math.random() < successChance * 0.7) atkUp = 1;
                     if(Math.random() < successChance * 0.7) defUp = 1;
                 }
