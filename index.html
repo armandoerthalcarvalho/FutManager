@@ -720,7 +720,7 @@
             '4-1-1-4': ['4-1-1-4'],
             '3-3-4': ['3-3-4 Em linha', '3-3-4 Contenção', '3-3-4 Ofensivo'],
             '3-4-3': ['3-4-3 Em linha', '3-4-3 Contenção', '3-4-3 Ofensivo', '3-4-3 Falso 9'],
-            '3-1-2-1-2': ['3-1-2-1-2'],
+            '3-1-2-1-3': ['3-1-2-1-3'],
             '5-4-1': ['5-4-1 Em linha', '5-4-1 Contenção', '5-4-1 Ofensivo', '5-4-1 Falso 9'],
             '5-1-2-1-1': ['5-1-2-1-1'],
             '4-5-1': ['4-5-1 Em linha', '4-5-1 Contenção', '4-5-1 Ofensivo', '4-5-1 Falso 9'],
@@ -746,14 +746,14 @@
             '4-2-4 Contenção': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'VOL', 'VOL', 'PE', 'ATA', 'ATA', 'PD'],
             '4-2-4 Ofensivo': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'MEI', 'MEI', 'PE', 'ATA', 'ATA', 'PD'],
             '4-1-1-4': ['GOL', 'LE', 'ZAG', 'ZAG', 'LD', 'VOL', 'MEI', 'PE', 'ATA', 'ATA', 'PD'],
-            '3-3-4 Em linha': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'MC', 'MC', 'MC', 'PE', 'ATA', 'PD'],
-            '3-3-4 Contenção': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'MC', 'VOL', 'MC', 'PE', 'ATA', 'PD'],
-            '3-3-4 Ofensivo': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'MC', 'MEI', 'MC', 'PE', 'ATA', 'PD'],
+            '3-3-4 Em linha': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'MC', 'MC', 'MC', 'PE', 'ATA', 'ATA','PD'],
+            '3-3-4 Contenção': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'MC', 'VOL', 'MC', 'PE', 'ATA', 'ATA', 'PD'],
+            '3-3-4 Ofensivo': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'MC', 'MEI', 'MC', 'PE', 'ATA', 'ATA','PD'],
             '3-4-3 Em linha': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'ME', 'MC', 'MC', 'MD', 'PE', 'ATA', 'PD'],
             '3-4-3 Contenção': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'ME', 'VOL', 'VOL', 'MD', 'PE', 'ATA', 'PD'],
             '3-4-3 Ofensivo': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'ME', 'MEI', 'MEI', 'MD', 'PE', 'ATA', 'PD'],
             '3-4-3 Falso 9': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'ME', 'VOL', 'VOL', 'MD', 'PE', 'F9', 'PD'],
-            '3-1-2-1-2': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'VOL', 'MC', 'MC', 'MEI', 'PE', 'ATA', 'PD'],
+            '3-1-2-1-3': ['GOL', 'ZAG', 'ZAG', 'ZAG', 'VOL', 'MC', 'MC', 'MEI', 'PE', 'ATA', 'PD'],
             '5-4-1 Em linha': ['GOL', 'LE', 'ZAG', 'ZAG', 'ZAG', 'LD', 'ME', 'MC', 'MC', 'MD', 'ATA'],
             '5-4-1 Contenção': ['GOL', 'LE', 'ZAG', 'ZAG', 'ZAG', 'LD', 'ME', 'VOL', 'VOL', 'MD', 'ATA'],
             '5-4-1 Ofensivo': ['GOL', 'LE', 'ZAG', 'ZAG', 'ZAG', 'LD', 'ME', 'MEI', 'MEI', 'MD', 'ATA'],
@@ -820,7 +820,12 @@
             return player;
         }
 
+        function sanitizeLineupSlots() {
+            lineupSlots = lineupSlots.map(id => id && squad.some(p => p.id === id) ? id : null);
+        }
+
         function normalizeTeamRoles(roles = {}) {
+            sanitizeLineupSlots();
             const nextRoles = { captain: null, setPieceTaker: null };
             if (roles && typeof roles === 'object') {
                 nextRoles.captain = roles.captain || null;
@@ -837,6 +842,100 @@
                 nextRoles.setPieceTaker = null;
             }
             return nextRoles;
+        }
+
+        const positionSortRank = { GOL: 0, DEF: 1, MEI: 2, ATA: 3 };
+        let trainingSelectorFilters = {
+            positions: new Set(['GOL', 'DEF', 'MEI', 'ATA']),
+            starter: true,
+            reserve: true,
+            minAge: 17,
+            maxAge: 45,
+            minStamina: 35,
+            maxStamina: 100,
+            showPanel: false
+        };
+        let currentTrainingSlotIndex = null;
+
+        function sortPlayersForDisplay(players = []) {
+            return [...players].sort((a, b) => {
+                const posA = positionSortRank[a.position] ?? 99;
+                const posB = positionSortRank[b.position] ?? 99;
+                if (posA !== posB) return posA - posB;
+
+                const starterA = lineupSlots.includes(a.id) ? 0 : 1;
+                const starterB = lineupSlots.includes(b.id) ? 0 : 1;
+                if (starterA !== starterB) return starterA - starterB;
+
+                return b.age - a.age;
+            });
+        }
+
+        function trainingPlayerMatchesFilter(player) {
+            if (!trainingSelectorFilters.positions.has(player.position)) return false;
+            const isStarter = lineupSlots.includes(player.id);
+            if (isStarter && !trainingSelectorFilters.starter) return false;
+            if (!isStarter && !trainingSelectorFilters.reserve) return false;
+            if (player.age < trainingSelectorFilters.minAge || player.age > trainingSelectorFilters.maxAge) return false;
+            if (player.stamina < trainingSelectorFilters.minStamina || player.stamina > trainingSelectorFilters.maxStamina) return false;
+            return true;
+        }
+
+        function toggleTrainingFilter(filterKey) {
+            if (filterKey === 'starter') {
+                trainingSelectorFilters.starter = !trainingSelectorFilters.starter;
+            } else if (filterKey === 'reserve') {
+                trainingSelectorFilters.reserve = !trainingSelectorFilters.reserve;
+            } else {
+                if (trainingSelectorFilters.positions.has(filterKey)) {
+                    trainingSelectorFilters.positions.delete(filterKey);
+                } else {
+                    trainingSelectorFilters.positions.add(filterKey);
+                }
+            }
+            if (currentTrainingSlotIndex !== null) {
+                openTrainingSelector(currentTrainingSlotIndex);
+            }
+        }
+
+        function updateTrainingNumericFilter(filterKey, value) {
+            let numeric = Number(value);
+            if (Number.isNaN(numeric)) return;
+            if (filterKey === 'minAge') {
+                trainingSelectorFilters.minAge = Math.max(15, Math.min(numeric, trainingSelectorFilters.maxAge));
+            } else if (filterKey === 'maxAge') {
+                trainingSelectorFilters.maxAge = Math.min(60, Math.max(numeric, trainingSelectorFilters.minAge));
+            } else if (filterKey === 'minStamina') {
+                trainingSelectorFilters.minStamina = Math.max(0, Math.min(numeric, trainingSelectorFilters.maxStamina));
+            } else if (filterKey === 'maxStamina') {
+                trainingSelectorFilters.maxStamina = Math.min(100, Math.max(numeric, trainingSelectorFilters.minStamina));
+            }
+            if (currentTrainingSlotIndex !== null) {
+                openTrainingSelector(currentTrainingSlotIndex);
+            }
+        }
+
+        function toggleTrainingFilterPanel() {
+            trainingSelectorFilters.showPanel = !trainingSelectorFilters.showPanel;
+            if (currentTrainingSlotIndex !== null) {
+                openTrainingSelector(currentTrainingSlotIndex);
+            }
+        }
+
+        function resetTrainingFilters() {
+            trainingSelectorFilters = {
+                positions: new Set(['GOL', 'DEF', 'MEI', 'ATA']),
+                starter: true,
+                reserve: true,
+                minAge: 17,
+                maxAge: 45,
+                minStamina: 35,
+                maxStamina: 100,
+                showPanel: false
+            };
+            if (currentTrainingSlotIndex !== null) {
+                openTrainingSelector(currentTrainingSlotIndex);
+            }
         }
 
         function invalidateTeamRoles() {
@@ -1142,28 +1241,57 @@ const suffixes = [
             logConsole(`Nova governança iniciada em nível corporativo: [${tier.toUpperCase()}]`);
         }
 
-function autoFillLineup() {
-    // Escudo extra de segurança
+function autoFillLineup(preserveExisting = false) {
     if (!formationsConfig[currentFormation]) {
         currentFormation = '4-4-2 Em linha';
     }
-    
-    lineupSlots = Array(11).fill(null);
+
     const reqs = formationsConfig[currentFormation];
-    let usedIds = new Set();
-    
-    for(let i = 0; i < reqs.length; i++) {
-        let subPos = reqs[i];
-        let genNeeded = subposData[subPos].gen; // Transforma "LD" em "DEF" para a busca
-        
+    const previousLineup = preserveExisting ? lineupSlots.slice() : Array(11).fill(null);
+    const newLineup = Array(11).fill(null);
+    const assignedIds = new Set();
+
+    if (preserveExisting) {
+        previousLineup.forEach((playerId, index) => {
+            if (!playerId) return;
+            const player = squad.find(p => p.id === playerId);
+            if (!player) return;
+            const requiredGen = subposData[reqs[index]].gen;
+            if (player.position === requiredGen) {
+                newLineup[index] = playerId;
+                assignedIds.add(playerId);
+            }
+        });
+
+        previousLineup.forEach((playerId) => {
+            if (!playerId || assignedIds.has(playerId)) return;
+            const player = squad.find(p => p.id === playerId);
+            if (!player) return;
+            const openIndex = reqs.findIndex((subPos, idx) => !newLineup[idx] && subposData[subPos].gen === player.position);
+            if (openIndex >= 0) {
+                newLineup[openIndex] = playerId;
+                assignedIds.add(playerId);
+            }
+        });
+    }
+
+    const usedIds = new Set(assignedIds);
+
+    for (let i = 0; i < reqs.length; i++) {
+        if (newLineup[i]) continue;
+        const subPos = reqs[i];
+        const genNeeded = subposData[subPos].gen;
+
         let found = squad.find(p => p.position === genNeeded && !usedIds.has(p.id));
-        if(!found) found = squad.find(p => !usedIds.has(p.id));
-        
-        if(found) {
-            lineupSlots[i] = found.id;
+        if (!found) found = squad.find(p => !usedIds.has(p.id));
+
+        if (found) {
+            newLineup[i] = found.id;
             usedIds.add(found.id);
         }
     }
+
+    lineupSlots = newLineup;
     teamRoles = normalizeTeamRoles(teamRoles);
     updateTacticalAnalysisModal();
 }
@@ -1420,12 +1548,6 @@ function updateTacticalAnalysisModal() {
         const captain = squad.find(p => p.id === teamRoles.captain);
         const setPieceTaker = squad.find(p => p.id === teamRoles.setPieceTaker);
         reportContainer.innerHTML = `
-            <div style="margin-top:14px;">
-                <h4 style="color:var(--accent-green); margin-bottom:8px;">Ataque Final</h4>
-                <div style="font-size:24px; font-weight:800; color:var(--accent-green);">${stats.attack.toFixed(2)}</div>
-                <h4 style="color:var(--accent-blue); margin-top:14px; margin-bottom:8px;">Defesa Final</h4>
-                <div style="font-size:24px; font-weight:800; color:var(--accent-blue);">${stats.defense.toFixed(2)}</div>
-            </div>
             <div style="margin-top:16px;">
                 <h4 style="margin-bottom:8px;">Relatório</h4>
                 <table style="width:100%; font-size:11px;">
@@ -1535,15 +1657,10 @@ function closeTacticalAnalysis() {
                 }
             });
 
-            // Atualização de Histórico de Desempenho e Dedução Financeira Coesa
+            const previousFormHistory = [...userFormHistory];
             let userHome = userMatch.homeId === userTeamId;
             let userG = userHome ? userMatch.homeScore : userMatch.awayScore;
             let oppG = userHome ? userMatch.awayScore : userMatch.homeScore;
-            
-            if (userG > oppG) userFormHistory.push('W');
-            else if (userG === oppG) userFormHistory.push('D');
-            else userFormHistory.push('L');
-            if (userFormHistory.length > 3) userFormHistory.shift();
 
             // Cobrança exata de despesa por matchday
             let currentPayrollCost = calculatePayroll();
@@ -1555,7 +1672,7 @@ function closeTacticalAnalysis() {
             if (userHome) {
                 let divOccupancyBase = { 1: 0.85, 2: 0.70, 3: 0.55, 4: 0.40, 5: 0.25 }[myTeam.division];
                 let formModifier = 0;
-                userFormHistory.forEach(f => {
+                previousFormHistory.forEach(f => {
                     if (f === 'W') formModifier += 0.10;
                     if (f === 'D') formModifier += 0.02;
                     if (f === 'L') formModifier -= 0.10;
@@ -1569,6 +1686,11 @@ function closeTacticalAnalysis() {
                 ticketRevenue = Math.round(attendance * baseTicketPrice);
                 finances.cash += ticketRevenue;
             }
+
+            if (userG > oppG) userFormHistory.push('W');
+            else if (userG === oppG) userFormHistory.push('D');
+            else userFormHistory.push('L');
+            if (userFormHistory.length > 3) userFormHistory.shift();
 
             // REQ 8: Escalonamento de Força da IA a cada 5 rodadas
             if (currentRound % 5 === 0) {
@@ -1820,14 +1942,6 @@ function updateFormationOptions(family, isUserInteraction = true) {
         changeFormation(formationFamilies[family][0]);
     }
 }
-        function updateFormationOptions(family) {
-            const formSelect = document.getElementById('formation-selector');
-            formSelect.innerHTML = "";
-            formationFamilies[family].forEach(form => {
-                formSelect.innerHTML += `<option value="${form}">${form}</option>`;
-            });
-            changeFormation(formationFamilies[family][0]);
-        }
 
         function autoEscalar() {
             let availablePlayers = squad.map(p => ({
@@ -1899,7 +2013,8 @@ function updateFormationOptions(family, isUserInteraction = true) {
 
         function changeFormation(newForm) {
             currentFormation = newForm;
-            autoFillLineup();
+            sanitizeLineupSlots();
+            teamRoles = normalizeTeamRoles(teamRoles);
             saveGame();
             renderTacticalField();
             renderBenchAndRoster();
@@ -2100,7 +2215,7 @@ function openSlotSelectorModal(slotIndex) {
             container.innerHTML = "";
             document.getElementById('squad-count').innerText = squad.length;
 
-            squad.forEach(p => {
+            sortPlayersForDisplay(squad).forEach(p => {
                 ensurePlayerSubattributes(p);
                 let isStarter = lineupSlots.includes(p.id);
                 let statusLabel = isStarter ? `<span style="color:var(--accent-green); font-size:10px;">[Titular Escalado]</span>` : `<span style="color:var(--text-muted); font-size:10px;">[Disponível para Negociação]</span>`;
@@ -2157,36 +2272,78 @@ function openSlotSelectorModal(slotIndex) {
                 alert("Os treinos desta rodada já foram finalizados e aplicados.");
                 return;
             }
-            // Filtra atletas que já estão em algum slot de treino para evitar duplicidade
+            currentTrainingSlotIndex = slotIndex;
             let chosenIds = trainingSlots.filter(s => s !== null).map(s => s.playerId);
-            let eligiblePlayers = squad.filter(p => !chosenIds.includes(p.id) && p.stamina >= 35);
+            let eligiblePlayers = squad.filter(p => !chosenIds.includes(p.id) && trainingPlayerMatchesFilter(p));
+            let sortedPlayers = sortPlayersForDisplay(eligiblePlayers);
+
+            const positionFilters = ['GOL', 'DEF', 'MEI', 'ATA'].map(pos => {
+                const checked = trainingSelectorFilters.positions.has(pos) ? 'checked' : '';
+                return `<label style="font-size:11px; margin-right:8px;"><input type="checkbox" ${checked} onchange="toggleTrainingFilter('${pos}')"> ${pos}</label>`;
+            }).join('');
+            const starterChecked = trainingSelectorFilters.starter ? 'checked' : '';
+            const reserveChecked = trainingSelectorFilters.reserve ? 'checked' : '';
+            const panelDisplay = trainingSelectorFilters.showPanel ? 'block' : 'none';
 
             let html = `
-                <h3>Vincular Atleta ao Treino Corporativo</h3>
-                <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Selecione o atleta e a metodologia de treino aplicada para o Slot ${slotIndex + 1}:</p>
-                <div style="display:flex; flex-direction:column; gap:8px; max-height:280px; overflow-y:auto;">
-${eligiblePlayers.map(p => {
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:14px;">
+                    <div style="flex:1;">
+                        <h3>Vincular Atleta ao Treino Corporativo</h3>
+                        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Selecione o atleta e a metodologia de treino aplicada para o Slot ${slotIndex + 1}:</p>
+                    </div>
+                    <button class="btn" style="height:36px; white-space:nowrap;" onclick="toggleTrainingFilterPanel()">Filtros</button>
+                </div>
+                <div id="training-filter-panel" style="display:${panelDisplay}; background:rgba(255,255,255,0.05); border:1px solid var(--border-glass); border-radius:10px; padding:14px; margin-top:12px;">
+                    <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:12px;">
+                        ${positionFilters}
+                    </div>
+                    <div style="display:flex; flex-wrap:wrap; gap:12px; margin-bottom:12px; font-size:11px;">
+                        <label><input type="checkbox" ${starterChecked} onchange="toggleTrainingFilter('starter')"> Titulares</label>
+                        <label><input type="checkbox" ${reserveChecked} onchange="toggleTrainingFilter('reserve')"> Reservas</label>
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(2, minmax(140px, 1fr)); gap:12px; font-size:11px; margin-bottom:12px;">
+                        <label style="display:flex; flex-direction:column; gap:4px;">Idade Mín.
+                            <input id="training-filter-minAge" type="number" min="15" max="60" value="${trainingSelectorFilters.minAge}" style="padding:6px; border-radius:8px; border:1px solid var(--border-glass); background:rgba(255,255,255,0.05); color:var(--text-main);" onchange="updateTrainingNumericFilter('minAge', this.value)">
+                        </label>
+                        <label style="display:flex; flex-direction:column; gap:4px;">Idade Máx.
+                            <input id="training-filter-maxAge" type="number" min="15" max="60" value="${trainingSelectorFilters.maxAge}" style="padding:6px; border-radius:8px; border:1px solid var(--border-glass); background:rgba(255,255,255,0.05); color:var(--text-main);" onchange="updateTrainingNumericFilter('maxAge', this.value)">
+                        </label>
+                        <label style="display:flex; flex-direction:column; gap:4px;">Estamina Mín.
+                            <input id="training-filter-minStamina" type="number" min="0" max="100" value="${trainingSelectorFilters.minStamina}" style="padding:6px; border-radius:8px; border:1px solid var(--border-glass); background:rgba(255,255,255,0.05); color:var(--text-main);" onchange="updateTrainingNumericFilter('minStamina', this.value)">
+                        </label>
+                        <label style="display:flex; flex-direction:column; gap:4px;">Estamina Máx.
+                            <input id="training-filter-maxStamina" type="number" min="0" max="100" value="${trainingSelectorFilters.maxStamina}" style="padding:6px; border-radius:8px; border:1px solid var(--border-glass); background:rgba(255,255,255,0.05); color:var(--text-main);" onchange="updateTrainingNumericFilter('maxStamina', this.value)">
+                        </label>
+                    </div>
+                    <button class="btn" style="margin-top:0; width:100%; font-size:11px; padding:8px;" onclick="resetTrainingFilters()">Resetar Filtros</button>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:8px; max-height:260px; overflow-y:auto; margin-top:16px;">
+${sortedPlayers.map(p => {
     let isTitular = lineupSlots.includes(p.id);
-    let statusBadge = isTitular ? '<span style="color:var(--accent-green); font-size:11px; font-weight:600;">[Titular]</span>' : '<span style="color:var(--text-muted); font-size:11px;">[Reserva]</span>';
+    let statusBadge = isTitular ? '<span style="color:var(--accent-green); font-size:11px; font-weight:600;">[Titular]</span>' : '<span style="font-size:11px; color:var(--text-muted);">[Reserva]</span>';
     return `
     <div style="background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border:1px solid var(--border-glass); display:flex; justify-content:space-between; align-items:center;">
         <div>
             <strong>${p.name}</strong> ${statusBadge} (${p.age} anos) - <span style="color:var(--accent-blue)">${p.position}</span><br>
             <span style="font-size:11px; color:var(--text-muted)">ATK: ${p.attack} | DEF: ${p.defense} | Energia: ${p.stamina}%</span>
         </div>
-        <div style="display:flex; gap:4px;">
+        <div style="display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end;">
             <button class="btn" style="padding:4px 8px; font-size:11px; background:rgba(0,210,255,0.2);" onclick="assignPlayerToTraining(${p.id}, ${slotIndex}, 'ofensivo')">Ofensivo</button>
             <button class="btn" style="padding:4px 8px; font-size:11px; background:rgba(0,255,136,0.2);" onclick="assignPlayerToTraining(${p.id}, ${slotIndex}, 'defensivo')">Defensivo</button>
             <button class="btn" style="padding:4px 8px; font-size:11px; background:rgba(255,183,3,0.2);" onclick="assignPlayerToTraining(${p.id}, ${slotIndex}, 'misto')">Misto</button>
         </div>
     </div>
 `}).join('')}
-                    ${eligiblePlayers.length === 0 ? '<p style="font-size:12px; color:var(--text-muted);">Nenhum atleta elegível ou com energia acima de 35%.</p>' : ''}
+                    ${sortedPlayers.length === 0 ? '<p style="font-size:12px; color:var(--text-muted);">Nenhum atleta elegível com os filtros aplicados.</p>' : ''}
                 </div>
                 <button class="btn btn-danger" style="width:100%; margin-top:15px;" onclick="clearTrainingSlot(${slotIndex})">Desocupar Slot</button>
                 <button class="btn" style="width:100%; margin-top:6px;" onclick="closeModal()">Fechar</button>
             `;
-            queueModal(html);
+            if (isModalActive) {
+                showModalContent(html);
+            } else {
+                queueModal(html);
+            }
         }
 
         function assignPlayerToTraining(playerId, slotIndex, type) {
