@@ -266,6 +266,33 @@
         .modal-overlay.active .modal-box {
             transform: scale(1);
         }
+        
+        .timeline-event {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            animation: slideIn 0.3s ease forwards;
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+
+        @keyframes slideIn {
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .timeline-minute {
+            font-weight: 800;
+            color: var(--accent-blue);
+            width: 35px;
+            flex-shrink: 0;
+            text-align: right;
+        }
+        
+        .timeline-desc {
+            flex: 1;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
 
         .player-card-grid {
             display: grid;
@@ -309,39 +336,33 @@
         }
         .stamina-fill { height: 100%; background: var(--accent-green); }
 
-        
-.tactical-field {
-    background: radial-gradient(circle at center, #1b4d3e 0%, #0d261f 100%);
-    border: 2px solid rgba(255,255,255,0.1);
-    border-radius: 12px;
-    padding: 32px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    min-height: 750px !important; /* Aumentado drasticamente o tamanho vertical do campo */
-    justify-content: space-between;
-    position: relative;
-    overflow: hidden;
-}
-
-        .tactical-row {
+        .tactical-field {
+            background: radial-gradient(circle at center, #1b4d3e 0%, #0d261f 100%);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 32px 24px;
             display: flex;
-            justify-content: center;
-            gap: 15px;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 750px !important;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
         }
 
-    .tactical-slot {
-    width: 80px !important;        /* Largura reduzida para diminuir o card */
-    min-height: 40px !important;   /* Altura reduzida para diminuir o card */
-    background: rgba(0,0,0,0.4);
-    border: 1px dashed rgba(255,255,255,0.3);
-    border-radius: 8px ;
-    padding: 3px 2px !important;   /* Espaçamento interno menor para caber em telas compactas */
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    overflow: hidden;
-}
+        .tactical-slot {
+            width: 80px !important;
+            min-height: 40px !important;
+            background: rgba(0,0,0,0.4);
+            border: 1px dashed rgba(255,255,255,0.3);
+            border-radius: 8px;
+            padding: 3px 2px !important;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            overflow: hidden;
+        }
+        
         .tactical-slot:hover {
             border-color: var(--accent-blue);
             background: rgba(0, 210, 255, 0.1);
@@ -366,7 +387,6 @@
             margin-top: 20px;
         }
 
-        /* Setup view onboarding layout */
         .setup-screen {
             display: flex;
             flex-direction: column;
@@ -374,6 +394,56 @@
             justify-content: center;
             min-height: 70vh;
             text-align: center;
+        }
+
+        .setup-identity-grid {
+            display: grid;
+            grid-template-columns: 1.3fr 0.8fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 980px;
+            margin-top: 20px;
+            align-items: start;
+        }
+
+        .setup-card, .setup-preview-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: left;
+        }
+
+        .setup-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .setup-field input, .setup-field textarea, .setup-field select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-glass);
+            background: rgba(255,255,255,0.05);
+            color: var(--text-main);
+        }
+
+        /* CORREÇÃO DO BUG DO SELECT: Garante cor contrastante nas options abertas */
+        select option {
+            background-color: #111827; 
+            color: #f8fafc;
+        }
+
+        .setup-tier-section.hidden {
+            display: none;
+        }
+
+        .setup-preview-card {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .tier-grid {
@@ -408,6 +478,7 @@
             text-align: center;
             cursor: pointer;
         }
+        
         .training-slot-box.assigned {
             border-style: solid;
             border-color: var(--accent-blue);
@@ -443,36 +514,101 @@
         </nav>
 
         <div class="content-area" id="main-content-hub">
+            
             <div id="view-setup" class="view-panel active">
                 <div class="setup-screen">
                     <h2>Diretriz de Inicialização Corporativa</h2>
-                    <p style="color: var(--text-muted); max-width: 600px;">Nenhum arquivo de governança prévio foi detectado em sua máquina local. Escolha o patamar de responsabilidade e o nível tático operacional da franquia:</p>
-                    <div class="tier-grid">
-                        <div class="tier-card" onclick="buildFreshDatabase('modesto')">
-                            <h3 style="color: var(--accent-red)">Operação Reconstrução</h3>
-                            <p style="font-size: 12px; color: var(--text-muted); margin: 10px 0;">Comece de baixo na última categoria profissional.</p>
-                            <div style="font-size: 13px; text-align: left; margin-top: 15px; line-height: 1.6;">
-                                📍 Liga: <strong>Série E</strong><br>
-                                💰 Caixa Inicial: <strong>R$ 1.500.000</strong><br>
-                                📊 Nível do Elenco: <strong>Modesto (45-55)</strong>
+                    <p style="color: var(--text-muted); max-width: 720px;">Antes de definir a ambição da franquia, dê alma ao clube. Nome, torcida, estádio, uniforme e slogan deixarão a experiência mais viva e orgânica desde o primeiro clique.</p>
+                    
+                    <div class="setup-identity-grid">
+                        <div class="setup-card">
+                            <div class="setup-field">
+                                <label for="setup-club-name">Nome do clube</label>
+                                <input id="setup-club-name" placeholder="Ex.: Aurora FC" oninput="renderSetupIdentityPreview()">
+                            </div>
+                            <div class="setup-field">
+                                <label for="setup-club-nickname">Apelido de torcida</label>
+                                <input id="setup-club-nickname" placeholder="Ex.: Os Aurorinos" oninput="renderSetupIdentityPreview()">
+                            </div>
+                            <div class="setup-field">
+                                <label for="setup-club-stadium">Nome do estádio</label>
+                                <input id="setup-club-stadium" placeholder="Ex.: Arena da Aurora" oninput="renderSetupIdentityPreview()">
+                            </div>
+                            <div class="setup-field">
+                                <label for="setup-club-slogan">Slogan (Lema Institucional)</label>
+                                <input id="setup-club-slogan" placeholder="Ex.: Orgulho e coragem" oninput="renderSetupIdentityPreview()">
+                            </div>
+                            <div class="setup-field">
+                                <label for="setup-club-chant">Canto ou mantra da torcida</label>
+                                <input id="setup-club-chant" placeholder="Ex.: Aurora, levanta a voz!" oninput="renderSetupIdentityPreview()">
+                            </div>
+                            <div class="setup-field">
+                                <label for="setup-club-mood">Humor do clube e da torcida</label>
+                                <input id="setup-club-mood" placeholder="Ex.: Ambição, pressão e fé" oninput="renderSetupIdentityPreview()">
+                            </div>
+                            
+                            <div class="grid-2" style="gap: 15px; margin-top: 10px;">
+                                <div class="setup-field" style="margin-bottom: 0;">
+                                    <label for="setup-club-badge">Estilo do logo</label>
+                                    <select id="setup-club-badge" onchange="renderSetupIdentityPreview()">
+                                        <option value="crest">Escudo Clássico (Azul)</option>
+                                        <option value="wave">Ondas de Identidade (Verde)</option>
+                                        <option value="hex">Hexágono Moderno (Vermelho)</option>
+                                        <option value="diamond">Diamante Afiado (Dourado)</option>
+                                        <option value="minimal">Círculo Minimalista (Roxo)</option>
+                                    </select>
+                                </div>
+                                <div class="setup-field" style="margin-bottom: 0;">
+                                    <label for="setup-club-kit">Estilo do uniforme</label>
+                                    <select id="setup-club-kit" onchange="renderSetupIdentityPreview()">
+                                        <option value="classic">Clássico (Bônus: +5% Público)</option>
+                                        <option value="modern">Moderno (Bônus: -5% Fadiga)</option>
+                                        <option value="vintage">Vintage (Bônus: +5% Valor Ingresso)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div style="display:flex; gap:10px; margin-top:20px;">
+                                <button class="btn btn-success" style="width: 100%;" onclick="advanceSetupIdentity()">Salvar Identidade e Continuar ➔</button>
                             </div>
                         </div>
-                        <div class="tier-card" onclick="buildFreshDatabase('intermediario')">
-                            <h3 style="color: var(--accent-warn)">Estabilidade Corporativa</h3>
-                            <p style="font-size: 12px; color: var(--text-muted); margin: 10px 0;">Gestão estruturada em uma divisão de acesso competitiva.</p>
-                            <div style="font-size: 13px; text-align: left; margin-top: 15px; line-height: 1.6;">
-                                📍 Liga: <strong>Série C</strong><br>
-                                💰 Caixa Inicial: <strong>R$ 4.500.000</strong><br>
-                                📊 Nível do Elenco: <strong>Mediano (60-70)</strong>
-                            </div>
+                        
+                        <div class="setup-preview-card">
+                            <h3 style="margin:0; color:var(--accent-blue)">Pré-visualização Oficial</h3>
+                            <div id="setup-logo-preview" style="min-height:140px; display:flex; align-items:center; justify-content:center; margin-top:15px;"></div>
+                            <div id="setup-preview-copy" style="font-size:13px; color:var(--text-muted); line-height:1.6; margin-top:15px; background:rgba(0,0,0,0.2); padding:15px; border-radius:10px; border:1px solid var(--border-glass);"></div>
                         </div>
-                        <div class="tier-card" onclick="buildFreshDatabase('elite')">
-                            <h3 style="color: var(--accent-green)">Gigante Executivo</h3>
-                            <p style="font-size: 12px; color: var(--text-muted); margin: 10px 0;">Assuma o comando de um clube com forte orçamento e cobrança máxima.</p>
-                            <div style="font-size: 13px; text-align: left; margin-top: 15px; line-height: 1.6;">
-                                📍 Liga: <strong>Série A</strong><br>
-                                💰 Caixa Inicial: <strong>R$ 9.000.000</strong><br>
-                                📊 Nível do Elenco: <strong>Elite (75-85)</strong>
+                    </div>
+                    
+                    <div id="setup-tier-section" class="setup-tier-section hidden" style="margin-top:40px; width:100%; max-width:900px; padding-top: 20px; border-top: 1px solid var(--border-glass);">
+                        <p style="color: var(--text-muted); margin-bottom: 12px; font-size: 16px;">Identidade validada. Agora escolha o patamar de responsabilidade e o nível tático operacional da franquia:</p>
+                        <div class="tier-grid">
+                            <div class="tier-card" onclick="buildFreshDatabase('modesto')">
+                                <h3 style="color: var(--accent-red)">Operação Reconstrução</h3>
+                                <p style="font-size: 12px; color: var(--text-muted); margin: 10px 0;">Comece de baixo na última categoria profissional.</p>
+                                <div style="font-size: 13px; text-align: left; margin-top: 15px; line-height: 1.6;">
+                                    📍 Liga: <strong>Série E</strong><br>
+                                    💰 Caixa Inicial: <strong>R$ 1.500.000</strong><br>
+                                    📊 Nível do Elenco: <strong>Modesto (45-55)</strong>
+                                </div>
+                            </div>
+                            <div class="tier-card" onclick="buildFreshDatabase('intermediario')">
+                                <h3 style="color: var(--accent-warn)">Estabilidade Corporativa</h3>
+                                <p style="font-size: 12px; color: var(--text-muted); margin: 10px 0;">Gestão estruturada em uma divisão de acesso competitiva.</p>
+                                <div style="font-size: 13px; text-align: left; margin-top: 15px; line-height: 1.6;">
+                                    📍 Liga: <strong>Série C</strong><br>
+                                    💰 Caixa Inicial: <strong>R$ 4.500.000</strong><br>
+                                    📊 Nível do Elenco: <strong>Mediano (60-70)</strong>
+                                </div>
+                            </div>
+                            <div class="tier-card" onclick="buildFreshDatabase('elite')">
+                                <h3 style="color: var(--accent-green)">Gigante Executivo</h3>
+                                <p style="font-size: 12px; color: var(--text-muted); margin: 10px 0;">Assuma o comando de um clube com forte orçamento e cobrança máxima.</p>
+                                <div style="font-size: 13px; text-align: left; margin-top: 15px; line-height: 1.6;">
+                                    📍 Liga: <strong>Série A</strong><br>
+                                    💰 Caixa Inicial: <strong>R$ 9.000.000</strong><br>
+                                    📊 Nível do Elenco: <strong>Elite (75-85)</strong>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -481,12 +617,13 @@
 
             <div id="view-dashboard" class="view-panel">
                 <h2>Painel do Comandante</h2>
+                <div id="club-vibe-banner" class="dashboard-card" style="margin-bottom:20px; border-left: 4px solid var(--accent-blue);"></div>
                 <div class="grid-2">
                     <div class="dashboard-card">
                         <h3>Próximo Compromisso</h3>
                         <div id="next-match-details" style="margin-top:15px; font-size:14px; line-height:1.6;"></div>
                         <div style="margin-top:20px; display:flex; gap:10px;">
-                            <button class="btn btn-success" style="flex:2; padding:16px;" onclick="playRound()">⚽ Executar Rodada do Campeonato</button>
+                            <button class="btn btn-success" style="flex:2; padding:16px;" onclick="playRound()">⚽ Executar Partida (Tempo Real)</button>
                         </div>
                     </div>
                     <div class="dashboard-card">
@@ -499,47 +636,28 @@
                         </table>
                     </div>
                 </div>
-                <div class="console-box" id="game-console">Sistema operacional pronto...</div>
+                <div class="console-box" id="game-console">Sistema operacional corporativo inicializado...</div>
             </div>
 
-<div id="view-tactics" class="view-panel">
-    <h2>Escalação Tática</h2>
-    <div style="max-width: 800px; margin: 0 auto;">
-        <label style="font-size:12px; color:var(--text-muted); font-weight:600;">Selecione a Estrutura Tática Rígida:</label>
-        <div style="display:flex; gap:10px; margin:8px 0 20px 0;">
-    <select id="family-selector"
-            class="btn"
-            style="flex:1; background:var(--bg-input)"
-            onchange="updateFormationOptions(this.value)">
-    </select>
+            <div id="view-tactics" class="view-panel">
+                <h2>Escalação Tática</h2>
+                <div style="max-width: 800px; margin: 0 auto;">
+                    <label style="font-size:12px; color:var(--text-muted); font-weight:600;">Selecione a Estrutura Tática Rígida:</label>
+                    <div style="display:flex; gap:10px; margin:8px 0 20px 0;">
+                        <select id="family-selector" class="btn" style="flex:1; background:var(--bg-input)" onchange="updateFormationOptions(this.value)"></select>
+                        <select id="formation-selector" class="btn" style="flex:2; background:var(--bg-input)" onchange="changeFormation(this.value)"></select>
+                        <button class="btn btn-success" style="padding:12px;" onclick="autoEscalar()">Auto Escalar</button>
+                        <button class="btn" style="padding:12px;" onclick="openTacticalAnalysis()">Análise Tática</button>
+                    </div>
+                    <div class="tactical-field" id="tactical-field-dom"></div>
+                </div>
+            </div>
 
-    <select id="formation-selector"
-            class="btn"
-            style="flex:2; background:var(--bg-input)"
-            onchange="changeFormation(this.value)">
-    </select>
-
-    <button class="btn btn-success"
-            style="padding:12px;"
-            onclick="autoEscalar()">
-        Auto Escalar
-    </button>
-
-    <button class="btn"
-            style="padding:12px;"
-            onclick="openTacticalAnalysis()">
-        Análise Tática
-    </button>
-</div>
-        <div class="tactical-field" id="tactical-field-dom"></div>
-    </div>
-</div>
-
-<div id="view-squad" class="view-panel">
-    <h2>Elenco Geral (<span id="squad-count">0</span>/30 Atletas)</h2>
-    <div style="margin-bottom:15px; font-size:11px; color:var(--text-muted)">Atletas em campo ativo não podem ser negociados imediatamente.</div>
-    <div class="player-card-grid" id="bench-container"></div>
-</div>
+            <div id="view-squad" class="view-panel">
+                <h2>Elenco Geral (<span id="squad-count">0</span>/30 Atletas)</h2>
+                <div style="margin-bottom:15px; font-size:11px; color:var(--text-muted)">Atletas em campo ativo não podem ser negociados imediatamente.</div>
+                <div class="player-card-grid" id="bench-container"></div>
+            </div>
 
             <div id="view-training" class="view-panel">
                 <h2>Complexo de Treinamento e Evolução Científica</h2>
@@ -567,18 +685,19 @@
                 </div>
             </div>
 
-<div id="view-market" class="view-panel">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 25px;">
-        <h2 style="margin-bottom:0;">Janela Global de Transferências</h2>
-        <div id="market-refresh-container"></div>
-    </div>
-<div class="player-card-grid" id="market-container"></div>
-</div>
+            <div id="view-market" class="view-panel">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 25px;">
+                    <h2 style="margin-bottom:0;">Janela Global de Transferências</h2>
+                    <div id="market-refresh-container"></div>
+                </div>
+                <div class="player-card-grid" id="market-container"></div>
+            </div>
 
             <div id="view-finances" class="view-panel">
                 <h2>Departamento Financeiro & Infraestrutura</h2>
                 <div class="grid-2">
                     <div>
+                        <div id="finance-identity-card" class="dashboard-card"></div>
                         <div class="dashboard-card">
                             <h3>Balanço e Projeções</h3>
                             <div style="margin-top:15px; font-size:14px; display:flex; flex-direction:column; gap:12px;">
@@ -605,95 +724,53 @@
                             </div>
                             <div style="border:1px solid var(--border-glass); padding:12px; border-radius:8px;">
                                 <strong>Preparador Físico Premium</strong>
-                                <p style="font-size:11px; color:var(--text-muted); margin:4px 0 8px 0;">Reduz o desgaste físico (perda de estamina) dos atletas nas partidas em 25%.</p>
+                                <p style="font-size:11px; color:var(--text-muted); margin:4px 0 8px 0;">Reduz o desgaste físico dos atletas nas partidas em 25%.</p>
                                 <button class="btn btn-success" id="hire-fitness" style="font-size:11px; padding:6px 12px;" onclick="hireStaffMember('fitness', 600000)">Contratar (R$ 600.000)</button>
                             </div>
                             <div style="border:1px solid var(--border-glass); padding:12px; border-radius:8px;">
                                 <strong>Diretor Comercial Sênior</strong>
-                                <p style="font-size:11px; color:var(--text-muted); margin:4px 0 8px 0;">Otimiza o marketing de ingressos, fornecendo um bônus de +15% no preço final cobrado por bilhete.</p>
+                                <p style="font-size:11px; color:var(--text-muted); margin:4px 0 8px 0;">Otimiza o marketing de ingressos, fornecendo um bônus de +15% no preço final cobrado.</p>
                                 <button class="btn btn-success" id="hire-commercial" style="font-size:11px; padding:6px 12px;" onclick="hireStaffMember('commercial', 750000)">Contratar (R$ 750.000)</button>
                             </div>
-<div style="border:1px solid var(--border-glass); padding:12px; border-radius:8px;">
-    <strong>Treinador Especializado</strong>
-    <p style="font-size:11px; color:var(--text-muted); margin:4px 0 8px 0;">Aumenta a probabilidade de sucesso de todos os treinamentos em 1.5x.</p>
-    <button class="btn btn-success" id="hire-specialist" style="font-size:11px; padding:6px 12px;" onclick="hireStaffMember('specialist', 1000000)">Contratar (R$ 1.000.000)</button>
-</div>
-<div style="border:1px solid var(--border-glass); padding:12px; border-radius:8px;">
-    <strong>Olheiro Mestre</strong>
-    <p style="font-size:11px; color:var(--text-muted); margin:4px 0 8px 0;">Fornece até 3 reciclagens exclusivas no mercado global por temporada.</p>
-    <button class="btn btn-success" id="hire-scout" style="font-size:11px; padding:6px 12px;" onclick="hireStaffMember('scout', 500000)">Contratar (R$ 500.000)</button>
-</div>
+                            <div style="border:1px solid var(--border-glass); padding:12px; border-radius:8px;">
+                                <strong>Treinador Especializado</strong>
+                                <p style="font-size:11px; color:var(--text-muted); margin:4px 0 8px 0;">Aumenta a probabilidade de sucesso de todos os treinamentos em 1.5x.</p>
+                                <button class="btn btn-success" id="hire-specialist" style="font-size:11px; padding:6px 12px;" onclick="hireStaffMember('specialist', 1000000)">Contratar (R$ 1.000.000)</button>
+                            </div>
+                            <div style="border:1px solid var(--border-glass); padding:12px; border-radius:8px;">
+                                <strong>Olheiro Mestre</strong>
+                                <p style="font-size:11px; color:var(--text-muted); margin:4px 0 8px 0;">Fornece até 3 reciclagens exclusivas no mercado global por temporada.</p>
+                                <button class="btn btn-success" id="hire-scout" style="font-size:11px; padding:6px 12px;" onclick="hireStaffMember('scout', 500000)">Contratar (R$ 500.000)</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    
     <div class="modal-overlay" id="global-modal-overlay">
         <div class="modal-box" id="global-modal-box"></div>
     </div>
 
     <div class="modal-overlay" id="tactical-analysis-modal">
         <div class="modal-box" style="width:420px;">
-
-        <h2 style="margin-bottom:25px;">
-            Análise Tática
-        </h2>
-
-        <div style="display:flex; flex-direction:column; gap:22px;">
-
-            <div style="text-align:center;">
-                <div style="
-                    color:var(--text-muted);
-                    font-size:12px;
-                    text-transform:uppercase;
-                    letter-spacing:1px;
-                    margin-bottom:8px;">
-                    Força Ofensiva
+            <h2 style="margin-bottom:25px;">Análise Tática</h2>
+            <div style="display:flex; flex-direction:column; gap:22px;">
+                <div style="text-align:center;">
+                    <div style="color:var(--text-muted); font-size:12px; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Força Ofensiva</div>
+                    <div id="analysis-attack" style="font-size:42px; font-weight:800; color:var(--accent-green);">0.00</div>
                 </div>
-
-                <div id="analysis-attack"
-                     style="
-                        font-size:42px;
-                        font-weight:800;
-                        color:var(--accent-green);">
-                    0.00
+                <hr style="border-color:var(--border-glass);">
+                <div style="text-align:center;">
+                    <div style="color:var(--text-muted); font-size:12px; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Força Defensiva</div>
+                    <div id="analysis-defense" style="font-size:42px; font-weight:800; color:var(--accent-blue);">0.00</div>
                 </div>
+                <div id="analysis-report"></div>
+                <button class="btn" onclick="closeTacticalAnalysis()">Fechar</button>
             </div>
-
-            <hr style="border-color:var(--border-glass);">
-
-            <div style="text-align:center;">
-                <div style="
-                    color:var(--text-muted);
-                    font-size:12px;
-                    text-transform:uppercase;
-                    letter-spacing:1px;
-                    margin-bottom:8px;">
-                    Força Defensiva
-                </div>
-
-                <div id="analysis-defense"
-                     style="
-                        font-size:42px;
-                        font-weight:800;
-                        color:var(--accent-blue);">
-                    0.00
-                </div>
-            </div>
-
-            <div id="analysis-report"></div>
-
-            <button
-                class="btn"
-                onclick="closeTacticalAnalysis()">
-                Fechar
-            </button>
-
         </div>
-
     </div>
-</div>
 
     <script>
         // --- CONFIGURAÇÃO DO ESTADO CENTRAL ---
@@ -705,9 +782,9 @@
         let currentRound = 1;
         let finances = { cash: 4500000, stadiumCapacity: 10000 };
         let staff = { coach: false, fitness: false, commercial: false, specialist: false, scout: false };
-        let marketRefreshes = 3; // Nova variável global
+        let marketRefreshes = 3;
         let squad = [];
-        let userFormHistory = []; // Mantém últimas 3 partidas ('W', 'D', 'L')
+        let userFormHistory = [];
         
         let currentFormation = '4-4-2 Em linha';
         
@@ -788,16 +865,11 @@
             'ATA': {def: 0.40, att: 1.60, gen: 'ATA'}
         };
         
-        // Heuristic helper: given a subPos and a Set of present subpositions, return additive adjustments
         function getHeuristicAdjForSubpos(subPos, presentSubpos) {
             let attAdj = 0, defAdj = 0;
             const has = x => presentSubpos.has(x);
-            if (!has('PE')) {
-                if (subPos === 'ME' || subPos === 'LE') { attAdj += 0.15; defAdj -= 0.15; }
-            }
-            if (!has('PD')) {
-                if (subPos === 'MD' || subPos === 'LD') { attAdj += 0.15; defAdj -= 0.15; }
-            }
+            if (!has('PE')) { if (subPos === 'ME' || subPos === 'LE') { attAdj += 0.15; defAdj -= 0.15; } }
+            if (!has('PD')) { if (subPos === 'MD' || subPos === 'LD') { attAdj += 0.15; defAdj -= 0.15; } }
             if (!has('ME')) {
                 if (subPos === 'PE') { defAdj += 0.05; attAdj -= 0.05; }
                 if (subPos === 'LE') { attAdj += 0.15; defAdj -= 0.15; }
@@ -806,34 +878,23 @@
                 if (subPos === 'PD') { defAdj += 0.05; attAdj -= 0.05; }
                 if (subPos === 'LD') { attAdj += 0.15; defAdj -= 0.15; }
             }
-            if (!has('LE')) {
-                if (subPos === 'ME' || subPos === 'PE') { attAdj -= 0.10; defAdj += 0.10; }
-            }
-            if (!has('LD')) {
-                if (subPos === 'MD' || subPos === 'PD') { attAdj -= 0.10; defAdj += 0.10; }
-            }
-            if (!has('VOL')) {
-                if (subPos === 'MC') { defAdj += 0.05; attAdj -= 0.05; }
-            }
-            if (!has('MEI')) {
-                if (subPos === 'MC') { defAdj -= 0.05; attAdj += 0.05; }
-            }
+            if (!has('LE')) { if (subPos === 'ME' || subPos === 'PE') { attAdj -= 0.10; defAdj += 0.10; } }
+            if (!has('LD')) { if (subPos === 'MD' || subPos === 'PD') { attAdj -= 0.10; defAdj += 0.10; } }
+            if (!has('VOL')) { if (subPos === 'MC') { defAdj += 0.05; attAdj -= 0.05; } }
+            if (!has('MEI')) { if (subPos === 'MC') { defAdj -= 0.05; attAdj += 0.05; } }
             if (has('F9')) {
                 if (subPos === 'MEI') { attAdj += 0.10; defAdj -= 0.10; }
                 if (['ME','MD','PE','PD'].includes(subPos)) { attAdj += 0.15; defAdj -= 0.15; }
             }
             return { attAdj, defAdj };
         }
+
         let lineupSlots = Array(11).fill(null);
-        let teamRoles = {
-            captain: null,
-            setPieceTaker: null
-        };
-        let trainingSlots = Array(3).fill(null); // {playerId, type}
+        let teamRoles = { captain: null, setPieceTaker: null };
+        let trainingSlots = Array(3).fill(null); 
 
         function getSubattributePercentModifier(value = 60) {
-            const numericValue = Number.isFinite(value) ? Number(value) : 60;
-            return (numericValue - 60) * 0.2;
+            return (Number(value) - 60) * 0.2;
         }
 
         function getSubattributeMultiplier(value = 60) {
@@ -842,17 +903,10 @@
 
         function ensurePlayerSubattributes(player) {
             if (!player) return null;
-            if (player.leadership === undefined || player.leadership === null) {
-                player.leadership = Math.floor(Math.random() * 101);
-            } else {
-                player.leadership = Math.max(0, Math.min(100, Number(player.leadership) || 0));
-            }
-
-            if (player.setPieces === undefined || player.setPieces === null) {
-                const offensiveMultiplier = { GOL: 0.35, DEF: 0.60, MEI: 0.85, ATA: 1.15 }[player.position] || 0.75;
-                player.setPieces = Math.max(0, Math.min(100, Math.round(Math.max(0, player.attack || 0) * offensiveMultiplier)));
-            } else {
-                player.setPieces = Math.max(0, Math.min(100, Number(player.setPieces) || 0));
+            if (player.leadership == null) player.leadership = Math.floor(Math.random() * 101);
+            if (player.setPieces == null) {
+                const multi = { GOL: 0.35, DEF: 0.60, MEI: 0.85, ATA: 1.15 }[player.position] || 0.75;
+                player.setPieces = Math.max(0, Math.min(100, Math.round((player.attack || 0) * multi)));
             }
             return player;
         }
@@ -868,29 +922,19 @@
                 nextRoles.captain = roles.captain || null;
                 nextRoles.setPieceTaker = roles.setPieceTaker || null;
             }
-
             const squadIds = new Set(squad.map(p => p.id));
             const lineupIds = new Set(lineupSlots.filter(Boolean));
 
-            if (!squadIds.has(nextRoles.captain) || !lineupIds.has(nextRoles.captain)) {
-                nextRoles.captain = null;
-            }
-            if (!squadIds.has(nextRoles.setPieceTaker) || !lineupIds.has(nextRoles.setPieceTaker)) {
-                nextRoles.setPieceTaker = null;
-            }
+            if (!squadIds.has(nextRoles.captain) || !lineupIds.has(nextRoles.captain)) nextRoles.captain = null;
+            if (!squadIds.has(nextRoles.setPieceTaker) || !lineupIds.has(nextRoles.setPieceTaker)) nextRoles.setPieceTaker = null;
+            
             return nextRoles;
         }
 
         const positionSortRank = { GOL: 0, DEF: 1, MEI: 2, ATA: 3 };
         let trainingSelectorFilters = {
             positions: new Set(['GOL', 'DEF', 'MEI', 'ATA']),
-            starter: true,
-            reserve: true,
-            minAge: 17,
-            maxAge: 45,
-            minStamina: 35,
-            maxStamina: 100,
-            showPanel: false
+            starter: true, reserve: true, minAge: 17, maxAge: 45, minStamina: 35, maxStamina: 100, showPanel: false
         };
         let currentTrainingSlotIndex = null;
 
@@ -919,64 +963,33 @@
         }
 
         function toggleTrainingFilter(filterKey) {
-            if (filterKey === 'starter') {
-                trainingSelectorFilters.starter = !trainingSelectorFilters.starter;
-            } else if (filterKey === 'reserve') {
-                trainingSelectorFilters.reserve = !trainingSelectorFilters.reserve;
-            } else {
-                if (trainingSelectorFilters.positions.has(filterKey)) {
-                    trainingSelectorFilters.positions.delete(filterKey);
-                } else {
-                    trainingSelectorFilters.positions.add(filterKey);
-                }
+            if (filterKey === 'starter') trainingSelectorFilters.starter = !trainingSelectorFilters.starter;
+            else if (filterKey === 'reserve') trainingSelectorFilters.reserve = !trainingSelectorFilters.reserve;
+            else {
+                if (trainingSelectorFilters.positions.has(filterKey)) trainingSelectorFilters.positions.delete(filterKey);
+                else trainingSelectorFilters.positions.add(filterKey);
             }
-            if (currentTrainingSlotIndex !== null) {
-                openTrainingSelector(currentTrainingSlotIndex);
-            }
+            if (currentTrainingSlotIndex !== null) openTrainingSelector(currentTrainingSlotIndex);
         }
 
         function updateTrainingNumericFilter(filterKey, value) {
             let numeric = Number(value);
             if (Number.isNaN(numeric)) return;
-            if (filterKey === 'minAge') {
-                trainingSelectorFilters.minAge = Math.max(15, Math.min(numeric, trainingSelectorFilters.maxAge));
-            } else if (filterKey === 'maxAge') {
-                trainingSelectorFilters.maxAge = Math.min(60, Math.max(numeric, trainingSelectorFilters.minAge));
-            } else if (filterKey === 'minStamina') {
-                trainingSelectorFilters.minStamina = Math.max(0, Math.min(numeric, trainingSelectorFilters.maxStamina));
-            } else if (filterKey === 'maxStamina') {
-                trainingSelectorFilters.maxStamina = Math.min(100, Math.max(numeric, trainingSelectorFilters.minStamina));
-            }
-            if (currentTrainingSlotIndex !== null) {
-                openTrainingSelector(currentTrainingSlotIndex);
-            }
+            if (filterKey === 'minAge') trainingSelectorFilters.minAge = Math.max(15, Math.min(numeric, trainingSelectorFilters.maxAge));
+            else if (filterKey === 'maxAge') trainingSelectorFilters.maxAge = Math.min(60, Math.max(numeric, trainingSelectorFilters.minAge));
+            else if (filterKey === 'minStamina') trainingSelectorFilters.minStamina = Math.max(0, Math.min(numeric, trainingSelectorFilters.maxStamina));
+            else if (filterKey === 'maxStamina') trainingSelectorFilters.maxStamina = Math.min(100, Math.max(numeric, trainingSelectorFilters.minStamina));
+            if (currentTrainingSlotIndex !== null) openTrainingSelector(currentTrainingSlotIndex);
         }
 
         function toggleTrainingFilterPanel() {
             trainingSelectorFilters.showPanel = !trainingSelectorFilters.showPanel;
-            if (currentTrainingSlotIndex !== null) {
-                openTrainingSelector(currentTrainingSlotIndex);
-            }
+            if (currentTrainingSlotIndex !== null) openTrainingSelector(currentTrainingSlotIndex);
         }
 
         function resetTrainingFilters() {
-            trainingSelectorFilters = {
-                positions: new Set(['GOL', 'DEF', 'MEI', 'ATA']),
-                starter: true,
-                reserve: true,
-                minAge: 17,
-                maxAge: 45,
-                minStamina: 35,
-                maxStamina: 100,
-                showPanel: false
-            };
-            if (currentTrainingSlotIndex !== null) {
-                openTrainingSelector(currentTrainingSlotIndex);
-            }
-        }
-
-        function invalidateTeamRoles() {
-            teamRoles = { captain: null, setPieceTaker: null };
+            trainingSelectorFilters = { positions: new Set(['GOL', 'DEF', 'MEI', 'ATA']), starter: true, reserve: true, minAge: 17, maxAge: 45, minStamina: 35, maxStamina: 100, showPanel: false };
+            if (currentTrainingSlotIndex !== null) openTrainingSelector(currentTrainingSlotIndex);
         }
 
         function hasRequiredTeamRoles() {
@@ -987,26 +1000,14 @@
 
         function setCaptain(playerId) {
             teamRoles = { ...teamRoles, captain: playerId };
-            if (playerId && !lineupSlots.includes(playerId)) {
-                teamRoles.captain = null;
-            }
-            saveGame();
-            renderTacticalField();
-            renderBenchAndRoster();
-            updateTacticalAnalysisModal();
-            closeModal();
+            if (playerId && !lineupSlots.includes(playerId)) teamRoles.captain = null;
+            saveGame(); renderTacticalField(); renderBenchAndRoster(); updateTacticalAnalysisModal(); closeModal();
         }
 
         function setSetPieceTaker(playerId) {
             teamRoles = { ...teamRoles, setPieceTaker: playerId };
-            if (playerId && !lineupSlots.includes(playerId)) {
-                teamRoles.setPieceTaker = null;
-            }
-            saveGame();
-            renderTacticalField();
-            renderBenchAndRoster();
-            updateTacticalAnalysisModal();
-            closeModal();
+            if (playerId && !lineupSlots.includes(playerId)) teamRoles.setPieceTaker = null;
+            saveGame(); renderTacticalField(); renderBenchAndRoster(); updateTacticalAnalysisModal(); closeModal();
         }
 
         function openPlayerRoleModal(playerId, slotIndex = null) {
@@ -1019,70 +1020,32 @@
                 <div style="display:flex; flex-direction:column; gap:8px;">
                     <button class="btn btn-success" onclick="setCaptain(${player.id})">Definir Capitão</button>
                     <button class="btn btn-success" onclick="setSetPieceTaker(${player.id})">Definir Bola Parada</button>
-                    ${isStarter ? `<button class="btn" onclick="openSlotSelectorModal(${slotIndex})">Trocar Jogador</button>` : ''}
+                    ${isStarter ? `<button class="btn" onclick="openSlotSelectorModal(${slotIndex})">Trocar Jogador do Slot</button>` : ''}
                 </div>
                 <button class="btn" style="width:100%; margin-top:10px;" onclick="closeModal()">Fechar</button>
             `;
             showModalContent(html);
         }
-        let hasTrainedThisRound = false;
 
+        let hasTrainedThisRound = false;
         let modalQueue = [];
         let isModalActive = false;
 
-        const firstNames = [
-    "Alisson", "Gabriel", "Lucas", "Rodrigo", "Marcos", "Bruno", "Vinícius", "Matheus",
-    "Vitor", "Diego", "Arthur", "Thiago", "Ederson", "Guilherme", "Felipe", "Gustavo",
-    "João", "Pedro", "Miguel", "Enzo", "Rafael", "Leonardo", "Henrique", "Caio",
-    "Murilo", "Eduardo", "André", "Carlos", "Daniel", "Matheus", "Samuel", "Nicolas",
-    "Igor", "Renato", "Alex", "Victor", "José", "Antônio", "Fernando", "Ricardo",
-    "Otávio", "Cauã", "Luan", "Nathan", "Yuri", "Cristian", "Cristiano", "Júlio",
-    "Alan", "Wesley", "Jean", "Fábio", "Roberto", "Paulo", "Marcelo", "Leandro",
-    "Adriano", "Jonathan", "Breno", "César", "Davi", "Elias", "Emerson", "Erick",
-    "Francisco", "Geovane", "Heitor", "Isaac", "Jair", "Jefferson", "Jonas", "Kaique",
-    "Kevin", "Luiz", "Maurício", "Noah", "Pablo", "Raul", "Sandro", "Tales",
-    "Tomás", "Valter", "William", "Yago", "Augusto", "Benício", "Bernardo", "Cássio",
-    "Cláudio", "Douglas", "Emanuel", "Fabrício", "Hugo", "Joaquim", "Kelvin", "Lorenzo",
-    "Márcio", "Ruan", "Sérgio", "Túlio"
-];
-
-const lastNames = [
-    "Silva", "Santos", "Oliveira", "Souza", "Rodrigues", "Ferreira", "Alves", "Pereira",
-    "Lima", "Gomes", "Costa", "Ribeiro", "Martins", "Carvalho", "Almeida", "Lopes",
-    "Barbosa", "Rocha", "Dias", "Monteiro", "Mendes", "Cardoso", "Teixeira", "Correia",
-    "Azevedo", "Moreira", "Nogueira", "Freitas", "Moura", "Castro", "Campos", "Rezende",
-    "Machado", "Melo", "Batista", "Vieira", "Farias", "Araújo", "Borges", "Cavalcante",
-    "Pinto", "Cunha", "Tavares", "Andrade", "Peixoto", "Coelho", "Aguiar", "Barros",
-    "Neves", "Bezerra", "Leite", "Duarte", "Franco", "Fonseca", "Macedo", "Sales",
-    "Pacheco", "Assis", "Queiroz", "Amaral", "Siqueira", "Xavier", "Brandão", "Bittencourt",
-    "Vasconcelos", "Bueno", "Porto", "Camargo", "Moraes", "Lacerda", "Ramos", "Rezende",
-    "Paiva", "Prado", "Valente", "Guimarães", "Barreto", "Santana", "Pinheiro", "Abreu",
-    "Nascimento", "Cordeiro", "Miranda", "Severino", "Sampaio", "Motta", "Cruz", "Veloso",
-    "Magalhães", "Drummond", "Figueiredo", "Maia", "Bastos", "Viana", "Arruda", "Noronha",
-    "Pimentel", "Saraiva", "Beltrão", "Guerra"
-];
+        const firstNames = ["Alisson", "Gabriel", "Lucas", "Rodrigo", "Marcos", "Bruno", "Vinícius", "Matheus", "Vitor", "Diego", "Arthur", "Thiago", "Ederson", "Guilherme", "Felipe", "Gustavo", "João", "Pedro", "Miguel", "Enzo", "Rafael", "Leonardo", "Henrique", "Caio", "Murilo", "Eduardo", "André", "Carlos", "Daniel", "Samuel", "Nicolas", "Igor", "Renato", "Alex", "Victor", "José", "Antônio", "Fernando", "Ricardo", "Otávio", "Cauã", "Luan", "Nathan", "Yuri", "Cristian", "Cristiano", "Júlio", "Alan", "Wesley", "Jean", "Fábio", "Roberto", "Paulo", "Marcelo", "Leandro", "Adriano", "Jonathan", "Breno", "César", "Davi", "Elias", "Emerson", "Erick", "Francisco", "Geovane", "Heitor", "Isaac", "Jair", "Jefferson", "Jonas", "Kaique", "Kevin", "Luiz", "Maurício", "Noah", "Pablo", "Raul", "Sandro", "Tales", "Tomás", "Valter", "William", "Yago", "Augusto", "Benício", "Bernardo", "Cássio", "Cláudio", "Douglas", "Emanuel", "Fabrício", "Hugo", "Joaquim", "Kelvin", "Lorenzo", "Márcio", "Ruan", "Sérgio", "Túlio"];
+        const lastNames = ["Silva", "Santos", "Oliveira", "Souza", "Rodrigues", "Ferreira", "Alves", "Pereira", "Lima", "Gomes", "Costa", "Ribeiro", "Martins", "Carvalho", "Almeida", "Lopes", "Barbosa", "Rocha", "Dias", "Monteiro", "Mendes", "Cardoso", "Teixeira", "Correia", "Azevedo", "Moreira", "Nogueira", "Freitas", "Moura", "Castro", "Campos", "Rezende", "Machado", "Melo", "Batista", "Vieira", "Farias", "Araújo", "Borges", "Cavalcante", "Pinto", "Cunha", "Tavares", "Andrade", "Peixoto", "Coelho", "Aguiar", "Barros", "Neves", "Bezerra", "Leite", "Duarte", "Franco", "Fonseca", "Macedo", "Sales", "Pacheco", "Assis", "Queiroz", "Amaral", "Siqueira", "Xavier", "Brandão", "Bittencourt", "Vasconcelos", "Bueno", "Porto", "Camargo", "Moraes", "Lacerda", "Ramos", "Paiva", "Prado", "Valente", "Guimarães", "Barreto", "Santana", "Pinheiro", "Abreu", "Nascimento", "Cordeiro", "Miranda", "Severino", "Sampaio", "Motta", "Cruz", "Veloso", "Magalhães", "Drummond", "Figueiredo", "Maia", "Bastos", "Viana", "Arruda", "Noronha", "Pimentel", "Saraiva", "Beltrão", "Guerra"];
         
         function poissonRandom(lambda) {
-            let L = Math.exp(-lambda);
-            let k = 0;
-            let p = 1;
-            do {
-                k++;
-                p *= Math.random();
-            } while (p > L && k < 12);
+            let L = Math.exp(-lambda), k = 0, p = 1;
+            do { k++; p *= Math.random(); } while (p > L && k < 12);
             return k - 1;
         }
 
         function calculatePlayerValue(p) {
             const player = ensurePlayerSubattributes({ ...p });
             let baseVal = 0;
-            if (player.position === 'GOL') baseVal = (player.defense * 0.90) + (player.attack * 0.10);
-            else if (player.position === 'DEF') baseVal = (player.defense * 0.70) + (player.attack * 0.30);
-            else if (player.position === 'MEI') baseVal = (player.defense * 0.50) + (player.attack * 0.50);
-            else if (player.position === 'ATA') baseVal = (player.defense * 0.30) + (player.attack * 0.70);
-
             const setPieceModifier = getSubattributePercentModifier(player.setPieces) / 4;
             const adjustedAttack = player.attack * (1 + (setPieceModifier / 100));
+
             if (player.position === 'GOL') baseVal = (player.defense * 0.90) + (adjustedAttack * 0.10);
             else if (player.position === 'DEF') baseVal = (player.defense * 0.70) + (adjustedAttack * 0.30);
             else if (player.position === 'MEI') baseVal = (player.defense * 0.50) + (adjustedAttack * 0.50);
@@ -1092,21 +1055,16 @@ const lastNames = [
             const capabilityExponent = Math.pow(baseVal / 40, 8) * baseFactor;
             
             let ageMultiplier = 1.0;
-            if (player.age <= 22) {
-                ageMultiplier = 1.6 + (23 - player.age) * 0.3; 
-            } else if (player.age >= 30) {
-                ageMultiplier = Math.max(0.05, 1.0 - (player.age - 29) * 0.16); 
-            }
+            if (player.age <= 22) ageMultiplier = 1.6 + (23 - player.age) * 0.3; 
+            else if (player.age >= 30) ageMultiplier = Math.max(0.05, 1.0 - (player.age - 29) * 0.16); 
+            
             const leadershipMultiplier = getSubattributeMultiplier(player.leadership);
             return Math.round(Math.max(5000, capabilityExponent * ageMultiplier * leadershipMultiplier));
         }
 
         function calculatePayroll() {
             let baseOperational = 10000;
-            let squadPayroll = squad.reduce((acc, p) => {
-                let salary = Math.pow((p.attack + p.defense), 4)/50000;
-                return acc + salary;
-            }, 0);
+            let squadPayroll = squad.reduce((acc, p) => acc + Math.pow((p.attack + p.defense), 4)/50000, 0);
             let staffCost = 0;
             if (staff.coach) staffCost += 3000;
             if (staff.fitness) staffCost += 2000;
@@ -1121,7 +1079,7 @@ const lastNames = [
             const pos = positionStr || positions[Math.floor(Math.random() * positions.length)];
             const age = Math.floor(Math.random() * 18) + 17; 
             
-            let minS = 57; let maxS = 68;
+            let minS = 57, maxS = 68;
             if (tier === 'modesto') { minS = 42; maxS = 53; }
             if (tier === 'elite') { minS = 72; maxS = 85; }
             
@@ -1135,64 +1093,174 @@ const lastNames = [
             const p = {
                 id: Math.floor(Math.random() * 900000) + 100000,
                 name: firstNames[Math.floor(Math.random() * firstNames.length)] + " " + lastNames[Math.floor(Math.random() * lastNames.length)],
-                age: age,
-                position: pos,
-                attack: att,
-                defense: def,
-                stamina: 100
+                age: age, position: pos, attack: att, defense: def, stamina: 100
             };
             ensurePlayerSubattributes(p);
             p.value = calculatePlayerValue(p);
             return p;
         }
 
-function initGame() {
-    const save = localStorage.getItem('FMPRO_SAVE_V3');
-    if (save) {
-        try {
-            const parsed = JSON.parse(save);
-            teams = parsed.teams;
-            fixtures = parsed.fixtures;
-            marketPlayers = parsed.marketPlayers;
-            userTeamId = parsed.userTeamId;
-            currentSeason = parsed.currentSeason || 1;
-            currentRound = parsed.currentRound;
-            finances = parsed.finances;
-            staff = parsed.staff || { coach: false, fitness: false, commercial: false, specialist: false, scout: false };
-            marketRefreshes = parsed.marketRefreshes !== undefined ? parsed.marketRefreshes : 3;
-            squad = parsed.squad;
-            
-            // CORREÇÃO: Fallback seguro para saves com strings antigas
-            currentFormation = parsed.currentFormation || '4-4-2 Em linha';
-            if (!formationsConfig[currentFormation]) {
-                currentFormation = '4-4-2 Em linha';
-            }
-            
-            lineupSlots = parsed.lineupSlots || Array(11).fill(null);
-            teamRoles = normalizeTeamRoles(parsed.teamRoles || {
-                captain: null,
-                setPieceTaker: null
-            });
-            squad.forEach(ensurePlayerSubattributes);
-            userFormHistory = parsed.userFormHistory || [];
-            hasTrainedThisRound = parsed.hasTrainedThisRound || false;
-            trainingSlots = parsed.trainingSlots || Array(3).fill(null);
-
-            document.getElementById('view-setup').classList.remove('active');
-            document.getElementById('main-navigation').style.display = 'flex';
-            switchView('dashboard');
-            renderAll();
-            logConsole("Infraestrutura de Governança carregada com sucesso.");
-            return;
-        } catch(e) {
-            logConsole("Falha de desserialização. Reiniciando fluxo de Onboarding.");
-            currentFormation = '4-4-2 Em linha'; // Garante limpeza de estado no catch
+        function createDefaultClubIdentity() {
+            return {
+                name: 'Elite Executive FC',
+                nickname: 'Os Executivos',
+                slogan: 'Orgulho, disciplina e ambição',
+                stadiumName: 'Arena do Horizonte',
+                badgeStyle: 'crest',
+                uniformStyle: 'classic',
+                chant: 'Aurora, levanta a voz!',
+                mood: 'Ambição e pressão'
+            };
         }
-    }
-    document.getElementById('main-navigation').style.display = 'none';
-    switchView('setup');
-}
+
+        let clubIdentity = createDefaultClubIdentity();
+
+        function getClubIdentity() {
+            if (!clubIdentity || typeof clubIdentity !== 'object') {
+                clubIdentity = createDefaultClubIdentity();
+            }
+            return { ...createDefaultClubIdentity(), ...clubIdentity };
+        }
+
+        function buildClubLogoSvg(identity) {
+            const accent = identity.badgeStyle === 'hex' ? '#ff3366' :
+                           identity.badgeStyle === 'wave' ? '#00ff88' :
+                           identity.badgeStyle === 'diamond' ? '#fbbf24' :
+                           identity.badgeStyle === 'minimal' ? '#a855f7' : '#00d2ff';
+
+            let base = '';
+            if (identity.badgeStyle === 'wave') {
+                 base = `<path d="M18 44 C30 20, 50 18, 64 36 C76 52, 88 54, 100 36" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>`;
+            } else if (identity.badgeStyle === 'hex') {
+                 base = `<polygon points="50,15 85,35 85,75 50,95 15,75 15,35" fill="none" stroke="#ffffff" stroke-width="6"/>
+                         <path d="M35 35 L65 65 M65 35 L35 65" stroke="#ffffff" stroke-width="4"/>`;
+            } else if (identity.badgeStyle === 'diamond') {
+                 base = `<polygon points="50,10 80,50 50,90 20,50" fill="#ffffff" opacity="0.9"/>`;
+            } else if (identity.badgeStyle === 'minimal') {
+                 base = `<circle cx="50" cy="50" r="30" fill="none" stroke="#ffffff" stroke-width="5"/><circle cx="50" cy="50" r="15" fill="#ffffff"/>`;
+            } else {
+                 base = `<path d="M50 10 L84 24 L74 56 L50 76 L26 56 L16 24 Z" fill="#ffffff" opacity="0.95"/>`;
+            }
+            return `<svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="8" width="84" height="84" rx="20" fill="${accent}"/><circle cx="50" cy="50" r="28" fill="rgba(0,0,0,0.3)" opacity="0.95"/>${base}</svg>`;
+        }
+
+        function populateSetupFormFromIdentity() {
+            const identity = getClubIdentity();
+            const fields = {
+                'setup-club-name': identity.name || '',
+                'setup-club-nickname': identity.nickname || '',
+                'setup-club-stadium': identity.stadiumName || '',
+                'setup-club-slogan': identity.slogan || '',
+                'setup-club-chant': identity.chant || '',
+                'setup-club-mood': identity.mood || '',
+                'setup-club-badge': identity.badgeStyle || 'crest',
+                'setup-club-kit': identity.uniformStyle || 'classic'
+            };
+            Object.entries(fields).forEach(([id, value]) => {
+                const el = document.getElementById(id);
+                if (el) el.value = value;
+            });
+            renderSetupIdentityPreview();
+        }
+
+        function renderSetupIdentityPreview() {
+            const identity = collectSetupIdentityFromForm(false);
+            const logoPreview = document.getElementById('setup-logo-preview');
+            const copyPreview = document.getElementById('setup-preview-copy');
+            if (logoPreview) logoPreview.innerHTML = buildClubLogoSvg(identity);
+            
+            if (copyPreview) {
+                copyPreview.innerHTML = `
+                    <div style="font-weight:700; color:var(--text-main); font-size:16px;">${identity.name || 'Nome do Clube'}</div>
+                    <div style="margin-top:4px; color:var(--accent-blue); font-weight:600;">${identity.nickname || 'Apelido'}</div>
+                    <div style="margin-top:10px;">🏟️ ${identity.stadiumName || 'Estádio'}</div>
+                    <div style="margin-top:6px; font-style:italic;">💬 “${identity.slogan || 'Slogan Institucional'}”</div>
+                    <div style="margin-top:8px; font-size:11px; color:var(--text-muted)">Clima Institucional: ${identity.mood || 'Padrão'}</div>
+                `;
+            }
+        }
+
+        function collectSetupIdentityFromForm(updateGlobal = true) {
+            const identity = getClubIdentity();
+            const newIdentity = {
+                ...identity,
+                name: document.getElementById('setup-club-name')?.value?.trim() || identity.name,
+                nickname: document.getElementById('setup-club-nickname')?.value?.trim() || identity.nickname,
+                stadiumName: document.getElementById('setup-club-stadium')?.value?.trim() || identity.stadiumName,
+                slogan: document.getElementById('setup-club-slogan')?.value?.trim() || identity.slogan,
+                chant: document.getElementById('setup-club-chant')?.value?.trim() || identity.chant,
+                mood: document.getElementById('setup-club-mood')?.value?.trim() || identity.mood,
+                badgeStyle: document.getElementById('setup-club-badge')?.value || identity.badgeStyle,
+                uniformStyle: document.getElementById('setup-club-kit')?.value || identity.uniformStyle
+            };
+            if (updateGlobal) clubIdentity = newIdentity;
+            return newIdentity;
+        }
+
+        function advanceSetupIdentity() {
+            const identity = collectSetupIdentityFromForm(true);
+            if (!identity.name || !identity.nickname || !identity.stadiumName) {
+                alert('Preencha os campos vitais (Nome, Apelido e Estádio) para desbloquear a seleção corporativa.');
+                return;
+            }
+            const section = document.getElementById('setup-tier-section');
+            if (section) {
+                section.classList.remove('hidden');
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function initGame() {
+            const save = localStorage.getItem('FMPRO_SAVE_V3');
+            if (save) {
+                try {
+                    const parsed = JSON.parse(save);
+                    teams = parsed.teams;
+                    fixtures = parsed.fixtures;
+                    marketPlayers = parsed.marketPlayers;
+                    userTeamId = parsed.userTeamId;
+                    currentSeason = parsed.currentSeason || 1;
+                    currentRound = parsed.currentRound;
+                    finances = parsed.finances;
+                    staff = parsed.staff || { coach: false, fitness: false, commercial: false, specialist: false, scout: false };
+                    marketRefreshes = parsed.marketRefreshes !== undefined ? parsed.marketRefreshes : 3;
+                    squad = parsed.squad;
+                    clubIdentity = parsed.clubIdentity || createDefaultClubIdentity();
+                    
+                    currentFormation = parsed.currentFormation || '4-4-2 Em linha';
+                    if (!formationsConfig[currentFormation]) currentFormation = '4-4-2 Em linha';
+                    
+                    lineupSlots = parsed.lineupSlots || Array(11).fill(null);
+                    teamRoles = normalizeTeamRoles(parsed.teamRoles || { captain: null, setPieceTaker: null });
+                    squad.forEach(ensurePlayerSubattributes);
+                    userFormHistory = parsed.userFormHistory || [];
+                    hasTrainedThisRound = parsed.hasTrainedThisRound || false;
+                    trainingSlots = parsed.trainingSlots || Array(3).fill(null);
+
+                    document.getElementById('view-setup').classList.remove('active');
+                    document.getElementById('main-navigation').style.display = 'flex';
+                    switchView('dashboard');
+                    renderAll();
+                    logConsole("Infraestrutura de Governança carregada com sucesso.");
+                    return;
+                } catch(e) {
+                    console.error(e);
+                    logConsole("Falha de desserialização. Reiniciando fluxo de Onboarding.");
+                    currentFormation = '4-4-2 Em linha';
+                }
+            }
+            document.getElementById('main-navigation').style.display = 'none';
+            switchView('setup');
+            populateSetupFormFromIdentity();
+        }
+
         function buildFreshDatabase(tier) {
+            const identity = collectSetupIdentityFromForm(true);
+            if (!identity.name || !identity.nickname || !identity.stadiumName) {
+                alert('Complete os dados institucionais para seguir.');
+                return;
+            }
+            clubIdentity = identity;
             teams = [];
             let startingDiv = 3;
             if (tier === 'modesto') { finances.cash = 1500000; startingDiv = 5; }
@@ -1208,51 +1276,23 @@ function initGame() {
             trainingSlots = Array(3).fill(null);
             teamRoles = { captain: null, setPieceTaker: null };
 
-const prefixes = [
-    "Atlético", "Real", "União", "Esporte", "Futebol Clube", "Nacional", "Sport", "Grêmio", "Sociedade", "Racing",
-    "Associação", "Clube", "Acadêmico", "Operário", "Ferroviário", "Industrial", "Comercial", "Juventude", "Estrela", "Nova",
-    "Velho", "Santa", "São", "Villa", "Vila", "Internacional", "Independente", "Liberdade", "Vitória", "Fortaleza",
-    "Imperial", "Colonial", "Aliança", "Esperança", "Progresso", "Cruzeiro", "Estrela do Sul", "Estrela do Norte", "Aurora", "Horizonte",
-    "Pioneiros", "Bandeirantes", "Leões", "Águias", "Lobos", "Tigres", "Panteras", "Falcões", "Dragões", "Titãs",
-    "Gigantes", "Guerreiros", "Gladiadores", "Legião", "Centuriões", "Elite", "Prime", "Master", "Elite FC", "Dínamo",
-    "Olympic", "Olympia", "Phoenix", "United", "City", "County", "Rovers", "Wanderers", "Athletic", "Sporting",
-    "River", "Monte", "Vale", "Serra", "Costa", "Litoral", "Capital", "Universitário", "Juvenil", "Renascença",
-    "Diamante", "Cristal", "Atlântica", "Continental", "Poder", "Invicta", "Vanguarda", "Constelação", "Estelar", "Galáctico",
-    "Tempestade", "Furacão", "Trovão", "Relâmpago", "Solar", "Lunar", "Cósmico", "Supremo", "Dinastia", "Império"
-];
-
-const suffixes = [
-    "Carioca", "Paulista", "Gaúcho", "Mineiro", "Catarinense", "Nordestino", "Central", "Metropolitano", "Imperial", "Campineiro",
-    "do Sul", "do Norte", "do Oeste", "do Leste", "da Serra", "do Vale", "da Costa", "da Praia", "da Capital", "Interiorano",
-    "Amazonense", "Pantaneiro", "Serrano", "Litorâneo", "Fluminense", "Brasiliense", "Paranaense", "Goiano", "Baiano", "Pernambucano",
-    "Cearense", "Potiguar", "Paraense", "Acreano", "Rondoniense", "Tocantinense", "Maranhense", "Piauiense", "Capixaba", "Alagoano",
-    "Sergipano", "Mato-Grossense", "Sul-Mato-Grossense", "Rio-Grandense", "Paulistano", "Santista", "Campestre", "Praiano", "Montanhês", "Ribeirinho",
-    "Azul", "Dourado", "Prateado", "Escarlate", "Alvinegro", "Tricolor", "Grená", "Celeste", "Rubro", "Esmeralda",
-    "de Ouro", "de Prata", "de Bronze", "do Futuro", "da Vitória", "da Esperança", "Invicto", "Supremo", "Elite", "Prime",
-    "United", "Athletic", "Sporting", "Rovers", "City", "County", "Dynamos", "Stars", "Warriors", "Legends",
-    "FC", "SC", "EC", "AC", "United FC", "Sport Club", "Atlético Clube", "Esporte Clube", "Futebol Clube", "Soccer Club",
-    "Galáctico", "Estelar", "Cósmico", "Solar", "Lunar", "Intercontinental", "Global", "Internacional", "Master", "Prime"
-];
+            const prefixes = ["Atlético", "Real", "União", "Esporte", "Futebol Clube", "Nacional", "Sport", "Grêmio", "Sociedade", "Racing", "Associação", "Clube", "Acadêmico", "Operário", "Ferroviário", "Juventude", "Estrela", "Nova", "Velho", "Santa", "São", "Vila", "Internacional", "Independente", "Liberdade", "Vitória", "Fortaleza", "Imperial", "Colonial", "Aliança"];
+            const suffixes = ["Carioca", "Paulista", "Gaúcho", "Mineiro", "Catarinense", "Nordestino", "Central", "Metropolitano", "Imperial", "Campineiro", "do Sul", "do Norte", "do Oeste", "do Leste", "da Serra", "do Vale", "da Costa", "da Praia", "da Capital", "Interiorano", "Amazonense", "Pantaneiro", "Serrano", "Litorâneo", "Fluminense", "Brasiliense", "Paranaense"];
             
             let idCounter = 1;
             for (let div = 1; div <= 5; div++) {
                 for (let i = 0; i < 8; i++) {
                     let n = prefixes[Math.floor(Math.random() * prefixes.length)] + " " + suffixes[Math.floor(Math.random() * suffixes.length)];
                     if (div === startingDiv && i === 0) {
-                        let customName = prompt("Bem-vindo Executivo! Qual será o nome corporativo da sua franquia?", "Elite Executive FC");
-                        n = customName ? customName.trim() : "Elite Executive FC";
+                        n = identity.name;
                         userTeamId = idCounter;
                     }
-                    
                     let basePowerAtt = Math.min(50 - (div * 8) + Math.floor(Math.random() * 60), 95);
                     let basePowerDef = Math.min(80 - (div * 8) + Math.floor(Math.random() * 20), 95);
 
                     teams.push({
-                        id: idCounter,
-                        name: n,
-                        division: div,
-                        baseAttack: Math.max(35, basePowerAtt),
-                        baseDefense: Math.max(35, basePowerDef),
+                        id: idCounter, name: n, division: div,
+                        baseAttack: Math.max(35, basePowerAtt), baseDefense: Math.max(35, basePowerDef),
                         points: 0, wins: 0, draws: 0, losses: 0, gf: 0, ga: 0, gd: 0
                     });
                     idCounter++;
@@ -1275,84 +1315,66 @@ const suffixes = [
             saveGame();
             switchView('dashboard');
             renderAll();
-            logConsole(`Nova governança iniciada em nível corporativo: [${tier.toUpperCase()}]`);
+            logConsole(`Nova governança iniciada em nível corporativo: [${tier.toUpperCase()}] — ${identity.name} (${identity.nickname})`);
         }
 
-function autoFillLineup(preserveExisting = false) {
-    if (!formationsConfig[currentFormation]) {
-        currentFormation = '4-4-2 Em linha';
-    }
+        function autoFillLineup(preserveExisting = false) {
+            if (!formationsConfig[currentFormation]) currentFormation = '4-4-2 Em linha';
 
-    const reqs = formationsConfig[currentFormation];
-    const previousLineup = preserveExisting ? lineupSlots.slice() : Array(11).fill(null);
-    const newLineup = Array(11).fill(null);
-    const assignedIds = new Set();
+            const reqs = formationsConfig[currentFormation];
+            const previousLineup = preserveExisting ? lineupSlots.slice() : Array(11).fill(null);
+            const newLineup = Array(11).fill(null);
+            const assignedIds = new Set();
 
-    if (preserveExisting) {
-        previousLineup.forEach((playerId, index) => {
-            if (!playerId) return;
-            const player = squad.find(p => p.id === playerId);
-            if (!player) return;
-            const requiredGen = subposData[reqs[index]].gen;
-            if (player.position === requiredGen) {
-                newLineup[index] = playerId;
-                assignedIds.add(playerId);
+            if (preserveExisting) {
+                previousLineup.forEach((playerId, index) => {
+                    if (!playerId) return;
+                    const player = squad.find(p => p.id === playerId);
+                    if (!player) return;
+                    const requiredGen = subposData[reqs[index]].gen;
+                    if (player.position === requiredGen) {
+                        newLineup[index] = playerId;
+                        assignedIds.add(playerId);
+                    }
+                });
+                previousLineup.forEach((playerId) => {
+                    if (!playerId || assignedIds.has(playerId)) return;
+                    const player = squad.find(p => p.id === playerId);
+                    if (!player) return;
+                    const openIndex = reqs.findIndex((subPos, idx) => !newLineup[idx] && subposData[subPos].gen === player.position);
+                    if (openIndex >= 0) {
+                        newLineup[openIndex] = playerId;
+                        assignedIds.add(playerId);
+                    }
+                });
             }
-        });
 
-        previousLineup.forEach((playerId) => {
-            if (!playerId || assignedIds.has(playerId)) return;
-            const player = squad.find(p => p.id === playerId);
-            if (!player) return;
-            const openIndex = reqs.findIndex((subPos, idx) => !newLineup[idx] && subposData[subPos].gen === player.position);
-            if (openIndex >= 0) {
-                newLineup[openIndex] = playerId;
-                assignedIds.add(playerId);
+            const usedIds = new Set(assignedIds);
+            for (let i = 0; i < reqs.length; i++) {
+                if (newLineup[i]) continue;
+                const subPos = reqs[i];
+                const genNeeded = subposData[subPos].gen;
+                let found = squad.find(p => p.position === genNeeded && !usedIds.has(p.id));
+                if (!found) found = squad.find(p => !usedIds.has(p.id));
+                if (found) {
+                    newLineup[i] = found.id;
+                    usedIds.add(found.id);
+                }
             }
-        });
-    }
 
-    const usedIds = new Set(assignedIds);
-
-    for (let i = 0; i < reqs.length; i++) {
-        if (newLineup[i]) continue;
-        const subPos = reqs[i];
-        const genNeeded = subposData[subPos].gen;
-
-        let found = squad.find(p => p.position === genNeeded && !usedIds.has(p.id));
-        if (!found) found = squad.find(p => !usedIds.has(p.id));
-
-        if (found) {
-            newLineup[i] = found.id;
-            usedIds.add(found.id);
+            lineupSlots = newLineup;
+            teamRoles = normalizeTeamRoles(teamRoles);
+            updateTacticalAnalysisModal();
         }
-    }
 
-    lineupSlots = newLineup;
-    teamRoles = normalizeTeamRoles(teamRoles);
-    updateTacticalAnalysisModal();
-}
-function saveGame() {
-    const data = {
-    teams,
-    fixtures,
-    marketPlayers,
-    userTeamId,
-    currentSeason,
-    currentRound,
-    finances,
-    staff,
-    squad,
-    currentFormation,
-    lineupSlots,
-    teamRoles,
-    userFormHistory,
-    hasTrainedThisRound,
-    trainingSlots,
-    marketRefreshes
-    };
-    localStorage.setItem('FMPRO_SAVE_V3', JSON.stringify(data));
-}
+        function saveGame() {
+            const data = {
+                teams, fixtures, marketPlayers, userTeamId, currentSeason, currentRound, finances, staff,
+                squad, currentFormation, lineupSlots, teamRoles, userFormHistory, hasTrainedThisRound,
+                trainingSlots, marketRefreshes, clubIdentity
+            };
+            localStorage.setItem('FMPRO_SAVE_V3', JSON.stringify(data));
+        }
 
         function resetGame() {
             if(confirm("Deseja deletar permanentemente o save atual e voltar ao onboarding de seleção?")) {
@@ -1361,105 +1383,55 @@ function saveGame() {
             }
         }
         
-function generateSeasonFixtures() {
-    fixtures = [];
+        function generateSeasonFixtures() {
+            fixtures = [];
+            for (let div = 1; div <= 5; div++) {
+                const divTeams = teams.filter(t => t.division === div);
+                const n = divTeams.length;
+                if (n % 2 !== 0) continue;
 
-    for (let div = 1; div <= 5; div++) {
+                const roundsPerTurn = n - 1;
+                const totalRounds = roundsPerTurn * 2;
+                let rotation = [...divTeams];
+                const firstTurn = [];
 
-        const divTeams = teams.filter(t => t.division === div);
-
-        const n = divTeams.length;
-
-        if (n % 2 !== 0) {
-            console.error("A divisão precisa ter número par de clubes.");
-            continue;
-        }
-
-        const roundsPerTurn = n - 1;
-        const totalRounds = roundsPerTurn * 2;
-
-        let rotation = [...divTeams];
-
-        const firstTurn = [];
-
-        // ---------- PRIMEIRO TURNO ----------
-        for (let round = 0; round < roundsPerTurn; round++) {
-
-            const matches = [];
-
-            for (let i = 0; i < n / 2; i++) {
-
-                let home = rotation[i];
-                let away = rotation[n - 1 - i];
-
-                // Alternância de mando
-                if ((round + i) % 2 === 1) {
-                    [home, away] = [away, home];
+                for (let round = 0; round < roundsPerTurn; round++) {
+                    const matches = [];
+                    for (let i = 0; i < n / 2; i++) {
+                        let home = rotation[i], away = rotation[n - 1 - i];
+                        if ((round + i) % 2 === 1) [home, away] = [away, home];
+                        matches.push({ homeId: home.id, awayId: away.id });
+                    }
+                    firstTurn.push(matches);
+                    const fixed = rotation[0];
+                    const moving = rotation.slice(1);
+                    moving.unshift(moving.pop());
+                    rotation = [fixed, ...moving];
                 }
 
-                matches.push({
-                    homeId: home.id,
-                    awayId: away.id
-                });
+                for (let round = 0; round < totalRounds; round++) {
+                    const sourceRound = round < roundsPerTurn ? firstTurn[round] : firstTurn[round - roundsPerTurn];
+                    sourceRound.forEach(match => {
+                        let homeId, awayId;
+                        if (round < roundsPerTurn) {
+                            homeId = match.homeId; awayId = match.awayId;
+                        } else {
+                            homeId = match.awayId; awayId = match.homeId;
+                        }
+                        fixtures.push({ division: div, round: round + 1, homeId, awayId, played: false, homeScore: 0, awayScore: 0 });
+                    });
+                }
             }
-
-            firstTurn.push(matches);
-
-            // Rotação (Circle Method)
-            const fixed = rotation[0];
-            const moving = rotation.slice(1);
-
-            moving.unshift(moving.pop());
-
-            rotation = [fixed, ...moving];
         }
-
-        // ---------- SEGUNDO TURNO ----------
-        for (let round = 0; round < totalRounds; round++) {
-
-            const sourceRound =
-                round < roundsPerTurn
-                    ? firstTurn[round]
-                    : firstTurn[round - roundsPerTurn];
-
-            sourceRound.forEach(match => {
-
-                let homeId, awayId;
-
-                if (round < roundsPerTurn) {
-                    homeId = match.homeId;
-                    awayId = match.awayId;
-                } else {
-                    // Inverte apenas o confronto correspondente
-                    homeId = match.awayId;
-                    awayId = match.homeId;
-                }
-
-                fixtures.push({
-                    division: div,
-                    round: round + 1,
-                    homeId,
-                    awayId,
-                    played: false,
-                    homeScore: 0,
-                    awayScore: 0
-                });
-            });
-        }
-    }
-}
 
         function normalizeMarketRefreshState() {
-            if (!Number.isFinite(marketRefreshes)) {
-                marketRefreshes = 3;
-            }
+            if (!Number.isFinite(marketRefreshes)) marketRefreshes = 3;
             marketRefreshes = Math.max(0, Math.min(3, Math.floor(Number(marketRefreshes) || 0)));
         }
 
         function generateMarket() {
             normalizeMarketRefreshState();
             marketPlayers = [];
-            // O mercado gera jogadores adequados ao nível da divisão atual do jogador
             let myTeam = teams.find(t => t.id === userTeamId);
             let division = myTeam && Number.isFinite(myTeam.division) ? myTeam.division : 1;
             let tier = 'intermediario';
@@ -1471,24 +1443,22 @@ function generateSeasonFixtures() {
             }
         }
 
-function refreshMarket() {
-    normalizeMarketRefreshState();
-    if (!staff.scout) return alert("Você precisa contratar o Olheiro Mestre para utilizar esta função.");
-    if (marketRefreshes <= 0) return alert("Sua cota de rastreamento excedeu (0/3). Aguarde a próxima temporada.");
-    
-    const previousRefreshes = marketRefreshes;
-    marketRefreshes = previousRefreshes - 1;
-    try {
-        generateMarket();
-    } catch (error) {
-        marketRefreshes = previousRefreshes;
-        console.error("Erro ao atualizar o mercado:", error);
-        return alert("O olheiro não conseguiu atualizar o mercado neste momento.");
-    }
-    saveGame();
-    renderAll();
-    logConsole(`Olheiro acionado. Novos atletas encontrados. (Resta: ${marketRefreshes})`);
-}
+        function refreshMarket() {
+            normalizeMarketRefreshState();
+            if (!staff.scout) return alert("Você precisa contratar o Olheiro Mestre para utilizar esta função.");
+            if (marketRefreshes <= 0) return alert("Sua cota de rastreamento excedeu (0/3). Aguarde a próxima temporada.");
+            
+            const previousRefreshes = marketRefreshes;
+            marketRefreshes = previousRefreshes - 1;
+            try {
+                generateMarket();
+            } catch (error) {
+                marketRefreshes = previousRefreshes;
+                return alert("O olheiro não conseguiu atualizar o mercado neste momento.");
+            }
+            saveGame(); renderAll();
+            logConsole(`Olheiro acionado. Novos atletas encontrados. (Resta: ${marketRefreshes})`);
+        }
 
         function showModalContent(htmlContent) {
             const overlay = document.getElementById('global-modal-overlay');
@@ -1505,7 +1475,13 @@ function refreshMarket() {
 
         function processModalQueue() {
             if (isModalActive || modalQueue.length === 0) return;
-            showModalContent(modalQueue.shift());
+            const content = modalQueue.shift();
+            
+            if (typeof content === 'function') {
+                content();
+            } else {
+                showModalContent(content);
+            }
         }
 
         function closeModal() {
@@ -1522,17 +1498,15 @@ function refreshMarket() {
             const setPieceTaker = squad.find(p => p.id === teamRoles.setPieceTaker);
             const leadershipModifier = captain ? getSubattributeMultiplier(captain.leadership) : 1;
             const contributions = [];
-                    // Determine which sub-positions are present in the current lineup
-                    const presentSubpos = new Set();
-                    for (let i = 0; i < 11; i++) {
-                        const pIdCheck = lineupSlots[i];
-                        const subPosCheck = config[i];
-                        if (pIdCheck && squad.find(x => x.id === pIdCheck)) {
-                            presentSubpos.add(subPosCheck);
-                        }
-                    }
+            const presentSubpos = new Set();
+            
+            for (let i = 0; i < 11; i++) {
+                const pIdCheck = lineupSlots[i];
+                const subPosCheck = config[i];
+                if (pIdCheck && squad.find(x => x.id === pIdCheck)) presentSubpos.add(subPosCheck);
+            }
 
-                    for (let i = 0; i < 11; i++) {
+            for (let i = 0; i < 11; i++) {
                 const pId = lineupSlots[i];
                 const subPos = config[i];
                 const p = squad.find(x => x.id === pId);
@@ -1542,7 +1516,6 @@ function refreshMarket() {
                     let sData = subposData[subPos];
                     let penalty = p.position !== sData.gen ? 0.60 : 1.0;
                     let staminaMod = p.stamina / 100;
-                    
                     let realAtt = p.attack * sData.att;
                     let realDef = p.defense * sData.def;
 
@@ -1551,94 +1524,33 @@ function refreshMarket() {
                         realAtt += realAtt * (setPieceBonus / 100);
                     }
 
-                    // Heuristic adjustments (accumulative)
-                    let attAdj = 0; // additive multiplier (e.g. +0.15 means *1.15)
-                    let defAdj = 0;
-
-                    // Helper shortcuts for presence checks
-                    const has = x => presentSubpos.has(x);
-
-                    // 1. If no PE, ME and LE present get +0.15 attack / -0.15 defense
-                    if (!has('PE')) {
-                        if (subPos === 'ME' || subPos === 'LE') { attAdj += 0.15; defAdj -= 0.15; }
-                    }
-                    // 2. If no PD, MD and LD present get +0.15 attack / -0.15 defense
-                    if (!has('PD')) {
-                        if (subPos === 'MD' || subPos === 'LD') { attAdj += 0.15; defAdj -= 0.15; }
-                    }
-                    // 3. If no ME, PE defense +0.05 attack -0.05; LE +0.15/-0.15
-                    if (!has('ME')) {
-                        if (subPos === 'PE') { defAdj += 0.05; attAdj -= 0.05; }
-                        if (subPos === 'LE') { attAdj += 0.15; defAdj -= 0.15; }
-                    }
-                    // 4. If no MD, PD defense +0.05 attack -0.05; LD +0.15/-0.15
-                    if (!has('MD')) {
-                        if (subPos === 'PD') { defAdj += 0.05; attAdj -= 0.05; }
-                        if (subPos === 'LD') { attAdj += 0.15; defAdj -= 0.15; }
-                    }
-                    // 5. If no LE, ME and PE attack -0.10 defense +0.10
-                    if (!has('LE')) {
-                        if (subPos === 'ME' || subPos === 'PE') { attAdj -= 0.10; defAdj += 0.10; }
-                    }
-                    // 6. If no LD, MD and PD attack -0.10 defense +0.10
-                    if (!has('LD')) {
-                        if (subPos === 'MD' || subPos === 'PD') { attAdj -= 0.10; defAdj += 0.10; }
-                    }
-                    // 7. If no VOL, all MC defense +0.05 attack -0.05
-                    if (!has('VOL')) {
-                        if (subPos === 'MC') { defAdj += 0.05; attAdj -= 0.05; }
-                    }
-                    // 8. If no MEI, all MC defense -0.05 attack +0.05
-                    if (!has('MEI')) {
-                        if (subPos === 'MC') { defAdj -= 0.05; attAdj += 0.05; }
-                    }
-                    // 9. If there is F9, MEI +0.10/-0.10; ME,MD,PE,PD +0.15/-0.15
-                    if (has('F9')) {
-                        if (subPos === 'MEI') { attAdj += 0.10; defAdj -= 0.10; }
-                        if (['ME','MD','PE','PD'].includes(subPos)) { attAdj += 0.15; defAdj -= 0.15; }
-                    }
-
-                    // Apply adjustments as multiplicative weights, clamp to avoid negative multipliers
-                    const attScale = Math.max(0.01, 1 + attAdj);
-                    const defScale = Math.max(0.01, 1 + defAdj);
+                    const provPresent = new Set(presentSubpos);
+                    provPresent.add(subPos);
+                    const heur = getHeuristicAdjForSubpos(subPos, provPresent);
+                    const attScale = Math.max(0.01, 1 + heur.attAdj);
+                    const defScale = Math.max(0.01, 1 + heur.defAdj);
 
                     const contributionAtt = realAtt * penalty * staminaMod * attScale;
                     const contributionDef = realDef * penalty * staminaMod * defScale;
                     
                     totalAtt += contributionAtt;
                     totalDef += contributionDef;
-                    // Visual vertical bias: positive => more attack tendency (shift up), negative => defense tendency (shift down)
-                    const verticalBias = (attAdj - defAdj);
+                    const verticalBias = (heur.attAdj - heur.defAdj);
+                    
                     contributions.push({
-                        name: p.name,
-                        attack: contributionAtt,
-                        defense: contributionDef,
-                        id: p.id,
-                        position: p.position,
-                        verticalBias,
-                        leadership: p.leadership,
-                        setPieces: p.setPieces,
+                        name: p.name, attack: contributionAtt, defense: contributionDef, id: p.id,
+                        position: p.position, verticalBias, leadership: p.leadership, setPieces: p.setPieces,
                         role: p.id === teamRoles.captain ? 'captain' : (p.id === teamRoles.setPieceTaker ? 'setPiece' : 'normal')
                     });
                 } else {
                     totalAtt += 8; totalDef += 8;
-                    contributions.push({
-                        name: 'Vazio',
-                        attack: 8,
-                        defense: 8,
-                        id: null,
-                        position: null,
-                        leadership: 60,
-                        setPieces: 60,
-                        role: 'empty'
-                    });
+                    contributions.push({ name: 'Vazio', attack: 8, defense: 8, id: null, position: null, leadership: 60, setPieces: 60, role: 'empty' });
                 }
             }
             return {
                 attack: (totalAtt / 11) * leadershipModifier,
                 defense: (totalDef / 11) * leadershipModifier,
-                leadershipModifier,
-                contributions
+                leadershipModifier, contributions
             };
         }
 
@@ -1646,71 +1558,63 @@ function refreshMarket() {
             return buildTeamContributionBreakdown();
         }
 
-function updateTacticalAnalysisModal() {
+        function updateTacticalAnalysisModal() {
+            const stats = buildTeamContributionBreakdown();
+            document.getElementById("analysis-attack").textContent = stats.attack.toFixed(2);
+            document.getElementById("analysis-defense").textContent = stats.defense.toFixed(2);
+            
+            const reportContainer = document.getElementById("analysis-report");
+            if (reportContainer) {
+                const rows = stats.contributions.map((entry, idx) => {
+                    return `<tr><td>${idx + 1}</td><td>${entry.name}</td><td>${entry.attack.toFixed(2)}</td><td>${entry.defense.toFixed(2)}</td><td>${(entry.attack + entry.defense).toFixed(2)}</td></tr>`;
+                }).join('');
+                const captain = squad.find(p => p.id === teamRoles.captain);
+                const setPieceTaker = squad.find(p => p.id === teamRoles.setPieceTaker);
+                reportContainer.innerHTML = `
+                    <div style="margin-top:16px;">
+                        <h4 style="margin-bottom:8px;">Relatório Analítico</h4>
+                        <table style="width:100%; font-size:11px;">
+                            <thead><tr><th>#</th><th>Jogador</th><th>ATA</th><th>DEF</th><th>Contrib.</th></tr></thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                    <div style="margin-top:16px;">
+                        <h4 style="margin-bottom:8px;">Especialistas</h4>
+                        <div style="font-size:12px; line-height:1.6;">
+                            <div><strong>Capitão</strong>: ${captain ? captain.name : 'Não definido (Falta Escalar)'}</div>
+                            <div>${captain ? `Liderança: ${captain.leadership} | Modificador: ${(getSubattributeMultiplier(captain.leadership) * 100 - 100).toFixed(0)}%` : ''}</div>
+                            <div style="margin-top:8px;"><strong>Bola Parada</strong>: ${setPieceTaker ? setPieceTaker.name : 'Não definido (Falta Escalar)'}</div>
+                            <div>${setPieceTaker ? `Bônus Ofensivo Local: +${(getSubattributePercentModifier(setPieceTaker.setPieces)).toFixed(0)}%` : ''}</div>
+                        </div>
+                    </div>`;
+            }
+        }
 
-    const stats = buildTeamContributionBreakdown();
-
-    document.getElementById("analysis-attack").textContent =
-        stats.attack.toFixed(2);
-
-    document.getElementById("analysis-defense").textContent =
-        stats.defense.toFixed(2);
-
-    const reportContainer = document.getElementById("analysis-report");
-    if (reportContainer) {
-        const rows = stats.contributions.map((entry, idx) => {
-            const roleLabel = entry.role === 'captain' ? 'Capitão' : (entry.role === 'setPiece' ? 'Bola Parada' : '');
-            return `<tr><td>${idx + 1}</td><td>${entry.name}</td><td>${entry.attack.toFixed(2)}</td><td>${entry.defense.toFixed(2)}</td><td>${(entry.attack + entry.defense).toFixed(2)}</td></tr>`;
-        }).join('');
-        const captain = squad.find(p => p.id === teamRoles.captain);
-        const setPieceTaker = squad.find(p => p.id === teamRoles.setPieceTaker);
-        reportContainer.innerHTML = `
-            <div style="margin-top:16px;">
-                <h4 style="margin-bottom:8px;">Relatório</h4>
-                <table style="width:100%; font-size:11px;">
-                    <thead><tr><th>#</th><th>Jogador</th><th>ATA</th><th>DEF</th><th>Contrib.</th></tr></thead>
-                    <tbody>${rows}</tbody>
-                </table>
-            </div>
-            <div style="margin-top:16px;">
-                <h4 style="margin-bottom:8px;">Funções</h4>
-                <div style="font-size:12px; line-height:1.6;">
-                    <div><strong>Capitão</strong>: ${captain ? captain.name : 'Não definido'}</div>
-                    <div>${captain ? `Liderança: ${captain.leadership} | Modificador: ${(getSubattributeMultiplier(captain.leadership) * 100 - 100).toFixed(0)}%` : ''}</div>
-                    <div style="margin-top:8px;"><strong>Bola Parada</strong>: ${setPieceTaker ? setPieceTaker.name : 'Não definido'}</div>
-                    <div>${setPieceTaker ? `Valor: ${setPieceTaker.setPieces} | Bônus ofensivo: ${(getSubattributePercentModifier(setPieceTaker.setPieces)).toFixed(0)}%` : ''}</div>
-                </div>
-            </div>`;
-    }
-}
-
-function openTacticalAnalysis() {
-
-    updateTacticalAnalysisModal();
-
-    document
-        .getElementById("tactical-analysis-modal")
-        .classList
-        .add("active");
-}
-
-function closeTacticalAnalysis() {
-
-    document
-        .getElementById("tactical-analysis-modal")
-        .classList
-        .remove("active");
-}
+        function openTacticalAnalysis() {
+            updateTacticalAnalysisModal();
+            document.getElementById("tactical-analysis-modal").classList.add("active");
+        }
+        function closeTacticalAnalysis() {
+            document.getElementById("tactical-analysis-modal").classList.remove("active");
+        }
         
         function playRound() {
             let myTeam = teams.find(t => t.id === userTeamId);
             let allCurrentFixtures = fixtures.filter(f => f.round === currentRound && !f.played);
 
-            if (!hasRequiredTeamRoles()) {
+            const filledSlots = lineupSlots.filter(id => id !== null).length;
+            if (filledSlots < 11 || !hasRequiredTeamRoles()) {
                 const missingHtml = `
-                    <h3>Pré-condição de Partida</h3>
-                    <p style="font-size:12px; color:var(--text-muted); margin-top:8px; line-height:1.6;">Defina Capitão e Batedor de Bola Parada antes de iniciar a rodada.</p>
-                    <button class="btn btn-success" style="width:100%; margin-top:16px;" onclick="closeModal()">Entendido</button>
+                    <div style="text-align: center;">
+                        <h3 style="color: var(--accent-warn);">Pré-condição de Partida Pendente</h3>
+                        <p style="font-size:13px; color:var(--text-muted); margin-top:10px; line-height:1.6;">Para validar a rodada junto à diretoria, garanta que:</p>
+                        <ul style="text-align: left; margin: 15px auto; max-width: 400px; font-size: 13px; line-height:1.8;">
+                            <li>O elenco titular possua exatos 11 jogadores escalados (Atual: ${filledSlots}/11).</li>
+                            <li>A Braçadeira de <strong>Capitão</strong> esteja definida em um titular.</li>
+                            <li>O Batedor de <strong>Bolas Paradas</strong> esteja definido em um titular.</li>
+                        </ul>
+                        <button class="btn btn-warn" style="width:100%; margin-top:16px; border: 1px solid var(--accent-warn); background:rgba(255,183,3,0.1); color:var(--text-main);" onclick="closeModal()">Revisar Estratégia</button>
+                    </div>
                 `;
                 queueModal(missingHtml);
                 return;
@@ -1764,8 +1668,10 @@ function closeTacticalAnalysis() {
                 if (match.homeId === userTeamId || match.awayId === userTeamId) userMatch = match;
             });
 
-            // Gerenciamento de Estamina Pós-Jogo
-            let lossFactor = staff.fitness ? 0.75 : 1.0;
+            // Impacto do Estilo do Uniforme Moderno (-5% de perda de fadiga base)
+            let modernKitBonus = (clubIdentity.uniformStyle === 'modern') ? 0.95 : 1.0;
+            let lossFactor = (staff.fitness ? 0.75 : 1.0) * modernKitBonus;
+            
             squad.forEach(p => {
                 if (lineupSlots.includes(p.id)) {
                     p.stamina = Math.max(15, p.stamina - Math.round((Math.floor(Math.random() * 8) + 8) * lossFactor));
@@ -1779,15 +1685,15 @@ function closeTacticalAnalysis() {
             let userG = userHome ? userMatch.homeScore : userMatch.awayScore;
             let oppG = userHome ? userMatch.awayScore : userMatch.homeScore;
 
-            // Cobrança exata de despesa por matchday
             let currentPayrollCost = calculatePayroll();
             finances.cash -= currentPayrollCost;
 
-            // Processamento do Fluxo de Bilheteria Realista (REQ 3)
             let ticketRevenue = 0;
             let attendance = 0;
             if (userHome) {
-                let divOccupancyBase = { 1: 0.85, 2: 0.70, 3: 0.55, 4: 0.40, 5: 0.25 }[myTeam.division];
+                // Impacto do Uniforme Clássico (+5% ocupação base)
+                let classicKitBonus = (clubIdentity.uniformStyle === 'classic') ? 0.05 : 0;
+                let divOccupancyBase = { 1: 0.85, 2: 0.70, 3: 0.55, 4: 0.40, 5: 0.25 }[myTeam.division] + classicKitBonus;
                 let formModifier = 0;
                 previousFormHistory.forEach(f => {
                     if (f === 'W') formModifier += 0.10;
@@ -1799,6 +1705,8 @@ function closeTacticalAnalysis() {
                 
                 let baseTicketPrice = { 1: 90, 2: 70, 3: 50, 4: 35, 5: 20 }[myTeam.division];
                 if (staff.commercial) baseTicketPrice = Math.round(baseTicketPrice * 1.15);
+                // Impacto do Uniforme Vintage (+5% ticket)
+                if (clubIdentity.uniformStyle === 'vintage') baseTicketPrice = Math.round(baseTicketPrice * 1.05);
                 
                 ticketRevenue = Math.round(attendance * baseTicketPrice);
                 finances.cash += ticketRevenue;
@@ -1809,7 +1717,6 @@ function closeTacticalAnalysis() {
             else userFormHistory.push('L');
             if (userFormHistory.length > 3) userFormHistory.shift();
 
-            // REQ 8: Escalonamento de Força da IA a cada 5 rodadas
             if (currentRound % 5 === 0) {
                 teams.forEach(t => {
                     if (t.id !== userTeamId) {
@@ -1817,66 +1724,224 @@ function closeTacticalAnalysis() {
                         t.baseDefense = Math.min(99, t.baseDefense + Math.floor(Math.random() * 3.5) - 1);
                     }
                 });
-                logConsole("Janela de Evolução Tecnológica: Equipes da IA possivelmente otimizaram seus parâmetros de elenco ligeiramente.");
+                logConsole("Evolução Tecnológica Coletiva: Equipes oponentes atualizaram seus padrões táticos.");
             }
 
-            // Disparar modais corporativos
-            triggerPostMatchModals(userMatch, attendance, ticketRevenue);
-
-            // Renovação de variáveis de controle tático/treino da rodada
+            triggerMatchAnimation(userMatch, attendance, ticketRevenue);
+            
             hasTrainedThisRound = false;
             trainingSlots = Array(3).fill(null);
 
-            if (currentRound < 14) {
-                currentRound++;
-            } else {
-                triggerEndOfSeasonModal();
-            }
+            if (currentRound < 14) currentRound++;
+            else triggerEndOfSeasonModal();
 
             saveGame();
             renderAll();
         }
 
-        function triggerPostMatchModals(match, att, cashGained) {
+        // Recupera o nome ponderado por uma stat (Ataque para gols, Defesa para desarmes, etc)
+        function getPlayerByWeight(contributions, weightKey) {
+            if (!contributions || contributions.length === 0) return { name: "O time", position: "N/A" };
+            const valid = contributions.filter(c => c.name !== 'Vazio');
+            if (valid.length === 0) return { name: "O time", position: "N/A" };
+
+            let total = valid.reduce((sum, c) => sum + (c[weightKey] || 0.1), 0);
+            let r = Math.random() * total;
+            for (let c of valid) {
+                r -= (c[weightKey] || 0.1);
+                if (r <= 0) return c;
+            }
+            return valid[0];
+        }
+
+        function generateMatchEvents(match, userHome, myScore, oppScore, identity, oppName) {
+            const stats = calculateUserTeamLiveStats();
+            const contributions = stats.contributions || [];
+            
+            let events = [];
+            
+            // Distribuir gols
+            for (let i = 0; i < myScore; i++) {
+                let min = Math.floor(Math.random() * 90) + 1;
+                let scorer = getPlayerByWeight(contributions, 'attack');
+                let assister = getPlayerByWeight(contributions, 'attack'); // Meias e atacantes tem mais peso
+                let isSetPiece = Math.random() > 0.75;
+                
+                let text = "";
+                if (isSetPiece && scorer.role === 'setPiece') {
+                    text = `⚽ <strong>GOL DO ${identity.nickname.toUpperCase()}!</strong> Magistral! O especialista ${scorer.name} cobra a bola parada com perfeição e estufa as redes!`;
+                } else {
+                    if (scorer.id !== assister.id && Math.random() > 0.4) {
+                        text = `⚽ <strong>GOL DO ${identity.nickname.toUpperCase()}!</strong> Jogada trabalhada por ${assister.name}, que encontra ${scorer.name} livre para marcar!`;
+                    } else {
+                        text = `⚽ <strong>GOL DO ${identity.nickname.toUpperCase()}!</strong> Brilho individual! ${scorer.name} rompe a linha defensiva e não perdoa!`;
+                    }
+                }
+                events.push({ min, type: 'my_goal', text });
+            }
+
+            for (let i = 0; i < oppScore; i++) {
+                let min = Math.floor(Math.random() * 90) + 1;
+                events.push({ min, type: 'opp_goal', text: `❌ <strong>GOL DO ${oppName.toUpperCase()}.</strong> Falha na recomposição defensiva permite o gol adversário.` });
+            }
+
+            // Gerar 4 eventos aleatórios narrativos
+            for (let i = 0; i < 4; i++) {
+                let min = Math.floor(Math.random() * 90) + 1;
+                let r = Math.random();
+                if (r < 0.3) {
+                    let defender = getPlayerByWeight(contributions, 'defense');
+                    events.push({ min, type: 'save', text: `🛡️ <strong>Defesa crucial!</strong> ${defender.name} faz uma intervenção providencial impedindo uma chance clara do ${oppName}.` });
+                } else if (r < 0.6) {
+                    let attacker = getPlayerByWeight(contributions, 'attack');
+                    events.push({ min, type: 'miss', text: `⚠️ <strong>Uuuuuh!</strong> ${attacker.name} arrisca um chute perigoso, mas a bola raspa a trave!` });
+                } else if (r < 0.8) {
+                    let captain = contributions.find(c => c.role === 'captain');
+                    if(captain) {
+                        events.push({ min, type: 'tactical', text: `🧠 <strong>Comando:</strong> O capitão ${captain.name} orienta o bloco da equipe pedindo a aplicação de "${identity.slogan}".` });
+                    } else {
+                        events.push({ min, type: 'foul', text: `🟨 Jogo paralisado por falta tática dura no meio-campo.` });
+                    }
+                } else {
+                    events.push({ min, type: 'chant', text: `🎶 A torcida explode cantando: "<em>${identity.chant}</em>", ditando o ritmo nas arquibancadas!` });
+                }
+            }
+
+            // Ordenar por minuto cronológico
+            events.sort((a, b) => a.min - b.min);
+            return events;
+        }
+
+        function triggerMatchAnimation(match, att, cashGained) {
             let userHome = match.homeId === userTeamId;
-            let myScore = userHome ? match.homeScore : match.awayScore;
-            let oppScore = userHome ? match.awayScore : match.homeScore;
+            let myScoreFinal = userHome ? match.homeScore : match.awayScore;
+            let oppScoreFinal = userHome ? match.awayScore : match.homeScore;
             let oppName = teams.find(t => t.id === (userHome ? match.awayId : match.homeId)).name;
+            const identity = getClubIdentity();
+            
+            let events = generateMatchEvents(match, userHome, myScoreFinal, oppScoreFinal, identity, oppName);
+            
+            queueModal(function() {
+                let initialHtml = `
+                    <div style="text-align:center; margin-bottom:15px;">
+                        <span style="font-size:11px; font-weight:800; color:var(--accent-blue); border:1px solid var(--accent-blue); padding:4px 10px; border-radius:4px;">TRANSMISSÃO AO VIVO</span>
+                        <h2 id="live-score" style="margin-top:15px; border:none; padding:0; font-size:42px; color:var(--text-main); transition: color 0.3s ease;">0 - 0</h2>
+                        <p style="color:var(--text-muted); margin-top:0;">${identity.name} x ${oppName}</p>
+                    </div>
+                    <div id="timeline-container" style="background:rgba(0,0,0,0.3); padding:20px; border-radius:10px; border:1px solid var(--border-glass); font-size:13px; line-height:1.6; height: 350px; overflow-y:auto; display:flex; flex-direction:column;">
+                        <div class="timeline-event"><div class="timeline-minute">0'</div><div class="timeline-desc">⏱️ <strong>Rola a bola!</strong> Início de partida no ${userHome ? identity.stadiumName : 'estádio adversário'}.</div></div>
+                    </div>
+                    <button id="btn-finish-match" class="btn btn-success" style="width:100%; margin-top:20px; padding:14px; opacity:0; pointer-events:none; transition:opacity 0.4s ease;" onclick="showPostMatchSummary(${userHome}, ${myScoreFinal}, ${oppScoreFinal}, '${oppName}', ${att}, ${cashGained})">Fim de Jogo. Analisar Impactos ➔</button>
+                    <button id="btn-skip-anim" class="btn" style="width:100%; margin-top:8px; font-size:11px; padding:6px; background:transparent;" onclick="skipMatchAnimation()">Pular Animação (Ir para o Resultado)</button>
+                `;
+                showModalContent(initialHtml);
+
+                let timelineEl = document.getElementById('timeline-container');
+                let scoreEl = document.getElementById('live-score');
+                let btnFinish = document.getElementById('btn-finish-match');
+                let btnSkip = document.getElementById('btn-skip-anim');
+                
+                let currentMyScore = 0;
+                let currentOppScore = 0;
+                let eventIndex = 0;
+
+                window.matchAnimationInterval = setInterval(() => {
+                    if (eventIndex >= events.length) {
+                        clearInterval(window.matchAnimationInterval);
+                        timelineEl.innerHTML += `<div class="timeline-event"><div class="timeline-minute">90+'</div><div class="timeline-desc">🏁 <strong>Fim de papo!</strong> O árbitro apita o final do confronto.</div></div>`;
+                        timelineEl.scrollTop = timelineEl.scrollHeight;
+                        btnFinish.style.opacity = '1';
+                        btnFinish.style.pointerEvents = 'auto';
+                        btnSkip.style.display = 'none';
+                        return;
+                    }
+
+                    let ev = events[eventIndex];
+                    if (ev.type === 'my_goal') currentMyScore++;
+                    if (ev.type === 'opp_goal') currentOppScore++;
+                    
+                    scoreEl.innerText = `${currentMyScore} - ${currentOppScore}`;
+                    if (currentMyScore > currentOppScore) scoreEl.style.color = 'var(--accent-green)';
+                    else if (currentMyScore < currentOppScore) scoreEl.style.color = 'var(--accent-red)';
+                    else scoreEl.style.color = 'var(--accent-warn)';
+
+                    timelineEl.innerHTML += `<div class="timeline-event"><div class="timeline-minute">${ev.min}'</div><div class="timeline-desc">${ev.text}</div></div>`;
+                    timelineEl.scrollTop = timelineEl.scrollHeight;
+
+                    eventIndex++;
+                }, 900); // Velocidade da simulação
+            });
+        }
+
+        function skipMatchAnimation() {
+            if (window.matchAnimationInterval) clearInterval(window.matchAnimationInterval);
+            let btnFinish = document.getElementById('btn-finish-match');
+            let btnSkip = document.getElementById('btn-skip-anim');
+            if (btnFinish) {
+                btnFinish.style.opacity = '1';
+                btnFinish.style.pointerEvents = 'auto';
+                btnFinish.innerText = "Simulação Acelerada. Avançar ➔";
+            }
+            if (btnSkip) btnSkip.style.display = 'none';
+        }
+
+        function showPostMatchSummary(userHome, myScore, oppScore, oppName, att, cashGained) {
+            closeModal();
+            const identity = getClubIdentity();
             
             let isWin = myScore > oppScore; let isDraw = myScore === oppScore;
             let statusColor = isWin ? 'var(--accent-green)' : (isDraw ? 'var(--accent-warn)' : 'var(--accent-red)');
 
-            const winQuotes = ["A arquibancada está inflamada. Vitória taticamente impecável, dominamos os espaços vazios com maestria.", "Performance avassaladora! O plano de jogo foi executado sem falhas, calando os críticos desta província."];
-            const drawQuotes = ["Clima de neutralidade. Faltou criatividade no terço final do campo para romper o bloqueio.", "Empate amargo. A apatia de transição impediu a consolidação dos três pontos cruciais hoje."];
-            const lossQuotes = ["Protestos ruidosos nos portões do complexo. Exigem reformulação imediata e punição aos displicentes.", "Fomos dominados estrategicamente. Uma humilhação tática que expõe fraturas severas no elenco."];
+            const winQuotes = [
+                "A arquibancada está inflamada. Vitória taticamente impecável!",
+                "Performance avassaladora! O plano foi executado à risca.",
+                "Três pontos vitais na conta. Diretoria respirou aliviada.",
+                "O esquema tático engoliu o adversário hoje. Grande jogo!",
+                "Estádio em festa! O trabalho durante a semana rendeu frutos.",
+                "Vitória maiúscula, consolidando o peso da nossa camisa.",
+                "Um show de eficiência ofensiva. Os investidores adoraram.",
+                "Transições rápidas, compactação perfeita. Dominamos.",
+                "A entrega coletiva foi assustadora hoje. Merecemos.",
+                "Superamos as expectativas. O clima no vestiário é excelente."
+            ];
+            
+            const drawQuotes = [
+                "Clima de neutralidade. Faltou capricho no terço final.",
+                "Empate amargo. A apatia impediu os três pontos cruciais.",
+                "Um ponto fora da curva. Precisamos ser mais incisivos.",
+                "Partida truncada. As defesas sobressaíram sobre os ataques.",
+                "Gosto de frustração. Tivemos a chance de matar o jogo.",
+                "Não fomos letais. O campeonato não perdoa hesitações.",
+                "Faltou aquele algo a mais. O capitão precisava chamar a responsabilidade.",
+                "Ponto tático, mas a torcida esperava um show. Seguimos.",
+                "Equilíbrio absoluto. Um resultado justo pelo que as equipes não criaram.",
+                "Deixamos pontos na mesa. É preciso revisar as instruções técnicas."
+            ];
+            
+            const lossQuotes = [
+                "Protestos no complexo. A torcida exige reformulação já.",
+                "Fomos dominados estrategicamente. Uma humilhação tática.",
+                "Zero pontos e muitas lições. O sistema defensivo ruiu.",
+                "A diretoria convocou reunião extraordinária após o vexame.",
+                "Apáticos, desconectados e lentos. Faltou alma hoje.",
+                "O adversário leu nosso plano de jogo. Fomos previsíveis.",
+                "Vexame em campo. A camisa pesou de forma negativa.",
+                "Desgaste visível. O time sofreu um apagão generalizado.",
+                "Erro coletivo brutal. Não existimos no meio campo.",
+                "Choque de realidade. Precisamos de reforços urgentemente."
+            ];
             
             let fanSay = isWin ? winQuotes[Math.floor(Math.random()*winQuotes.length)] : (isDraw ? drawQuotes[Math.floor(Math.random()*drawQuotes.length)] : lossQuotes[Math.floor(Math.random()*lossQuotes.length)]);
 
             let revenueHTML = userHome 
-                ? `<p style='margin-top:8px;'>🏟️ <strong>Ocupação do Estádio:</strong> ${att.toLocaleString()} torcedores pagantes.<br>💳 <strong>Faturamento de Bilheteria:</strong> +R$ ${cashGained.toLocaleString()}</p>`
-                : `<p style='margin-top:8px; color:var(--text-muted);'>🛫 Jogo executado fora de casa. Sem receitas operacionais de bilheteria.</p>`;
-
-            let html1 = `
-                <div style="text-align:center; margin-bottom:20px;">
-                    <span style="font-size:11px; font-weight:800; color:${statusColor}; border:1px solid ${statusColor}; padding:4px 10px; border-radius:4px;">VEREDITO DA JORNADA</span>
-                    <h2 style="margin-top:15px; border:none; padding:0; font-size:28px;">${myScore} - ${oppScore}</h2>
-                    <p style="color:var(--text-muted)">Contra <strong>${oppName}</strong></p>
-                </div>
-                <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:10px; border:1px solid var(--border-glass); font-size:13px; line-height:1.6;">
-                    <p>📢 <strong>Voz das Arquibancadas:</strong> "${fanSay}"</p>
-                    <hr style="border-color:var(--border-glass); margin:10px 0;">
-                    ${revenueHTML}
-                    <p style="margin-top:6px; color:var(--accent-red);">📉 <strong>Despesa de Custos do Matchday:</strong> -R$ ${calculatePayroll().toLocaleString()}</p>
-                </div>
-                <button class="btn btn-success" style="width:100%; margin-top:20px; padding:14px;" onclick="closeModal()">Analisar Evolução da Tabela ➔</button>
-            `;
-            queueModal(html1);
+                ? `<p style='margin-top:8px;'>🏟️ <strong>Ocupação na Arena:</strong> ${att.toLocaleString()} torcedores pagantes.<br>💳 <strong>Faturamento de Bilheteria:</strong> +R$ ${cashGained.toLocaleString()}</p>`
+                : `<p style='margin-top:8px; color:var(--text-muted);'>🛫 Jogo como Visitante. Operação isenta de faturamento de bilheteria direta.</p>`;
 
             let myDiv = teams.find(t => t.id === userTeamId).division;
             let sortedTeams = teams.filter(t => t.division === myDiv).sort((a,b) => b.points - a.points || b.gd - a.gd || b.gf - a.gf);
             let myPos = sortedTeams.findIndex(t => t.id === userTeamId) + 1;
-
             let rowsHTML = "";
+            
             sortedTeams.forEach((t, idx) => {
                 let rank = idx + 1;
                 let zoneClass = rank <= 2 ? "zone-prom" : (rank >= 7 ? "zone-releg" : "");
@@ -1884,26 +1949,39 @@ function closeTacticalAnalysis() {
                 rowsHTML += `<tr class="${isMe} ${zoneClass}"><td><strong>${rank}</strong></td><td>${t.name}</td><td>${t.points}</td><td>${t.wins}</td><td>${t.gd}</td></tr>`;
             });
 
-            let boardFeedback = myPos <= 2 
-                ? `<span style="color:var(--accent-green)">EXCELENTE: Dentro da zona de promoção (G2). O plano estratégico está gerando dividendos operacionais.</span>`
-                : (myPos >= 7 ? `<span style="color:var(--accent-red)">ALERTA MÁXIMO: Zona de rebaixamento detectada (Z2). Riscos severos de perda de aportes comerciais!</span>` : `<span style="color:var(--accent-warn)">ESTÁVEL: Posição intermediária de tabela. Diretoria exige maior agressividade técnica.</span>`);
+            let boardFeedback = "";
+            if (myPos === 1) boardFeedback = `<span style="color:var(--accent-green)">EXCELENTE: Liderança isolada consolidada. Bônus de cota comercial previstos.</span>`;
+            else if (myPos === 2) boardFeedback = `<span style="color:var(--accent-green)">MUITO BOM: Firme no G2 de acesso. Mantenha a cadência de vitórias.</span>`;
+            else if (myPos >= 3 && myPos <= 4) boardFeedback = `<span style="color:var(--accent-blue)">MODERADO: Na caça do pelotão de frente. A diretoria exige foco na próxima rodada.</span>`;
+            else if (myPos >= 5 && myPos <= 6) boardFeedback = `<span style="color:var(--accent-warn)">ESTÁVEL: Posição de estagnação. Os conselheiros pedem variação tática.</span>`;
+            else if (myPos === 7) boardFeedback = `<span style="color:var(--accent-red)">ALERTA MÁXIMO: Zona de rebaixamento raspando. Risco iminente de perda de patrocínio.</span>`;
+            else boardFeedback = `<span style="color:var(--accent-red)">CRÍTICO: Lanterna divisória detectada. Cargo executivo sob forte ameaça de destituição!</span>`;
 
-            let html2 = `
-                <h3>Classificação Oficial - Série ${String.fromCharCode(64 + myDiv)}</h3>
-                <table style="width:100%; font-size:12px;">
+            let htmlSummary = `
+                <div style="text-align:center; margin-bottom:20px;">
+                    <span style="font-size:11px; font-weight:800; color:${statusColor}; border:1px solid ${statusColor}; padding:4px 10px; border-radius:4px;">RESULTADO FINAL VALIDADO</span>
+                    <h2 style="margin-top:15px; border:none; padding:0; font-size:32px; color:${statusColor}">${myScore} - ${oppScore}</h2>
+                </div>
+                <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:10px; border:1px solid var(--border-glass); font-size:13px; line-height:1.6;">
+                    <p>📢 <strong>Voz Oficial dos "${identity.nickname}":</strong> "${fanSay}"</p>
+                    <hr style="border-color:var(--border-glass); margin:10px 0;">
+                    ${revenueHTML}
+                    <p style="margin-top:6px; color:var(--accent-red);">📉 <strong>Despesa Contábil Operacional:</strong> -R$ ${calculatePayroll().toLocaleString()}</p>
+                </div>
+                
+                <h3 style="margin-top:20px; font-size:15px;">Atualização: Tabela Série ${String.fromCharCode(64 + myDiv)}</h3>
+                <table style="width:100%; font-size:12px; margin-top:10px;">
                     <thead><tr><th>Pos</th><th>Clube</th><th>P</th><th>V</th><th>GD</th></tr></thead>
                     <tbody>${rowsHTML}</tbody>
                 </table>
-                <div style="margin-top:20px; background:rgba(0,0,0,0.3); padding:15px; border-radius:10px; border:1px solid var(--border-glass); font-size:13px;">
-                    <strong>Relatório de Métricas da Diretoria:</strong>
-                    <p style="margin-top:6px; line-height:1.5;">${boardFeedback}</p>
+                <div style="margin-top:15px; background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; border:1px solid var(--border-glass); font-size:12px;">
+                    <strong>Ofício da Diretoria Executiva:</strong><br><br>${boardFeedback}
                 </div>
-                <button class="btn" style="width:100%; margin-top:20px; padding:14px; border-color:var(--accent-blue)" onclick="closeModal()">Retornar ao Painel Operacional</button>
+                <button class="btn" style="width:100%; margin-top:20px; padding:14px; border-color:var(--accent-blue)" onclick="closeModal()">Sair para o Painel Operacional</button>
             `;
-            queueModal(html2);
+            queueModal(htmlSummary);
         }
 
-        // REQ 4 & 9: TRANSIÇÃO DE TEMPORADA COM CURVA BIOLÓGICA DE IDADE E APOSENTADORIA
         function triggerEndOfSeasonModal() {
             let myDiv = teams.find(t => t.id === userTeamId).division;
             let sortedTeams = teams.filter(t => t.division === myDiv).sort((a,b) => b.points - a.points || b.gd - a.gd || b.gf - a.gf);
@@ -1914,7 +1992,7 @@ function closeTacticalAnalysis() {
             if (myPos <= 2) {
                 if (myDiv > 1) {
                     nextDiv = myDiv - 1;
-                    message = `🚀 <strong>PROMOÇÃO ASSEGURADA!</strong> Sua liderança corporativa garantiu o acesso para a Série ${String.fromCharCode(64 + nextDiv)}. O conselho aprovou bônus de R$ 4.000.000.`;
+                    message = `🚀 <strong>PROMOÇÃO ASSEGURADA!</strong> Sua liderança garantiu o acesso para a Série ${String.fromCharCode(64 + nextDiv)}. O conselho aprovou bônus de R$ 4.000.000.`;
                     finances.cash += 4000000;
                 } else {
                     message = `🏆 <strong>SOBERANIA SUPREMA!</strong> Você manteve o clube no topo da elite (Série A). Injeção macroeconômica de R$ 8.000.000 efetuada.`;
@@ -1926,7 +2004,7 @@ function closeTacticalAnalysis() {
                     message = `📉 <strong>DEGRADAÇÃO OPERACIONAL.</strong> O clube foi rebaixado para a Série ${String.fromCharCode(64 + nextDiv)}. Perda de investidores custou multa de R$ 2.000.000.`;
                     finances.cash = Math.max(0, finances.cash - 2000000);
                 } else {
-                    message = `🚨 <strong>FRACASSO PARALISANTE.</strong> Lanterna da última divisão. Conselho executou intervenção judicial para manutenção básica do CNPJ.`;
+                    message = `🚨 <strong>FRACASSO PARALISANTE.</strong> Lanterna da última divisão. Conselho executou intervenção judicial para manutenção.`;
                 }
             } else {
                 message = `⚖️ <strong>MANUTENÇÃO DE DIRETRIZ.</strong> Permanência estável na Série ${String.fromCharCode(64 + myDiv)}. Ajuste o orçamento para o novo ano comercial.`;
@@ -1934,41 +2012,32 @@ function closeTacticalAnalysis() {
 
             teams.find(t => t.id === userTeamId).division = nextDiv;
 
-            // Lógica Biológica de Mudança de Idade e Atributos entre Temporadas (REQ 4)
-            let evolutionLogs = "";
             let retiredList = [];
-
             squad.forEach(p => {
                 p.age++;
                 let attChange = 0; let defChange = 0;
-                
-                if (p.age <= 22) { // Crescimento ultra rápido
-                    attChange = Math.floor(Math.random() * 4) + 2;
-                    defChange = Math.floor(Math.random() * 4) + 2;
-                } else if (p.age <= 29) { // Flutuação natural equilibrada
-                    attChange = Math.floor(Math.random() * 4) - 1;
-                    defChange = Math.floor(Math.random() * 4) - 1;
-                } else { // Queda acentuada em idades elevadas
-                    attChange = -(Math.floor(Math.random() * 4) + 1);
-                    defChange = -(Math.floor(Math.random() * 4) + 1);
+                if (p.age <= 22) {
+                    attChange = Math.floor(Math.random() * 4) + 2; defChange = Math.floor(Math.random() * 4) + 2;
+                } else if (p.age <= 29) { 
+                    attChange = Math.floor(Math.random() * 4) - 1; defChange = Math.floor(Math.random() * 4) - 1;
+                } else { 
+                    attChange = -(Math.floor(Math.random() * 4) + 1); defChange = -(Math.floor(Math.random() * 4) + 1);
                 }
 
                 p.attack = Math.max(10, Math.min(99, p.attack + attChange));
                 p.defense = Math.max(10, Math.min(99, p.defense + defChange));
                 p.value = calculatePlayerValue(p);
 
-                // Regra estrita de aposentadoria
                 if (p.age > 30 && Math.max(p.attack, p.defense) < 60) {
                     retiredList.push(p);
                 }
             });
 
-            // Expulsar aposentados do array principal do elenco
             squad = squad.filter(p => !retiredList.includes(p));
             teamRoles = normalizeTeamRoles(teamRoles);
 
             let retiredHTML = retiredList.length > 0 
-                ? `<p style="color:var(--accent-red); margin-top:8px;">⚠️ <strong>Aposentadorias Confirmadas (${retiredList.length}):</strong> ${retiredList.map(p => p.name + " (" + p.age + " anos)").join(', ')} deixaram o futebol profissional devido à decadência técnica.</p>`
+                ? `<p style="color:var(--accent-red); margin-top:8px;">⚠️ <strong>Aposentadorias (${retiredList.length}):</strong> ${retiredList.map(p => p.name).join(', ')} encerraram a carreira pelo declínio técnico.</p>`
                 : `<p style="color:var(--accent-green); margin-top:8px;">✓ Nenhum atleta ativou a cláusula de aposentadoria compulsória neste ciclo.</p>`;
 
             let html = `
@@ -1977,11 +2046,11 @@ function closeTacticalAnalysis() {
                     <p style="font-size:16px; margin-bottom:12px;">${message}</p>
                     <hr style="border-color:var(--border-glass); margin:12px 0;">
                     <h4>Auditoria Biológica do Plantel (Envelhecimento):</h4>
-                    <p style="color:var(--text-muted); font-size:12px;">Todos os atletas envelheceram 1 ano. Promessas evoluíram de nível e veteranos sofreram declínio físico sistêmico.</p>
+                    <p style="color:var(--text-muted); font-size:12px;">Todos os atletas envelheceram 1 ano. Promessas evoluíram e veteranos sofreram declínio físico sistêmico.</p>
                     ${retiredHTML}
-                    <p style="margin-top:10px;">Nova categoria operacional ativa: <strong>Série ${String.fromCharCode(64 + nextDiv)}</strong></p>
+                    <p style="margin-top:10px;">Nova categoria ativa: <strong>Série ${String.fromCharCode(64 + nextDiv)}</strong></p>
                 </div>
-                <button class="btn btn-success" style="width:100%; margin-top:25px; padding:16px; font-size:15px;" onclick="executeSeasonTransition(${nextDiv})">Garantir Transição de Temporada e Virar o Ano Ano ➔</button>
+                <button class="btn btn-success" style="width:100%; margin-top:25px; padding:16px; font-size:15px;" onclick="executeSeasonTransition(${nextDiv})">Garantir Transição de Temporada ➔</button>
             `;
             queueModal(html);
         }
@@ -2009,11 +2078,11 @@ function closeTacticalAnalysis() {
             
             squad.forEach(p => p.stamina = 100);
             teamRoles = normalizeTeamRoles(teamRoles);
-            // Repor elenco emergencialmente caso aposentadorias quebrem o time abaixo de 11 jogadores
+            
             while(squad.length < 11) {
                 squad.push(createProceduralPlayer(null, 'modesto'));
             }
-            autoFillLineup();
+            autoFillLineup(true);
 
             closeModal();
             saveGame();
@@ -2022,64 +2091,49 @@ function closeTacticalAnalysis() {
         }
 
         function initFormationUI() {
-    const famSelect = document.getElementById('family-selector');
-    if(!famSelect) return;
-    
-    let currentFamily = '4-4-2';
-    for (let fam in formationFamilies) {
-        if (formationFamilies[fam].includes(currentFormation)) {
-            currentFamily = fam;
-            break;
+            const famSelect = document.getElementById('family-selector');
+            if(!famSelect) return;
+            
+            let currentFamily = '4-4-2';
+            for (let fam in formationFamilies) {
+                if (formationFamilies[fam].includes(currentFormation)) { currentFamily = fam; break; }
+            }
+
+            if (famSelect.options.length === 0) {
+                for (let fam in formationFamilies) {
+                    let isSelected = (fam === currentFamily) ? "selected" : "";
+                    famSelect.innerHTML += `<option value="${fam}" ${isSelected}>${fam}</option>`;
+                }
+            } else {
+                famSelect.value = currentFamily;
+            }
+            updateFormationOptions(currentFamily, false);
         }
-    }
 
-    if (famSelect.options.length === 0) {
-        for (let fam in formationFamilies) {
-            let isSelected = (fam === currentFamily) ? "selected" : "";
-            famSelect.innerHTML += `<option value="${fam}" ${isSelected}>${fam}</option>`;
+        function updateFormationOptions(family, isUserInteraction = true) {
+            const formSelect = document.getElementById('formation-selector');
+            if(!formSelect) return;
+            formSelect.innerHTML = "";
+            formationFamilies[family].forEach(form => {
+                let isSelected = (form === currentFormation) ? "selected" : "";
+                formSelect.innerHTML += `<option value="${form}" ${isSelected}>${form}</option>`;
+            });
+            if (isUserInteraction) changeFormation(formationFamilies[family][0]);
         }
-    } else {
-        famSelect.value = currentFamily;
-    }
-
-    updateFormationOptions(currentFamily, false);
-}
-
-function updateFormationOptions(family, isUserInteraction = true) {
-    const formSelect = document.getElementById('formation-selector');
-    if(!formSelect) return;
-
-    formSelect.innerHTML = "";
-    formationFamilies[family].forEach(form => {
-        let isSelected = (form === currentFormation) ? "selected" : "";
-        formSelect.innerHTML += `<option value="${form}" ${isSelected}>${form}</option>`;
-    });
-
-    if (isUserInteraction) {
-        changeFormation(formationFamilies[family][0]);
-    }
-}
 
         function autoEscalar() {
             let config = formationsConfig[currentFormation];
             let bestLineup = null;
             let bestScore = -Infinity;
 
-            // Run greedy allocation 100 times with different slot orderings
             for (let iter = 0; iter < 100; iter++) {
-                // Create a randomized order of slots for this iteration
                 const allSlots = [];
                 for (let i = 0; i < 11; i++) allSlots.push(i);
-                // Fisher-Yates shuffle
                 for (let i = allSlots.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [allSlots[i], allSlots[j]] = [allSlots[j], allSlots[i]];
                 }
-
-                // Run greedy allocation with this order
                 const lineup = tryGreedyAllocation(allSlots, config);
-
-                // Score this lineup using final contribution calculation
                 lineupSlots = lineup;
                 const stats = buildTeamContributionBreakdown();
                 const totalScore = stats.attack + stats.defense;
@@ -2089,12 +2143,9 @@ function updateFormationOptions(family, isUserInteraction = true) {
                     bestLineup = lineup.slice();
                 }
             }
-
-            // Apply best found lineup
             lineupSlots = bestLineup || Array(11).fill(null);
             teamRoles = normalizeTeamRoles(teamRoles);
             updateTacticalAnalysisModal();
-
             saveGame();
             renderTacticalField();
             renderBenchAndRoster();
@@ -2105,22 +2156,15 @@ function updateFormationOptions(family, isUserInteraction = true) {
             let usedIds = new Set();
             const presentSubpos = new Set();
 
-            // Group slots by general position requirement
             let genRequirements = { 'GOL': [], 'DEF': [], 'MEI': [], 'ATA': [] };
-            config.forEach((subPos, idx) => {
-                genRequirements[subposData[subPos].gen].push({ idx, subPos });
-            });
+            config.forEach((subPos, idx) => { genRequirements[subposData[subPos].gen].push({ idx, subPos }); });
 
-            // Process slots in randomized order
             for (let slotIdx of slotOrder) {
                 const subPos = config[slotIdx];
                 const genPos = subposData[subPos].gen;
-
-                // Separate candidates
                 let nativeCandidates = squad.filter(p => p.position === genPos && !usedIds.has(p.id));
                 let nonNativeCandidates = squad.filter(p => p.position !== genPos && !usedIds.has(p.id));
 
-                // Function to score a player for this subposition
                 const scorePlayerForSlot = (player, targetSub, isNative) => {
                     const sData = subposData[targetSub];
                     const penalty = isNative ? 1.0 : 0.60;
@@ -2132,48 +2176,31 @@ function updateFormationOptions(family, isUserInteraction = true) {
                         const setPieceBonus = getSubattributePercentModifier(player.setPieces);
                         realAtt += realAtt * (setPieceBonus / 100);
                     }
-
-                    // Apply heuristic adjustments
                     const provPresent = new Set(presentSubpos);
                     provPresent.add(targetSub);
                     const heur = getHeuristicAdjForSubpos(targetSub, provPresent);
                     const attScale = Math.max(0.01, 1 + heur.attAdj);
                     const defScale = Math.max(0.01, 1 + heur.defAdj);
-                    
                     return (realAtt * penalty * staminaMod * attScale) + (realDef * penalty * staminaMod * defScale);
                 };
 
-                let best = null;
-                let bestScore = -Infinity;
-
-                // Try native candidates first
+                let best = null, bestScore = -Infinity;
                 for (let cand of nativeCandidates) {
                     const score = scorePlayerForSlot(cand, subPos, true);
-                    if (score > bestScore) {
-                        bestScore = score;
-                        best = cand;
-                    }
+                    if (score > bestScore) { bestScore = score; best = cand; }
                 }
-
-                // If no native, try non-natives
                 if (!best) {
                     for (let cand of nonNativeCandidates) {
                         const score = scorePlayerForSlot(cand, subPos, false);
-                        if (score > bestScore) {
-                            bestScore = score;
-                            best = cand;
-                        }
+                        if (score > bestScore) { bestScore = score; best = cand; }
                     }
                 }
-
-                // Assign to lineup
                 if (best) {
                     lineup[slotIdx] = best.id;
                     usedIds.add(best.id);
                     presentSubpos.add(subPos);
                 }
             }
-
             return lineup;
         }
 
@@ -2187,34 +2214,31 @@ function updateFormationOptions(family, isUserInteraction = true) {
             updateTacticalAnalysisModal();
         }
 
-function openSlotSelectorModal(slotIndex) {
-    const requiredSubPos = formationsConfig[currentFormation][slotIndex];
-    const requiredGenPos = subposData[requiredSubPos].gen;
-    
-    let allocatedPlayerIds = lineupSlots.filter((id, idx) => idx !== slotIndex && id !== null);
+        function openSlotSelectorModal(slotIndex) {
+            const requiredSubPos = formationsConfig[currentFormation][slotIndex];
+            const requiredGenPos = subposData[requiredSubPos].gen;
+            let allocatedPlayerIds = lineupSlots.filter((id, idx) => idx !== slotIndex && id !== null);
+            let primaryPlayers = squad.filter(p => p.position === requiredGenPos && !allocatedPlayerIds.includes(p.id));
+            let secondaryPlayers = squad.filter(p => p.position !== requiredGenPos && !allocatedPlayerIds.includes(p.id));
 
-    let primaryPlayers = squad.filter(p => p.position === requiredGenPos && !allocatedPlayerIds.includes(p.id));
-    let secondaryPlayers = squad.filter(p => p.position !== requiredGenPos && !allocatedPlayerIds.includes(p.id));
+            let html = `
+                <h3>Escalar Atleta - Função Tática: ${requiredSubPos}</h3>
+                <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Improvisações fora da macroárea (<strong>${requiredGenPos}</strong>) aplicam penalidade de <strong>-40% no rendimento</strong> do jogador em campo.</p>
+                <h4 style="color:var(--accent-green);">Especialistas Encontrados:</h4>
+                <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px; max-height:160px; overflow-y:auto;">
+                    ${primaryPlayers.map(p => renderPlayerRowForModal(p, slotIndex, false)).join('')}
+                    ${primaryPlayers.length === 0 ? '<p style="font-size:12px; color:var(--text-muted)">Nenhum especialista livre no plantel.</p>' : ''}
+                </div>
+                <h4 style="color:var(--accent-warn); margin-top:15px;">Outras Opções de Improviso:</h4>
+                <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px; max-height:160px; overflow-y:auto;">
+                    ${secondaryPlayers.map(p => renderPlayerRowForModal(p, slotIndex, true)).join('')}
+                </div>
+                <button class="btn btn-danger" style="width:100%; margin-top:20px;" onclick="unassignSlot(${slotIndex})">Esvaziar Slot</button>
+                <button class="btn" style="width:100%; margin-top:8px;" onclick="closeModal()">Cancelar</button>
+            `;
+            showModalContent(html);
+        }
 
-    let html = `
-        <h3>Escalar Atleta - Função Tática: ${requiredSubPos}</h3>
-        <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Improvisações fora da macroárea (<strong>${requiredGenPos}</strong>) aplicam penalidade de <strong>-40% no rendimento</strong> do jogador em campo.</p>
-        
-        <h4 style="color:var(--accent-green);">Especialistas Encontrados:</h4>
-        <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px; max-height:160px; overflow-y:auto;">
-            ${primaryPlayers.map(p => renderPlayerRowForModal(p, slotIndex, false)).join('')}
-            ${primaryPlayers.length === 0 ? '<p style="font-size:12px; color:var(--text-muted)">Nenhum especialista livre no plantel.</p>' : ''}
-        </div>
-
-        <h4 style="color:var(--accent-warn); margin-top:15px;">Outras Opções de Improviso:</h4>
-        <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px; max-height:160px; overflow-y:auto;">
-            ${secondaryPlayers.map(p => renderPlayerRowForModal(p, slotIndex, true)).join('')}
-        </div>
-        <button class="btn btn-danger" style="width:100%; margin-top:20px;" onclick="unassignSlot(${slotIndex})">Esvaziar Slot</button>
-        <button class="btn" style="width:100%; margin-top:8px;" onclick="closeModal()">Cancelar</button>
-    `;
-    showModalContent(html);
-}
         function renderPlayerRowForModal(p, slotIndex, hasPenalty) {
             let penaltyBadge = hasPenalty ? "<span style='color:var(--accent-red); font-weight:bold;'>[Improviso -40%]</span>" : "";
             return `
@@ -2245,93 +2269,54 @@ function openSlotSelectorModal(slotIndex) {
         function renderTacticalField() {
             const container = document.getElementById('tactical-field-dom');
             container.innerHTML = "";
-            
-            // Garante que o campo tático seja o ponto de ancoragem relativo e tenha boa altura operacional
             container.style.position = "relative";
             container.style.minHeight = "540px"; 
 
             const layout = formationsConfig[currentFormation];
-            
-            // 1. Mapeamento analítico de ocorrências para distribuição horizontal simétrica de peças centrais
             const counts = {};
-            layout.forEach(pos => {
-                counts[pos] = (counts[pos] || 0) + 1;
-            });
-
-            // Rastreador dinâmico de índice interno para posições duplicadas/triplicadas
+            layout.forEach(pos => { counts[pos] = (counts[pos] || 0) + 1; });
             const currentIdxOfPos = {};
 
-            // 2. Tabela de Profundidade Vertical Tática (Suavização de Camadas: 0% = Ataque Total, 100% = Linha de Fundo)
             const subposTopMap = {
-                'GOL': 88,  // Goleiro bem recuado na área
-                'ZAG': 73,  // Defesa central profunda
-                'LE':  67,  // Laterais flutuando suavemente adiantados em relação aos zagueiros
-                'LD':  67,
-                'VOL': 54,  // Primeiro combate / Volante de contenção
-                'MC':  41,  // Meio-campo central clássico
-                'ME':  41,  // Meias abertos alinhados horizontalmente com o MC
-                'MD':  41,
-                'MEI': 27,  // Meia-atacante / Conexão ofensiva
-                'F9':  20,  // Elemento surpresa flutuante
-                'PE':  14,  // Extremos ofensivos paralelos à grande área
-                'PD':  14,
-                'ATA': 10   // Centroavante espetado na última linha
+                'GOL': 88, 'ZAG': 73, 'LE': 67, 'LD': 67, 'VOL': 54, 
+                'MC': 41, 'ME': 41, 'MD': 41, 'MEI': 27, 'F9': 20, 
+                'PE': 14, 'PD': 14, 'ATA': 10
             };
 
-            // Precompute contribution stats to get per-slot vertical bias
             const statsForRender = buildTeamContributionBreakdown();
 
-            // 3. Processamento individual e plotagem dos 11 slots táticos
             layout.forEach((subPosName, idx) => {
-                if (!currentIdxOfPos[subPosName]) {
-                    currentIdxOfPos[subPosName] = 0;
-                }
+                if (!currentIdxOfPos[subPosName]) currentIdxOfPos[subPosName] = 0;
                 const occurrenceIdx = currentIdxOfPos[subPosName];
                 currentIdxOfPos[subPosName]++;
 
-                // Definição da coordenada Vertical (Y)
                 let topPercent = subposTopMap[subPosName] !== undefined ? subposTopMap[subPosName] : 41;
-                // Apply visual vertical translation based on heuristic bias for this slot
                 const biasEntry = (statsForRender && statsForRender.contributions && statsForRender.contributions[idx]) || null;
                 const bias = biasEntry ? (biasEntry.verticalBias || 0) : 0;
-                // positive bias => more attacking => shift up (smaller top percent)
-                const shift = -bias * 8; // scale factor => ~8% per unit of bias
+                const shift = -bias * 8; 
                 topPercent = Math.max(4, Math.min(92, topPercent + shift));
 
-                // Definição da coordenada Horizontal (X) aplicando o Fator de Lateralidade Amplo
-                let leftPercent = 50; // Padrão centralizado absoluto
-
-                if (subPosName === 'ME' || subPosName === 'PE') {
-                    leftPercent = 15; // Força ancoragem total na ala esquerda do campo
-                } else if (subPosName === 'MD' || subPosName === 'PD') {
-                    leftPercent = 85; // Força ancoragem total na ala direita do campo
-                  
-                } else if (subPosName === 'LE') { leftPercent = 10;}
-                else if (subPosName === 'LD') { leftPercent = 90;}
+                let leftPercent = 50; 
+                if (subPosName === 'ME' || subPosName === 'PE') leftPercent = 15; 
+                else if (subPosName === 'MD' || subPosName === 'PD') leftPercent = 85; 
+                else if (subPosName === 'LE') leftPercent = 10;
+                else if (subPosName === 'LD') leftPercent = 90;
                 else {
-                    // Algoritmo de dispersão para eixos centrais múltiplos (Zagueiros duplos/trios, MCs, ATAs)
                     const totalMatches = counts[subPosName];
-                    if (totalMatches === 2) {
-                        // Divisão simétrica de duas peças (ex: dois ZAGs ou dois ATAs)
-                        leftPercent = (occurrenceIdx === 0) ? 34 : 66;
-                    } else if (totalMatches === 3) {
-                        // Divisão harmônica de três peças (ex: três zagueiros da linha de 5 ou 3-4-3)
+                    if (totalMatches === 2) leftPercent = (occurrenceIdx === 0) ? 34 : 66;
+                    else if (totalMatches === 3) {
                         if (occurrenceIdx === 0) leftPercent = 26;
                         else if (occurrenceIdx === 1) leftPercent = 50;
                         else leftPercent = 74;
                     } else if (totalMatches === 4) {
-                        // Salvaguarda estrutural para linhas com 4 elementos idênticos
                         if (occurrenceIdx === 0) leftPercent = 20;
                         else if (occurrenceIdx === 1) leftPercent = 40;
                         else if (occurrenceIdx === 2) leftPercent = 60;
                         else leftPercent = 80;
                     }
-                    updateTacticalAnalysisModal();
                 }
 
-                // Construção de estilos CSS in-line para posicionamento absoluto milimétrico
                 const positionStyle = `position: absolute; top: ${topPercent}%; left: ${leftPercent}%; transform: translate(-50%, -50%); width: 88px; min-height: 94px; margin: 0; box-sizing: border-box; z-index: 10;`;
-
                 const pId = lineupSlots[idx];
                 const p = squad.find(x => x.id === pId);
 
@@ -2347,39 +2332,26 @@ function openSlotSelectorModal(slotIndex) {
 
                     const captainBadge = teamRoles.captain === p.id ? '<div style="position:absolute; top:4px; right:4px; display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:999px; background:rgba(0, 210, 255, 0.18); color:var(--accent-blue); font-size:8px; font-weight:800;">C</div>' : '';
                     const setPieceBadge = teamRoles.setPieceTaker === p.id ? '<div style="position:absolute; top:4px; left:4px; display:inline-flex; align-items:center; justify-content:center; width:20px; height:16px; border-radius:999px; background:rgba(0, 255, 136, 0.18); color:var(--accent-green); font-size:8px; font-weight:800;">BP</div>' : '';
-                    const subattributeBadges = `
-                        <div style="display:flex; gap:4px; margin-top:4px; flex-wrap:wrap; justify-content:center;">
-                            <span style="font-size:8px; padding:1px 4px; border-radius:999px; background:rgba(255,255,255,0.08); color:var(--accent-blue);">L:${p.leadership || 60}</span>
-                            <span style="font-size:8px; padding:1px 4px; border-radius:999px; background:rgba(255,255,255,0.08); color:var(--accent-green);">BP:${p.setPieces || 60}</span>
-                        </div>`;
+                    
                     container.innerHTML += `
                         <div class="tactical-slot filled" style="${positionStyle} ${borderStyle} padding:8px 6px; height:auto; position:absolute;" onclick="openPlayerRoleModal(${p.id}, ${idx})">
                             <div style="position:relative; display:flex; flex-direction:column; align-items:center; width:100%; min-height:90px;">
                                 ${captainBadge}${setPieceBadge}
-                                <div style="font-size:9px; color:var(--text-muted); font-weight:800; margin-top:8px;">
-                                    ${subPosName}
+                                <div style="font-size:9px; color:var(--text-muted); font-weight:800; margin-top:8px;">${subPosName}</div>
+                                <div style="font-size:10px; font-weight:600; line-height:1.1; margin-top:6px; padding:0 2px; text-align:center; overflow-wrap:anywhere; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${p.name}</div>
+                                <div style="display:flex; gap:4px; margin-top:4px; flex-wrap:wrap; justify-content:center;">
+                                    <span style="font-size:8px; padding:1px 4px; border-radius:999px; background:rgba(255,255,255,0.08); color:var(--accent-blue);">L:${p.leadership}</span>
+                                    <span style="font-size:8px; padding:1px 4px; border-radius:999px; background:rgba(255,255,255,0.08); color:var(--accent-green);">BP:${p.setPieces}</span>
                                 </div>
-                                <div style="font-size:10px; font-weight:600; line-height:1.1; margin-top:6px; padding:0 2px; text-align:center; overflow-wrap:anywhere; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
-                                    ${p.name}
-                                </div>
-                                ${subattributeBadges}
-                                <div style="font-size:9px; color:var(--accent-blue); margin-top:2px;">
-                                    A${p.attack} | D${p.defense}
-                                </div>
-                                <div style="font-size:9px; color:${stamColor}; font-weight:bold; margin-top:2px;">
-                                    ${p.stamina}% ENG
-                                </div>
+                                <div style="font-size:9px; color:var(--accent-blue); margin-top:2px;">A${p.attack} | D${p.defense}</div>
+                                <div style="font-size:9px; color:${stamColor}; font-weight:bold; margin-top:2px;">${p.stamina}% ENG</div>
                             </div>
                         </div>`;
                 } else {
                     container.innerHTML += `
                         <div class="tactical-slot" style="${positionStyle}" onclick="openSlotSelectorModal(${idx})">
-                            <div style="font-size:10px; color:var(--text-muted)">
-                                + ${subPosName}
-                            </div>
-                            <div style="font-size:9px; color:var(--accent-red)">
-                                Vazio
-                            </div>
+                            <div style="font-size:10px; color:var(--text-muted)">+ ${subPosName}</div>
+                            <div style="font-size:9px; color:var(--accent-red)">Vazio</div>
                         </div>`;
                 }
             });
@@ -2429,7 +2401,7 @@ function openSlotSelectorModal(slotIndex) {
             if(pIndex === -1) return;
             let p = squad[pIndex];
             
-            if(squad.length <= 11) {
+            if(squad.length - 1 < 11) {
                 alert("Bloqueio de Elenco: Você necessita de no mínimo 11 atletas para não sofrer W.O. institucional.");
                 return;
             }
@@ -2441,7 +2413,6 @@ function openSlotSelectorModal(slotIndex) {
             saveGame(); renderAll();
         }
 
-        // REQ 6: SISTEMA INTERATIVO DE TREINAMENTO CIENTÍFICO
         function openTrainingSelector(slotIndex) {
             if(hasTrainedThisRound) {
                 alert("Os treinos desta rodada já foram finalizados e aplicados.");
@@ -2456,8 +2427,7 @@ function openSlotSelectorModal(slotIndex) {
                 const checked = trainingSelectorFilters.positions.has(pos) ? 'checked' : '';
                 return `<label style="font-size:11px; margin-right:8px;"><input type="checkbox" ${checked} onchange="toggleTrainingFilter('${pos}')"> ${pos}</label>`;
             }).join('');
-            const starterChecked = trainingSelectorFilters.starter ? 'checked' : '';
-            const reserveChecked = trainingSelectorFilters.reserve ? 'checked' : '';
+            
             const panelDisplay = trainingSelectorFilters.showPanel ? 'block' : 'none';
 
             let html = `
@@ -2469,77 +2439,71 @@ function openSlotSelectorModal(slotIndex) {
                     <button class="btn" style="height:36px; white-space:nowrap;" onclick="toggleTrainingFilterPanel()">Filtros</button>
                 </div>
                 <div id="training-filter-panel" style="display:${panelDisplay}; background:rgba(255,255,255,0.05); border:1px solid var(--border-glass); border-radius:10px; padding:14px; margin-top:12px;">
-                    <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:12px;">
-                        ${positionFilters}
-                    </div>
+                    <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:12px;">${positionFilters}</div>
                     <div style="display:flex; flex-wrap:wrap; gap:12px; margin-bottom:12px; font-size:11px;">
-                        <label><input type="checkbox" ${starterChecked} onchange="toggleTrainingFilter('starter')"> Titulares</label>
-                        <label><input type="checkbox" ${reserveChecked} onchange="toggleTrainingFilter('reserve')"> Reservas</label>
+                        <label><input type="checkbox" ${trainingSelectorFilters.starter ? 'checked' : ''} onchange="toggleTrainingFilter('starter')"> Titulares</label>
+                        <label><input type="checkbox" ${trainingSelectorFilters.reserve ? 'checked' : ''} onchange="toggleTrainingFilter('reserve')"> Reservas</label>
                     </div>
                     <div style="display:grid; grid-template-columns:repeat(2, minmax(140px, 1fr)); gap:12px; font-size:11px; margin-bottom:12px;">
                         <label style="display:flex; flex-direction:column; gap:4px;">Idade Mín.
-                            <input id="training-filter-minAge" type="number" min="15" max="60" value="${trainingSelectorFilters.minAge}" style="padding:6px; border-radius:8px; border:1px solid var(--border-glass); background:rgba(255,255,255,0.05); color:var(--text-main);" onchange="updateTrainingNumericFilter('minAge', this.value)">
+                            <input type="number" min="15" max="60" value="${trainingSelectorFilters.minAge}" style="padding:6px; border-radius:8px; border:1px solid var(--border-glass); background:rgba(255,255,255,0.05); color:var(--text-main);" onchange="updateTrainingNumericFilter('minAge', this.value)">
                         </label>
                         <label style="display:flex; flex-direction:column; gap:4px;">Idade Máx.
-                            <input id="training-filter-maxAge" type="number" min="15" max="60" value="${trainingSelectorFilters.maxAge}" style="padding:6px; border-radius:8px; border:1px solid var(--border-glass); background:rgba(255,255,255,0.05); color:var(--text-main);" onchange="updateTrainingNumericFilter('maxAge', this.value)">
+                            <input type="number" min="15" max="60" value="${trainingSelectorFilters.maxAge}" style="padding:6px; border-radius:8px; border:1px solid var(--border-glass); background:rgba(255,255,255,0.05); color:var(--text-main);" onchange="updateTrainingNumericFilter('maxAge', this.value)">
                         </label>
                         <label style="display:flex; flex-direction:column; gap:4px;">Estamina Mín.
-                            <input id="training-filter-minStamina" type="number" min="0" max="100" value="${trainingSelectorFilters.minStamina}" style="padding:6px; border-radius:8px; border:1px solid var(--border-glass); background:rgba(255,255,255,0.05); color:var(--text-main);" onchange="updateTrainingNumericFilter('minStamina', this.value)">
+                            <input type="number" min="0" max="100" value="${trainingSelectorFilters.minStamina}" style="padding:6px; border-radius:8px; border:1px solid var(--border-glass); background:rgba(255,255,255,0.05); color:var(--text-main);" onchange="updateTrainingNumericFilter('minStamina', this.value)">
                         </label>
                         <label style="display:flex; flex-direction:column; gap:4px;">Estamina Máx.
-                            <input id="training-filter-maxStamina" type="number" min="0" max="100" value="${trainingSelectorFilters.maxStamina}" style="padding:6px; border-radius:8px; border:1px solid var(--border-glass); background:rgba(255,255,255,0.05); color:var(--text-main);" onchange="updateTrainingNumericFilter('maxStamina', this.value)">
+                            <input type="number" min="0" max="100" value="${trainingSelectorFilters.maxStamina}" style="padding:6px; border-radius:8px; border:1px solid var(--border-glass); background:rgba(255,255,255,0.05); color:var(--text-main);" onchange="updateTrainingNumericFilter('maxStamina', this.value)">
                         </label>
                     </div>
                     <button class="btn" style="margin-top:0; width:100%; font-size:11px; padding:8px;" onclick="resetTrainingFilters()">Resetar Filtros</button>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:8px; max-height:260px; overflow-y:auto; margin-top:16px;">
-${sortedPlayers.map(p => {
-    let isTitular = lineupSlots.includes(p.id);
-    let statusBadge = isTitular ? '<span style="color:var(--accent-green); font-size:11px; font-weight:600;">[Titular]</span>' : '<span style="font-size:11px; color:var(--text-muted);">[Reserva]</span>';
-    return `
-    <div style="background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border:1px solid var(--border-glass); display:flex; justify-content:space-between; align-items:center;">
-        <div>
-            <strong>${p.name}</strong> ${statusBadge} (${p.age} anos) - <span style="color:var(--accent-blue)">${p.position}</span><br>
-            <span style="font-size:11px; color:var(--text-muted)">ATK: ${p.attack} | DEF: ${p.defense} | Energia: ${p.stamina}%</span>
-        </div>
-        <div style="display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end;">
-            <button class="btn" style="padding:4px 8px; font-size:11px; background:rgba(0,210,255,0.2);" onclick="assignPlayerToTraining(${p.id}, ${slotIndex}, 'ofensivo')">Ofensivo</button>
-            <button class="btn" style="padding:4px 8px; font-size:11px; background:rgba(0,255,136,0.2);" onclick="assignPlayerToTraining(${p.id}, ${slotIndex}, 'defensivo')">Defensivo</button>
-            <button class="btn" style="padding:4px 8px; font-size:11px; background:rgba(255,183,3,0.2);" onclick="assignPlayerToTraining(${p.id}, ${slotIndex}, 'misto')">Misto</button>
-        </div>
-    </div>
-`}).join('')}
+                    ${sortedPlayers.map(p => {
+                        let isTitular = lineupSlots.includes(p.id);
+                        let statusBadge = isTitular ? '<span style="color:var(--accent-green); font-size:11px; font-weight:600;">[Titular]</span>' : '<span style="font-size:11px; color:var(--text-muted);">[Reserva]</span>';
+                        return `
+                        <div style="background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border:1px solid var(--border-glass); display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <strong>${p.name}</strong> ${statusBadge} (${p.age} anos) - <span style="color:var(--accent-blue)">${p.position}</span><br>
+                                <span style="font-size:11px; color:var(--text-muted)">ATK: ${p.attack} | DEF: ${p.defense} | Energia: ${p.stamina}%</span>
+                            </div>
+                            <div style="display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end;">
+                                <button class="btn" style="padding:4px 8px; font-size:11px; background:rgba(0,210,255,0.2);" onclick="assignPlayerToTraining(${p.id}, ${slotIndex}, 'ofensivo')">Ofensivo</button>
+                                <button class="btn" style="padding:4px 8px; font-size:11px; background:rgba(0,255,136,0.2);" onclick="assignPlayerToTraining(${p.id}, ${slotIndex}, 'defensivo')">Defensivo</button>
+                                <button class="btn" style="padding:4px 8px; font-size:11px; background:rgba(255,183,3,0.2);" onclick="assignPlayerToTraining(${p.id}, ${slotIndex}, 'misto')">Misto</button>
+                            </div>
+                        </div>`}).join('')}
                     ${sortedPlayers.length === 0 ? '<p style="font-size:12px; color:var(--text-muted);">Nenhum atleta elegível com os filtros aplicados.</p>' : ''}
                 </div>
                 <button class="btn btn-danger" style="width:100%; margin-top:15px;" onclick="clearTrainingSlot(${slotIndex})">Desocupar Slot</button>
                 <button class="btn" style="width:100%; margin-top:6px;" onclick="closeModal()">Fechar</button>
             `;
-            if (isModalActive) {
-                showModalContent(html);
-            } else {
-                queueModal(html);
-            }
+            if (isModalActive) showModalContent(html); else queueModal(html);
         }
 
         function assignPlayerToTraining(playerId, slotIndex, type) {
             trainingSlots[slotIndex] = { playerId, type };
-            closeModal();
-            renderTrainingView();
+            closeModal(); renderTrainingView();
         }
 
         function clearTrainingSlot(slotIndex) {
             trainingSlots[slotIndex] = null;
-            closeModal();
-            renderTrainingView();
+            closeModal(); renderTrainingView();
         }
 
         function renderTrainingView() {
-            document.getElementById('btn-run-training').disabled = hasTrainedThisRound;
-            if(hasTrainedThisRound) document.getElementById('btn-run-training').style.opacity = '0.4';
-            else document.getElementById('btn-run-training').style.opacity = '1';
+            const btn = document.getElementById('btn-run-training');
+            if (btn) {
+                btn.disabled = hasTrainedThisRound;
+                btn.style.opacity = hasTrainedThisRound ? '0.4' : '1';
+            }
 
             for(let i=0; i<3; i++) {
                 let box = document.getElementById(`t-slot-${i}`);
+                if (!box) continue;
                 let slot = trainingSlots[i];
                 if(slot) {
                     let p = squad.find(x => x.id === slot.playerId);
@@ -2563,10 +2527,9 @@ ${sortedPlayers.map(p => {
                 if(!p) return;
 
                 executed = true;
-                // Taxas de absorção baseadas na curva de idade (jovens evoluem com muito mais facilidade)
                 let baseChance = Math.max(0.2, 0.85 - (p.age - 17) * 0.04);
                 let multiplier = staff.specialist ? 1.5 : 1.0;
-                let successChance = Math.min(1.0, baseChance * multiplier); // Limita em 100%
+                let successChance = Math.min(1.0, baseChance * multiplier); 
                 let atkUp = 0; let defUp = 0;
 
                 if (slot.type === 'ofensivo') {
@@ -2575,7 +2538,7 @@ ${sortedPlayers.map(p => {
                 } else if (slot.type === 'defensivo') {
                     p.stamina = Math.max(0, p.stamina - 25);
                     if(Math.random() < successChance) defUp = Math.floor(Math.random() * 2) + 1;
-                } else { // Misto
+                } else {
                     p.stamina = Math.max(0, p.stamina - 35);
                     if(Math.random() < successChance * 0.7) atkUp = 1;
                     if(Math.random() < successChance * 0.7) defUp = 1;
@@ -2601,17 +2564,15 @@ ${sortedPlayers.map(p => {
             saveGame();
             renderAll();
 
-            let modalHtml = `
+            queueModal(`
                 <h3>Centro de Desenvolvimento Científico</h3>
                 <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:10px; border:1px solid var(--border-glass); font-size:13px; line-height:1.6; margin-top:15px;">
                     ${reportText}
                 </div>
                 <button class="btn btn-success" style="width:100%; margin-top:15px;" onclick="closeModal()">Confirmar Relatórios</button>
-            `;
-            queueModal(modalHtml);
+            `);
         }
 
-        // REQ 5: OPÇÃO DE EXPANDIR ESTÁDIO E COMISSÃO
         function upgradeStadium() {
             let cost = 4000000;
             if(finances.cash < cost) {
@@ -2625,18 +2586,10 @@ ${sortedPlayers.map(p => {
         }
 
         function hireStaffMember(type, cost) {
-            if (!type || !['coach', 'fitness', 'commercial', 'specialist', 'scout'].includes(type)) {
-                alert("Membro da comissão inválido.");
-                return;
-            }
-            if (staff[type]) {
-                alert("Este membro da comissão já está contratado.");
-                return;
-            }
-            if (finances.cash < cost) {
-                alert("Recursos insuficientes para contratação deste especialista.");
-                return;
-            }
+            if (!type || !['coach', 'fitness', 'commercial', 'specialist', 'scout'].includes(type)) return alert("Membro da comissão inválido.");
+            if (staff[type]) return alert("Este membro da comissão já está contratado.");
+            if (finances.cash < cost) return alert("Recursos insuficientes para contratação deste especialista.");
+            
             finances.cash -= cost;
             staff[type] = true;
             logConsole(`Recrutamento Executado: Integrante da comissão [${type.toUpperCase()}] acoplado à folha.`);
@@ -2669,14 +2622,9 @@ ${sortedPlayers.map(p => {
             let p = marketPlayers[marketIdx];
             if (!p) return;
             ensurePlayerSubattributes(p);
-            if (squad.length >= 30) {
-                alert("Teto Máximo Excedido: O limite corporativo é estável em 30 atletas alocados.");
-                return;
-            }
-            if (finances.cash < p.value) {
-                alert("Insolvência Cambial: Créditos insuficientes.");
-                return;
-            }
+            if (squad.length >= 30) return alert("Teto Máximo Excedido: O limite corporativo é estável em 30 atletas alocados.");
+            if (finances.cash < p.value) return alert("Insolvência Cambial: Créditos insuficientes.");
+            
             finances.cash -= p.value;
             squad.push(p);
             marketPlayers.splice(marketIdx, 1);
@@ -2687,18 +2635,52 @@ ${sortedPlayers.map(p => {
         function renderAll() {
             let myTeam = teams.find(t => t.id === userTeamId);
             if(!myTeam) return;
+            const identity = getClubIdentity();
 
-            document.getElementById('hud-club').innerText = myTeam.name;
+            document.getElementById('hud-club').innerText = `${identity.name} (${identity.nickname})`;
             document.getElementById('hud-season').innerText = currentSeason;
             document.getElementById('hud-div').innerText = `Série ${String.fromCharCode(64 + myTeam.division)}`;
             document.getElementById('hud-cash').innerText = `R$ ${finances.cash.toLocaleString()}`;
             document.getElementById('hud-stadium').innerText = `${finances.stadiumCapacity.toLocaleString()} lug.`;
             document.getElementById('hud-round').innerText = `${currentRound}/14`;
 
+            const vibePanel = document.getElementById('club-vibe-banner');
+            if (vibePanel) {
+                vibePanel.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:10px;">
+                        <div style="display:flex; gap:15px; align-items:center;">
+                            <div style="width:50px; height:50px; border-radius:12px; background:rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center;">${buildClubLogoSvg(identity)}</div>
+                            <div>
+                                <div style="font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent-blue)">Identidade do Clube</div>
+                                <div style="font-weight:700; margin-top:4px; font-size:18px;">${identity.name}</div>
+                            </div>
+                        </div>
+                        <div style="font-size:11px; color:var(--text-muted); text-align:right;">
+                            <strong>${identity.nickname}</strong><br><em>“${identity.slogan}”</em>
+                        </div>
+                    </div>
+                    <div style="font-size:12px; color:var(--text-muted); line-height:1.5; margin-top:8px;">🏟️ ${identity.stadiumName} · 🎵 “${identity.chant}”</div>
+                `;
+            }
+
+            const financeIdentity = document.getElementById('finance-identity-card');
+            if (financeIdentity) {
+                financeIdentity.innerHTML = `
+                    <div style="display:flex; gap:12px; align-items:center; margin-bottom:8px;">
+                        <div style="width:44px; height:44px; border-radius:12px; background:rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center;">${buildClubLogoSvg(identity)}</div>
+                        <div>
+                            <div style="font-weight:700;">${identity.name}</div>
+                            <div style="font-size:11px; color:var(--text-muted);">${identity.nickname} · ${identity.stadiumName}</div>
+                        </div>
+                    </div>
+                    <div style="font-size:12px; color:var(--text-muted); line-height:1.5; font-style:italic;">“${identity.slogan}”</div>
+                `;
+            }
+
             let roundFixtures = fixtures.filter(f => f.division === myTeam.division && f.round === currentRound);
             let myMatch = roundFixtures.find(f => f.homeId === userTeamId || f.awayId === userTeamId);
-            
             const nextMatchDiv = document.getElementById('next-match-details');
+            
             if (myMatch) {
                 let isHome = myMatch.homeId === userTeamId;
                 let opponent = teams.find(t => t.id === (isHome ? myMatch.awayId : myMatch.homeId));
@@ -2713,7 +2695,8 @@ ${sortedPlayers.map(p => {
             }
 
             let sortedTeams = teams.filter(t => t.division === myTeam.division).sort((a,b) => b.points - a.points || b.gd - a.gd || b.gf - a.gf);
-            const tbody = document.querySelector('#dashboard-table tbody'); tbody.innerHTML = "";
+            const tbody = document.querySelector('#dashboard-table tbody'); 
+            tbody.innerHTML = "";
             sortedTeams.forEach((t, idx) => {
                 let rank = idx + 1;
                 let zoneClass = rank <= 2 ? "zone-prom" : (rank >= 7 ? "zone-releg" : "");
@@ -2725,20 +2708,19 @@ ${sortedPlayers.map(p => {
             document.getElementById('fin-payroll').innerText = `R$ ${calculatePayroll().toLocaleString()}`;
             document.getElementById('fin-stadium-cap').innerText = finances.stadiumCapacity.toLocaleString();
             
-['coach', 'fitness', 'commercial', 'specialist', 'scout'].forEach(type => {
-    let btn = document.getElementById(`hire-${type}`);
-    if (staff[type] && btn) { btn.innerText = "Contratado / Ativo"; btn.disabled = true; btn.style.opacity = "0.5"; }
-});
+            ['coach', 'fitness', 'commercial', 'specialist', 'scout'].forEach(type => {
+                let btn = document.getElementById(`hire-${type}`);
+                if (staff[type] && btn) { btn.innerText = "Contratado / Ativo"; btn.disabled = true; btn.style.opacity = "0.5"; }
+            });
 
-// Lógica para injetar o botão do Olheiro no Mercado
-let marketHeader = document.getElementById('market-refresh-container');
-if(marketHeader) {
-    if(staff.scout) {
-        marketHeader.innerHTML = `<button class="btn btn-success" style="font-size:12px; padding:8px;" onclick="refreshMarket()">🔄 Refresh Mercado (${marketRefreshes}/3)</button>`;
-    } else {
-        marketHeader.innerHTML = `<span style="font-size:11px; color:var(--text-muted)">Contrate o Olheiro Mestre para atualizações manuais.</span>`;
-    }
-}
+            let marketHeader = document.getElementById('market-refresh-container');
+            if(marketHeader) {
+                if(staff.scout) {
+                    marketHeader.innerHTML = `<button class="btn btn-success" style="font-size:12px; padding:8px;" onclick="refreshMarket()">🔄 Refresh Mercado (${marketRefreshes}/3)</button>`;
+                } else {
+                    marketHeader.innerHTML = `<span style="font-size:11px; color:var(--text-muted)">Contrate o Olheiro Mestre para atualizações manuais.</span>`;
+                }
+            }
 
             renderTacticalField();
             renderBenchAndRoster();
@@ -2753,10 +2735,8 @@ if(marketHeader) {
 
             const targetPanel = document.getElementById(`view-${viewId}`);
             if (targetPanel) targetPanel.classList.add('active');
-            if (clickedButton) {
-                clickedButton.classList.add('active');
-            }
-            }
+            if (clickedButton) clickedButton.classList.add('active');
+        }
 
         function logConsole(msg) {
             const c = document.getElementById('game-console');
