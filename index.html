@@ -2044,86 +2044,120 @@ function updateFormationOptions(family, isUserInteraction = true) {
 }
 
         function autoEscalar() {
-            let availablePlayers = squad.map(p => ({
-                ...p,
-                effAtt: p.attack * (p.stamina / 100),
-                effDef: p.defense * (p.stamina / 100)
-            }));
-
-            lineupSlots = Array(11).fill(null);
             let config = formationsConfig[currentFormation];
-            
-            // Descobre quantas vagas de posição GERAL a formação exige
+            let bestLineup = null;
+            let bestScore = -Infinity;
+
+            // Run greedy allocation 100 times with different slot orderings
+            for (let iter = 0; iter < 100; iter++) {
+                // Create a randomized order of slots for this iteration
+                const allSlots = [];
+                for (let i = 0; i < 11; i++) allSlots.push(i);
+                // Fisher-Yates shuffle
+                for (let i = allSlots.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [allSlots[i], allSlots[j]] = [allSlots[j], allSlots[i]];
+                }
+
+                // Run greedy allocation with this order
+                const lineup = tryGreedyAllocation(allSlots, config);
+
+                // Score this lineup using final contribution calculation
+                lineupSlots = lineup;
+                const stats = buildTeamContributionBreakdown();
+                const totalScore = stats.attack + stats.defense;
+
+                if (totalScore > bestScore) {
+                    bestScore = totalScore;
+                    bestLineup = lineup.slice();
+                }
+            }
+
+            // Apply best found lineup
+            lineupSlots = bestLineup || Array(11).fill(null);
+            teamRoles = normalizeTeamRoles(teamRoles);
+            updateTacticalAnalysisModal();
+
+            saveGame();
+            renderTacticalField();
+            renderBenchAndRoster();
+        }
+
+        function tryGreedyAllocation(slotOrder, config) {
+            const lineup = Array(11).fill(null);
+            let usedIds = new Set();
+            const presentSubpos = new Set();
+
+            // Group slots by general position requirement
             let genRequirements = { 'GOL': [], 'DEF': [], 'MEI': [], 'ATA': [] };
             config.forEach((subPos, idx) => {
                 genRequirements[subposData[subPos].gen].push({ idx, subPos });
             });
 
-            let usedIds = new Set();
+            // Process slots in randomized order
+            for (let slotIdx of slotOrder) {
+                const subPos = config[slotIdx];
+                const genPos = subposData[subPos].gen;
 
-            ['GOL', 'DEF', 'MEI', 'ATA'].forEach(genPos => {
-                let slotsNeeded = genRequirements[genPos];
-                if(slotsNeeded.length === 0) return;
+                // Separate candidates
+                let nativeCandidates = squad.filter(p => p.position === genPos && !usedIds.has(p.id));
+                let nonNativeCandidates = squad.filter(p => p.position !== genPos && !usedIds.has(p.id));
 
-                // Greedy selection per sub-position using heuristic-adjusted projected contribution
-                let candidates = availablePlayers.filter(p => !usedIds.has(p.id));
+                // Function to score a player for this subposition
+                const scorePlayerForSlot = (player, targetSub, isNative) => {
+                    const sData = subposData[targetSub];
+                    const penalty = isNative ? 1.0 : 0.60;
+                    const staminaMod = player.stamina / 100;
+                    let realAtt = player.attack * sData.att;
+                    let realDef = player.defense * sData.def;
+                    
+                    if (teamRoles.setPieceTaker && player.id === teamRoles.setPieceTaker) {
+                        const setPieceBonus = getSubattributePercentModifier(player.setPieces);
+                        realAtt += realAtt * (setPieceBonus / 100);
+                    }
 
-                // Sort slotsNeeded by attack weight so attacking roles choose first
-                slotsNeeded.sort((a, b) => subposData[b.subPos].att - subposData[a.subPos].att);
+                    // Apply heuristic adjustments
+                    const provPresent = new Set(presentSubpos);
+                    provPresent.add(targetSub);
+                    const heur = getHeuristicAdjForSubpos(targetSub, provPresent);
+                    const attScale = Math.max(0.01, 1 + heur.attAdj);
+                    const defScale = Math.max(0.01, 1 + heur.defAdj);
+                    
+                    return (realAtt * penalty * staminaMod * attScale) + (realDef * penalty * staminaMod * defScale);
+                };
 
-                // Track present subpos as we assign
-                const presentSubpos = new Set();
-                // include any already-filled lineup slots
-                for (let li = 0; li < lineupSlots.length; li++) {
-                    const pid = lineupSlots[li];
-                    if (pid) presentSubpos.add(config[li]);
+                let best = null;
+                let bestScore = -Infinity;
+
+                // Try native candidates first
+                for (let cand of nativeCandidates) {
+                    const score = scorePlayerForSlot(cand, subPos, true);
+                    if (score > bestScore) {
+                        bestScore = score;
+                        best = cand;
+                    }
                 }
 
-                for (let sReq of slotsNeeded) {
-                    const targetSub = sReq.subPos;
-                    // Evaluate best candidate for this specific sub-position
-                    let best = null;
-                    let bestScore = -Infinity;
-                    for (let cand of candidates) {
-                        if (usedIds.has(cand.id)) continue;
-                        // projected real att/def for this subPos
-                        const sData = subposData[targetSub];
-                        const penalty = cand.position !== sData.gen ? 0.60 : 1.0;
-                        const staminaMod = cand.stamina / 100;
-                        let realAtt = cand.attack * sData.att;
-                        let realDef = cand.defense * sData.def;
-                        if (teamRoles.setPieceTaker && cand.id === teamRoles.setPieceTaker) {
-                            const setPieceBonus = getSubattributePercentModifier(cand.setPieces);
-                            realAtt += realAtt * (setPieceBonus / 100);
-                        }
-                        // build provisional present set including this subPos
-                        const provPresent = new Set(presentSubpos);
-                        provPresent.add(targetSub);
-                        const heur = getHeuristicAdjForSubpos(targetSub, provPresent);
-                        const attScale = Math.max(0.01, 1 + heur.attAdj);
-                        const defScale = Math.max(0.01, 1 + heur.defAdj);
-                        const contrib = (realAtt * penalty * staminaMod * attScale) + (realDef * penalty * staminaMod * defScale);
-                        if (contrib > bestScore) {
-                            bestScore = contrib;
+                // If no native, try non-natives
+                if (!best) {
+                    for (let cand of nonNativeCandidates) {
+                        const score = scorePlayerForSlot(cand, subPos, false);
+                        if (score > bestScore) {
+                            bestScore = score;
                             best = cand;
                         }
                     }
-                    if (best) {
-                        lineupSlots[sReq.idx] = best.id;
-                        usedIds.add(best.id);
-                        // mark present and remove candidate from pool
-                        presentSubpos.add(targetSub);
-                        candidates = candidates.filter(c => c.id !== best.id);
-                    }
                 }
-                updateTacticalAnalysisModal();
-            });
 
-            teamRoles = normalizeTeamRoles(teamRoles);
+                // Assign to lineup
+                if (best) {
+                    lineup[slotIdx] = best.id;
+                    usedIds.add(best.id);
+                    presentSubpos.add(subPos);
+                }
+            }
 
-            saveGame();
-            renderTacticalField();
-            renderBenchAndRoster();
+            return lineup;
         }
 
         function changeFormation(newForm) {
