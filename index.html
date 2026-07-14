@@ -675,8 +675,8 @@
                     <div class="dashboard-card">
                         <h3>Painel de Informações de Desgaste</h3>
                         <div style="font-size: 13px; line-height: 1.6; color: var(--text-muted);">
-                            🔵 <strong>Foco Ofensivo:</strong> Chance de aumento em Ataque. Consome <span style="color:var(--accent-red)">25 de Estamina</span>.<br>
-                            🟢 <strong>Foco Defensivo:</strong> Chance de aumento em Defesa. Consome <span style="color:var(--accent-red)">25 de Estamina</span>.<br>
+                            🔵 <strong>Foco Ofensivo:</strong> Chance de aumento em Ataque. Consome <span style="color:var(--accent-red)">30 de Estamina</span>.<br>
+                            🟢 <strong>Foco Defensivo:</strong> Chance de aumento em Defesa. Consome <span style="color:var(--accent-red)">30 de Estamina</span>.<br>
                             🟡 <strong>Intensivo Misto:</strong> Chance sutil em ambos. Consome <span style="color:var(--accent-red)">20 de Estamina</span>.<br>
                             <br>
                             <span style="color: var(--accent-warn)">Nota: O limite mínimo para submeter um atleta ao treinamento é de 35% de energia restante.</span>
@@ -850,19 +850,19 @@
         };
 
         const subposData = {
-            'GOL': {def: 1.90, att: 0.10, gen: 'GOL'},
-            'ZAG': {def: 1.60, att: 0.40, gen: 'DEF'},
-            'LE':  {def: 1.40, att: 0.60, gen: 'DEF'},
-            'LD':  {def: 1.40, att: 0.60, gen: 'DEF'},
-            'VOL': {def: 1.20, att: 0.80, gen: 'MEI'},
+            'GOL': {def: 1.40, att: 0.10, gen: 'GOL'},
+            'ZAG': {def: 1.30, att: 0.30, gen: 'DEF'},
+            'LE':  {def: 1.20, att: 0.50, gen: 'DEF'},
+            'LD':  {def: 1.20, att: 0.50, gen: 'DEF'},
+            'VOL': {def: 1.10, att: 0.85, gen: 'MEI'},
             'MC':  {def: 1.00, att: 1.00, gen: 'MEI'},
             'ME':  {def: 1.00, att: 1.00, gen: 'MEI'},
             'MD':  {def: 1.00, att: 1.00, gen: 'MEI'},
-            'MEI': {def: 0.80, att: 1.20, gen: 'MEI'},
-            'F9':  {def: 0.60, att: 1.40, gen: 'ATA'},
-            'PE':  {def: 0.50, att: 1.50, gen: 'ATA'},
-            'PD':  {def: 0.50, att: 1.50, gen: 'ATA'},
-            'ATA': {def: 0.40, att: 1.60, gen: 'ATA'}
+            'MEI': {def: 0.85, att: 1.10, gen: 'MEI'},
+            'F9':  {def: 0.50, att: 1.20, gen: 'ATA'},
+            'PE':  {def: 0.40, att: 1.25, gen: 'ATA'},
+            'PD':  {def: 0.40, att: 1.25, gen: 'ATA'},
+            'ATA': {def: 0.30, att: 1.30, gen: 'ATA'}
         };
         
         function getHeuristicAdjForSubpos(subPos, presentSubpos) {
@@ -905,7 +905,7 @@
             if (!player) return null;
             if (player.leadership == null) player.leadership = Math.floor(Math.random() * 101);
             if (player.setPieces == null) {
-                const multi = { GOL: 0.35, DEF: 0.60, MEI: 0.85, ATA: 1.15 }[player.position] || 0.75;
+                const multi = { GOL: 0.35, DEF: 0.60, MEI: 1.55, ATA: 1.15 }[player.position] || 0.75;
                 player.setPieces = Math.max(0, Math.min(100, Math.round((player.attack || 0) * multi)));
             }
             return player;
@@ -1046,12 +1046,12 @@
             const setPieceModifier = getSubattributePercentModifier(player.setPieces) / 4;
             const adjustedAttack = player.attack * (1 + (setPieceModifier / 100));
 
-            if (player.position === 'GOL') baseVal = (player.defense * 0.90) + (adjustedAttack * 0.10);
-            else if (player.position === 'DEF') baseVal = (player.defense * 0.70) + (adjustedAttack * 0.30);
+            if (player.position === 'GOL') baseVal = (player.defense * 0.70) + (adjustedAttack * 0.05);
+            else if (player.position === 'DEF') baseVal = (player.defense * 0.65) + (adjustedAttack * 0.15);
             else if (player.position === 'MEI') baseVal = (player.defense * 0.50) + (adjustedAttack * 0.50);
-            else if (player.position === 'ATA') baseVal = (player.defense * 0.30) + (adjustedAttack * 0.70);
+            else if (player.position === 'ATA') baseVal = (player.defense * 0.15) + (adjustedAttack * 0.65);
 
-            const baseFactor = 22000; 
+            const baseFactor = 44000; 
             const capabilityExponent = Math.pow(baseVal / 40, 8) * baseFactor;
             
             let ageMultiplier = 1.0;
@@ -1059,7 +1059,7 @@
             else if (player.age >= 30) ageMultiplier = Math.max(0.05, 1.0 - (player.age - 29) * 0.16); 
             
             const leadershipMultiplier = getSubattributeMultiplier(player.leadership);
-            return Math.round(Math.max(5000, capabilityExponent * ageMultiplier * leadershipMultiplier));
+            return Math.round(Math.max(1000, capabilityExponent * ageMultiplier * leadershipMultiplier));
         }
 
         function calculatePayroll() {
@@ -1079,9 +1079,9 @@
             const pos = positionStr || positions[Math.floor(Math.random() * positions.length)];
             const age = Math.floor(Math.random() * 18) + 17; 
             
-            let minS = 57, maxS = 68;
-            if (tier === 'modesto') { minS = 42; maxS = 53; }
-            if (tier === 'elite') { minS = 72; maxS = 85; }
+            let minS = 50, maxS = 60;
+            if (tier === 'modesto') { minS = 30; maxS = 40; }
+            if (tier === 'elite') { minS = 70; maxS = 80; }
             
             let att = Math.floor(Math.random() * (maxS + 1 - minS)) + minS;
             let def = Math.floor(Math.random() * (maxS + 1 - minS)) + minS;
@@ -1287,8 +1287,8 @@
                         n = identity.name;
                         userTeamId = idCounter;
                     }
-                    let basePowerAtt = Math.min(50 - (div * 8) + Math.floor(Math.random() * 60), 95);
-                    let basePowerDef = Math.min(80 - (div * 8) + Math.floor(Math.random() * 20), 95);
+                    let basePowerAtt = Math.min(59 - (div * 10) + Math.floor(Math.random() * 10), 90);
+                    let basePowerDef = Math.min(75 - (div * 10) + Math.floor(Math.random() * 10), 90);
 
                     teams.push({
                         id: idCounter, name: n, division: div,
@@ -2543,10 +2543,10 @@
                 let atkUp = 0; let defUp = 0;
 
                 if (slot.type === 'ofensivo') {
-                    p.stamina = Math.max(0, p.stamina - 25);
+                    p.stamina = Math.max(0, p.stamina - 30);
                     if(Math.random() < successChance) atkUp = Math.floor(Math.random() * 2) + 1;
                 } else if (slot.type === 'defensivo') {
-                    p.stamina = Math.max(0, p.stamina - 25);
+                    p.stamina = Math.max(0, p.stamina - 30);
                     if(Math.random() < successChance) defUp = Math.floor(Math.random() * 2) + 1;
                 } else {
                     p.stamina = Math.max(0, p.stamina - 20);
