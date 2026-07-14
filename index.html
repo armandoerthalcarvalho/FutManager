@@ -1287,25 +1287,26 @@
                         n = identity.name;
                         userTeamId = idCounter;
                     }
+                    let basePowerAtt = 0, basePowerDef = 0;
                     if (div === 1) {
-                        let basePowerAtt = Math.min(51 + Math.floor(Math.random() * 10), 90);
-                        let basePowerDef = Math.min(68 + Math.floor(Math.random() * 10), 90);
+                        basePowerAtt = Math.min(51 + Math.floor(Math.random() * 10), 90);
+                        basePowerDef = Math.min(68 + Math.floor(Math.random() * 10), 90);
                     }
                     else if (div === 2) {
-                        let basePowerAtt = Math.min(43 + Math.floor(Math.random() * 10), 85);
-                        let basePowerDef = Math.min(58 + Math.floor(Math.random() * 10), 85);
+                        basePowerAtt = Math.min(43 + Math.floor(Math.random() * 10), 85);
+                        basePowerDef = Math.min(58 + Math.floor(Math.random() * 10), 85);
                     }
                     else if (div === 3) {
-                        let basePowerAtt = Math.min(36 + Math.floor(Math.random() * 10), 80);
-                        let basePowerDef = Math.min(48 + Math.floor(Math.random() * 10), 80);
+                        basePowerAtt = Math.min(36 + Math.floor(Math.random() * 10), 80);
+                        basePowerDef = Math.min(48 + Math.floor(Math.random() * 10), 80);
                     }
                     else if (div === 4) {
-                        let basePowerAtt = Math.min(28 + Math.floor(Math.random() * 10), 75);
-                        let basePowerDef = Math.min(38 + Math.floor(Math.random() * 10), 75);
+                        basePowerAtt = Math.min(28 + Math.floor(Math.random() * 10), 75);
+                        basePowerDef = Math.min(38 + Math.floor(Math.random() * 10), 75);
                     }
                     else if (div === 5) {
-                        let basePowerAtt = Math.min(21 + Math.floor(Math.random() * 10), 70);
-                        let basePowerDef = Math.min(29 + Math.floor(Math.random() * 10), 70);
+                        basePowerAtt = Math.min(21 + Math.floor(Math.random() * 10), 70);
+                        basePowerDef = Math.min(29 + Math.floor(Math.random() * 10), 70);
                     }
 
                     teams.push({
