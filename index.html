@@ -1500,11 +1500,36 @@
             const contributions = [];
             const presentSubpos = new Set();
             
+            // Variável para armazenar a contagem de crowding
+            const macroCount = { 'DEF': 0, 'MEI': 0, 'ATA': 0, 'GOL': 0 };
+            
             for (let i = 0; i < 11; i++) {
                 const pIdCheck = lineupSlots[i];
                 const subPosCheck = config[i];
-                if (pIdCheck && squad.find(x => x.id === pIdCheck)) presentSubpos.add(subPosCheck);
+                if (pIdCheck && squad.find(x => x.id === pIdCheck)) {
+                    presentSubpos.add(subPosCheck);
+                    macroCount[subposData[subPosCheck].gen]++; // Conta a ocupação setorial
+                }
             }
+
+            // Funções de mitigação de Overcrowding
+            const getCrowdingMult = (macro, count) => {
+                if (macro === 'DEF' || macro === 'MEI') {
+                    if (count >= 5) return 0.90;
+                    if (count === 4) return 0.95;
+                } else if (macro === 'ATA') {
+                    if (count >= 4) return 0.90;
+                    if (count === 3) return 0.95;
+                }
+                return 1.0;
+            };
+
+            const crowdingMults = {
+                'DEF': getCrowdingMult('DEF', macroCount['DEF']),
+                'MEI': getCrowdingMult('MEI', macroCount['MEI']),
+                'ATA': getCrowdingMult('ATA', macroCount['ATA']),
+                'GOL': 1.0
+            };
 
             for (let i = 0; i < 11; i++) {
                 const pId = lineupSlots[i];
@@ -1530,9 +1555,12 @@
                     const attScale = Math.max(0.01, 1 + heur.attAdj);
                     const defScale = Math.max(0.01, 1 + heur.defAdj);
 
-                    const contributionAtt = realAtt * penalty * staminaMod * attScale;
-                    const contributionDef = realDef * penalty * staminaMod * defScale;
-                    
+                    // APLICAÇÃO DO CROWDING AQUI
+                    const crowdPenalty = crowdingMults[sData.gen];
+
+                    const contributionAtt = realAtt * penalty * staminaMod * attScale * crowdPenalty;
+                    const contributionDef = realDef * penalty * staminaMod * defScale * crowdPenalty;
+
                     totalAtt += contributionAtt;
                     totalDef += contributionDef;
                     const verticalBias = (heur.attAdj - heur.defAdj);
