@@ -589,7 +589,7 @@
                                 <div style="font-size: 13px; text-align: left; margin-top: 15px; line-height: 1.6;">
                                     📍 Liga: <strong>Série E</strong><br>
                                     💰 Caixa Inicial: <strong>R$ 1.500.000</strong><br>
-                                    📊 Nível do Elenco: <strong>Modesto (45-55)</strong>
+                                    📊 Nível do Elenco: <strong>Modesto (30-40)</strong>
                                 </div>
                             </div>
                             <div class="tier-card" onclick="buildFreshDatabase('intermediario')">
@@ -598,7 +598,7 @@
                                 <div style="font-size: 13px; text-align: left; margin-top: 15px; line-height: 1.6;">
                                     📍 Liga: <strong>Série C</strong><br>
                                     💰 Caixa Inicial: <strong>R$ 4.500.000</strong><br>
-                                    📊 Nível do Elenco: <strong>Mediano (60-70)</strong>
+                                    📊 Nível do Elenco: <strong>Mediano (50-60)</strong>
                                 </div>
                             </div>
                             <div class="tier-card" onclick="buildFreshDatabase('elite')">
@@ -607,7 +607,7 @@
                                 <div style="font-size: 13px; text-align: left; margin-top: 15px; line-height: 1.6;">
                                     📍 Liga: <strong>Série A</strong><br>
                                     💰 Caixa Inicial: <strong>R$ 9.000.000</strong><br>
-                                    📊 Nível do Elenco: <strong>Elite (75-85)</strong>
+                                    📊 Nível do Elenco: <strong>Elite (70-80)</strong>
                                 </div>
                             </div>
                         </div>
@@ -850,19 +850,19 @@
         };
 
         const subposData = {
-            'GOL': {def: 1.40, att: 0.10, gen: 'GOL'},
-            'ZAG': {def: 1.30, att: 0.30, gen: 'DEF'},
-            'LE':  {def: 1.20, att: 0.50, gen: 'DEF'},
-            'LD':  {def: 1.20, att: 0.50, gen: 'DEF'},
+            'GOL': {def: 1.50, att: 0.05, gen: 'GOL'},
+            'ZAG': {def: 1.40, att: 0.30, gen: 'DEF'},
+            'LE':  {def: 1.30, att: 0.55, gen: 'DEF'},
+            'LD':  {def: 1.30, att: 0.55, gen: 'DEF'},
             'VOL': {def: 1.10, att: 0.85, gen: 'MEI'},
             'MC':  {def: 1.00, att: 1.00, gen: 'MEI'},
             'ME':  {def: 1.00, att: 1.00, gen: 'MEI'},
             'MD':  {def: 1.00, att: 1.00, gen: 'MEI'},
             'MEI': {def: 0.85, att: 1.10, gen: 'MEI'},
-            'F9':  {def: 0.50, att: 1.20, gen: 'ATA'},
-            'PE':  {def: 0.40, att: 1.25, gen: 'ATA'},
-            'PD':  {def: 0.40, att: 1.25, gen: 'ATA'},
-            'ATA': {def: 0.30, att: 1.30, gen: 'ATA'}
+            'F9':  {def: 0.55, att: 1.30, gen: 'ATA'},
+            'PE':  {def: 0.40, att: 1.35, gen: 'ATA'},
+            'PD':  {def: 0.40, att: 1.35, gen: 'ATA'},
+            'ATA': {def: 0.30, att: 1.40, gen: 'ATA'}
         };
         
         function getHeuristicAdjForSubpos(subPos, presentSubpos) {
@@ -1046,10 +1046,10 @@
             const setPieceModifier = getSubattributePercentModifier(player.setPieces) / 4;
             const adjustedAttack = player.attack * (1 + (setPieceModifier / 100));
 
-            if (player.position === 'GOL') baseVal = (player.defense * 0.70) + (adjustedAttack * 0.05);
-            else if (player.position === 'DEF') baseVal = (player.defense * 0.65) + (adjustedAttack * 0.15);
+            if (player.position === 'GOL') baseVal = (player.defense * 0.75) + (adjustedAttack * 0.025);
+            else if (player.position === 'DEF') baseVal = (player.defense * 0.70) + (adjustedAttack * 0.15);
             else if (player.position === 'MEI') baseVal = (player.defense * 0.50) + (adjustedAttack * 0.50);
-            else if (player.position === 'ATA') baseVal = (player.defense * 0.15) + (adjustedAttack * 0.65);
+            else if (player.position === 'ATA') baseVal = (player.defense * 0.15) + (adjustedAttack * 0.70);
 
             const baseFactor = 44000; 
             const capabilityExponent = Math.pow(baseVal / 40, 8) * baseFactor;
@@ -1287,12 +1287,30 @@
                         n = identity.name;
                         userTeamId = idCounter;
                     }
-                    let basePowerAtt = Math.min(59 - (div * 10) + Math.floor(Math.random() * 10), 90);
-                    let basePowerDef = Math.min(75 - (div * 10) + Math.floor(Math.random() * 10), 90);
+                    if (div === 1) {
+                        let basePowerAtt = Math.min(51 + Math.floor(Math.random() * 10), 90);
+                        let basePowerDef = Math.min(68 + Math.floor(Math.random() * 10), 90);
+                    }
+                    else if (div === 2) {
+                        let basePowerAtt = Math.min(43 + Math.floor(Math.random() * 10), 85);
+                        let basePowerDef = Math.min(58 + Math.floor(Math.random() * 10), 85);
+                    }
+                    else if (div === 3) {
+                        let basePowerAtt = Math.min(36 + Math.floor(Math.random() * 10), 80);
+                        let basePowerDef = Math.min(48 + Math.floor(Math.random() * 10), 80);
+                    }
+                    else if (div === 4) {
+                        let basePowerAtt = Math.min(28 + Math.floor(Math.random() * 10), 75);
+                        let basePowerDef = Math.min(38 + Math.floor(Math.random() * 10), 75);
+                    }
+                    else if (div === 5) {
+                        let basePowerAtt = Math.min(21 + Math.floor(Math.random() * 10), 70);
+                        let basePowerDef = Math.min(29 + Math.floor(Math.random() * 10), 70);
+                    }
 
                     teams.push({
                         id: idCounter, name: n, division: div,
-                        baseAttack: Math.max(35, basePowerAtt), baseDefense: Math.max(35, basePowerDef),
+                        baseAttack: Math.max(16, basePowerAtt), baseDefense: Math.max(24, basePowerDef),
                         points: 0, wins: 0, draws: 0, losses: 0, gf: 0, ga: 0, gd: 0
                     });
                     idCounter++;
