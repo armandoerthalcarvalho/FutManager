@@ -678,6 +678,7 @@
                             🔵 <strong>Foco Ofensivo:</strong> Chance de aumento em Ataque. Consome <span style="color:var(--accent-red)">30 de Estamina</span>.<br>
                             🟢 <strong>Foco Defensivo:</strong> Chance de aumento em Defesa. Consome <span style="color:var(--accent-red)">30 de Estamina</span>.<br>
                             🟡 <strong>Intensivo Misto:</strong> Chance sutil em ambos. Consome <span style="color:var(--accent-red)">20 de Estamina</span>.<br>
+                            ⚫ <strong>Bola Parada:</strong> Chance de aumento no subatributo Bola Parada. Consome <span style="color:var(--accent-red)">10 de Estamina</span>.<br>
                             <br>
                             <span style="color: var(--accent-warn)">Nota: O limite mínimo para submeter um atleta ao treinamento é de 35% de energia restante.</span>
                         </div>
@@ -894,7 +895,7 @@
         let trainingSlots = Array(3).fill(null); 
 
         function getSubattributePercentModifier(value = 60) {
-            return (Number(value) - 60) * 0.2;
+            return (Number(value) - 40) * 0.2;
         }
 
         function getSubattributeMultiplier(value = 60) {
@@ -1337,6 +1338,107 @@
             logConsole(`Nova governança iniciada em nível corporativo: [${tier.toUpperCase()}] — ${identity.name} (${identity.nickname})`);
         }
 
+function autoAssignTeamRoles() {
+    if (!lineupSlots || lineupSlots.length === 0) {
+        teamRoles = normalizeTeamRoles(teamRoles);
+        return;
+    }
+
+    const config = formationsConfig[currentFormation];
+    if (!config) {
+        teamRoles = normalizeTeamRoles(teamRoles);
+        return;
+    }
+
+    let bestCaptain = null;
+    let bestCaptainLeadership = -Infinity;
+
+    let bestSetPiece = null;
+    let bestSetPieceGain = -Infinity;
+
+    const presentSubpos = new Set();
+    const macroCount = { GOL: 0, DEF: 0, MEI: 0, ATA: 0 };
+
+    for (let i = 0; i < lineupSlots.length; i++) {
+        const playerId = lineupSlots[i];
+        if (!playerId) continue;
+
+        const player = squad.find(p => p.id === playerId);
+        if (!player) continue;
+
+        presentSubpos.add(config[i]);
+        macroCount[subposData[config[i]].gen]++;
+    }
+
+    const getCrowdingMult = (macro, count) => {
+        if (macro === 'DEF' || macro === 'MEI') {
+            if (count >= 5) return 0.90;
+            if (count === 4) return 0.95;
+        } else if (macro === 'ATA') {
+            if (count >= 4) return 0.90;
+            if (count === 3) return 0.95;
+        }
+        return 1.0;
+    };
+
+    const crowdingMults = {
+        GOL: 1,
+        DEF: getCrowdingMult('DEF', macroCount.DEF),
+        MEI: getCrowdingMult('MEI', macroCount.MEI),
+        ATA: getCrowdingMult('ATA', macroCount.ATA)
+    };
+
+    for (let i = 0; i < lineupSlots.length; i++) {
+
+        const playerId = lineupSlots[i];
+        if (!playerId) continue;
+
+        const player = squad.find(p => p.id === playerId);
+        if (!player) continue;
+
+        ensurePlayerSubattributes(player);
+
+        if (player.leadership > bestCaptainLeadership) {
+            bestCaptainLeadership = player.leadership;
+            bestCaptain = player.id;
+        }
+
+        const subPos = config[i];
+        const sData = subposData[subPos];
+
+        const penalty = player.position !== sData.gen ? 0.60 : 1.0;
+        const staminaMod = player.stamina / 100;
+
+        const heur = getHeuristicAdjForSubpos(subPos, presentSubpos);
+
+        const attScale = Math.max(0.01, 1 + heur.attAdj);
+
+        const crowdPenalty = crowdingMults[sData.gen];
+
+        const baseAttack =
+            player.attack *
+            sData.att *
+            penalty *
+            staminaMod *
+            attScale *
+            crowdPenalty;
+
+        const bonusPercent = getSubattributePercentModifier(player.setPieces);
+
+        const gain = baseAttack * (bonusPercent / 100);
+
+        if (gain > bestSetPieceGain) {
+            bestSetPieceGain = gain;
+            bestSetPiece = player.id;
+        }
+    }
+
+    teamRoles = normalizeTeamRoles({
+        captain: bestCaptain,
+        setPieceTaker: bestSetPiece
+    });
+}
+
         function autoFillLineup(preserveExisting = false) {
             if (!formationsConfig[currentFormation]) currentFormation = '4-4-2 Em linha';
 
@@ -1382,7 +1484,7 @@
             }
 
             lineupSlots = newLineup;
-            teamRoles = normalizeTeamRoles(teamRoles);
+            autoAssignTeamRoles();
             updateTacticalAnalysisModal();
         }
 
@@ -2108,76 +2210,194 @@ function processLeagueMovements() {
             queueModal(htmlSummary);
         }
 
+const SEASON_POSITION_REWARDS = [
+    2000000,
+    1000000,
+    400000,
+    200000,
+    100000,
+    0,
+    -200000,
+    -400000
+];
+
+function getDivisionRewardMultiplier(division) {
+    return 2 ** (5 - division);
+}
+
         function triggerEndOfSeasonModal() {
-            let myDiv = teams.find(t => t.id === userTeamId).division;
-            let sortedTeams = teams.filter(t => t.division === myDiv).sort((a,b) => b.points - a.points || b.gd - a.gd || b.gf - a.gf);
-            let myPos = sortedTeams.findIndex(t => t.id === userTeamId) + 1;
+    const myTeam = teams.find(t => t.id === userTeamId);
+    const myDiv = myTeam.division;
 
-            let message = ""; let nextDiv = myDiv;
+    const sortedTeams = teams
+        .filter(t => t.division === myDiv)
+        .sort((a, b) => b.points - a.points || b.gd - a.gd || b.gf - a.gf);
 
-            if (myPos <= 2) {
-                if (myDiv > 1) {
-                    nextDiv = myDiv - 1;
-                    message = `🚀 <strong>PROMOÇÃO ASSEGURADA!</strong> Sua liderança garantiu o acesso para a Série ${String.fromCharCode(64 + nextDiv)}. O conselho aprovou bônus de R$ 4.000.000.`;
-                    finances.cash += 4000000;
-                } else {
-                    message = `🏆 <strong>SOBERANIA SUPREMA!</strong> Você manteve o clube no topo da elite (Série A). Injeção macroeconômica de R$ 8.000.000 efetuada.`;
-                    finances.cash += 8000000;
-                }
-            } else if (myPos >= 7) {
-                if (myDiv < 5) {
-                    nextDiv = myDiv + 1;
-                    message = `📉 <strong>DEGRADAÇÃO OPERACIONAL.</strong> O clube foi rebaixado para a Série ${String.fromCharCode(64 + nextDiv)}. Perda de investidores custou multa de R$ 2.000.000.`;
-                    finances.cash = Math.max(0, finances.cash - 2000000);
-                } else {
-                    message = `🚨 <strong>FRACASSO PARALISANTE.</strong> Lanterna da última divisão. Conselho executou intervenção judicial para manutenção.`;
-                }
-            } else {
-                message = `⚖️ <strong>MANUTENÇÃO DE DIRETRIZ.</strong> Permanência estável na Série ${String.fromCharCode(64 + myDiv)}. Ajuste o orçamento para o novo ano comercial.`;
-            }
+    const myPos = sortedTeams.findIndex(t => t.id === userTeamId) + 1;
 
-            let retiredList = [];
-            squad.forEach(p => {
-                p.age++;
-                let attChange = 0; let defChange = 0;
-                if (p.age <= 22) {
-                    attChange = Math.floor(Math.random() * 4) + 2; defChange = Math.floor(Math.random() * 4) + 2;
-                } else if (p.age <= 29) { 
-                    attChange = Math.floor(Math.random() * 4) - 1; defChange = Math.floor(Math.random() * 4) - 1;
-                } else { 
-                    attChange = -(Math.floor(Math.random() * 4) + 1); defChange = -(Math.floor(Math.random() * 4) + 1);
-                }
+    let nextDiv = myDiv;
 
-                p.attack = Math.max(10, Math.min(99, p.attack + attChange));
-                p.defense = Math.max(10, Math.min(99, p.defense + defChange));
-                p.value = calculatePlayerValue(p);
+    // Promoção / permanência / rebaixamento
+    if (myPos <= 2 && myDiv > 1) {
+        nextDiv = myDiv - 1;
+    } else if (myPos >= 7 && myDiv < 5) {
+        nextDiv = myDiv + 1;
+    }
 
-                if (p.age > 30 && Math.max(p.attack, p.defense) < 60) {
-                    retiredList.push(p);
-                }
-            });
+    // Premiação financeira
+    const baseReward = SEASON_POSITION_REWARDS[myPos - 1];
+    const seasonReward = baseReward * getDivisionRewardMultiplier(myDiv);
 
-            squad = squad.filter(p => !retiredList.includes(p));
-            teamRoles = normalizeTeamRoles(teamRoles);
+    finances.cash = Math.max(0, finances.cash + seasonReward);
 
-            let retiredHTML = retiredList.length > 0 
-                ? `<p style="color:var(--accent-red); margin-top:8px;">⚠️ <strong>Aposentadorias (${retiredList.length}):</strong> ${retiredList.map(p => p.name).join(', ')} encerraram a carreira pelo declínio técnico.</p>`
-                : `<p style="color:var(--accent-green); margin-top:8px;">✓ Nenhum atleta ativou a cláusula de aposentadoria compulsória neste ciclo.</p>`;
+    // Mensagem esportiva
+    let sportingMessage = "";
 
-            let html = `
-                <h2 style="color:var(--accent-blue); text-align:center; border:none; padding:0;">BALANÇO GERAL DA TEMPORADA ${currentSeason}</h2>
-                <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-glass); padding:20px; border-radius:12px; margin-top:20px; font-size:14px; line-height:1.6;">
-                    <p style="font-size:16px; margin-bottom:12px;">${message}</p>
-                    <hr style="border-color:var(--border-glass); margin:12px 0;">
-                    <h4>Auditoria Biológica do Plantel (Envelhecimento):</h4>
-                    <p style="color:var(--text-muted); font-size:12px;">Todos os atletas envelheceram 1 ano. Promessas evoluíram e veteranos sofreram declínio físico sistêmico.</p>
-                    ${retiredHTML}
-                    <p style="margin-top:10px;">Nova categoria ativa: <strong>Série ${String.fromCharCode(64 + nextDiv)}</strong></p>
-                </div>
-                <button class="btn btn-success" style="width:100%; margin-top:25px; padding:16px; font-size:15px;" onclick="executeSeasonTransition(${nextDiv})">Garantir Transição de Temporada ➔</button>
-            `;
-            queueModal(html);
+    switch (myPos) {
+        case 1:
+            sportingMessage = myDiv === 1
+                ? "🏆 <strong>CAMPEÃO NACIONAL!</strong> Sua equipe conquistou o título da Série A."
+                : `🏆 <strong>CAMPEÃO DA SÉRIE ${String.fromCharCode(64 + myDiv)}!</strong> A campanha terminou com acesso garantido.`;
+            break;
+
+        case 2:
+            sportingMessage = myDiv === 1
+                ? "🥈 <strong>VICE-CAMPEÃO.</strong> Excelente temporada na elite nacional."
+                : `🚀 <strong>ACESSO CONQUISTADO!</strong> O clube disputará a Série ${String.fromCharCode(64 + nextDiv)} na próxima temporada.`;
+            break;
+
+        case 3:
+            sportingMessage = "🥉 <strong>ÓTIMA CAMPANHA.</strong> O clube encerrou o campeonato muito próximo da zona de acesso.";
+            break;
+
+        case 4:
+            sportingMessage = "📈 <strong>TEMPORADA POSITIVA.</strong> A equipe apresentou evolução consistente.";
+            break;
+
+        case 5:
+            sportingMessage = "⚖️ <strong>TEMPORADA ESTÁVEL.</strong> Permanência tranquila na divisão.";
+            break;
+
+        case 6:
+            sportingMessage = "📋 <strong>OBJETIVO MÍNIMO CUMPRIDO.</strong> O clube evitou qualquer risco esportivo.";
+            break;
+
+        case 7:
+            sportingMessage = myDiv === 5
+                ? "📉 <strong>TEMPORADA MUITO FRACA.</strong> A equipe terminou na zona inferior da Série E."
+                : `📉 <strong>REBAIXAMENTO.</strong> O clube disputará a Série ${String.fromCharCode(64 + nextDiv)} na próxima temporada.`;
+            break;
+
+        case 8:
+            sportingMessage = myDiv === 5
+                ? "🚨 <strong>LANTERNA DA SÉRIE E.</strong> Será necessária uma reconstrução completa do elenco."
+                : `🚨 <strong>LANTERNA.</strong> O clube foi rebaixado para a Série ${String.fromCharCode(64 + nextDiv)}.`;
+            break;
+    }
+
+    // Mensagem financeira
+    let financialMessage;
+
+    if (seasonReward > 0) {
+        financialMessage =
+            `💰 Premiação da temporada: <strong>R$ ${seasonReward.toLocaleString('pt-BR')}</strong>.`;
+    } else if (seasonReward < 0) {
+        financialMessage =
+            `💸 Penalidade financeira: <strong>R$ ${Math.abs(seasonReward).toLocaleString('pt-BR')}</strong>.`;
+    } else {
+        financialMessage =
+            `💼 Nenhuma bonificação financeira foi aplicada nesta temporada.`;
+    }
+
+    // Evolução dos jogadores
+    let retiredList = [];
+
+    squad.forEach(p => {
+
+        p.age++;
+
+        let attChange = 0;
+        let defChange = 0;
+
+        if (p.age <= 22) {
+
+            attChange = Math.floor(Math.random() * 4) + 2;
+            defChange = Math.floor(Math.random() * 4) + 2;
+
+        } else if (p.age <= 29) {
+
+            attChange = Math.floor(Math.random() * 4) - 1;
+            defChange = Math.floor(Math.random() * 4) - 1;
+
+        } else {
+
+            attChange = -(Math.floor(Math.random() * 4) + 1);
+            defChange = -(Math.floor(Math.random() * 4) + 1);
+
         }
+
+        p.attack = Math.max(10, Math.min(99, p.attack + attChange));
+        p.defense = Math.max(10, Math.min(99, p.defense + defChange));
+        p.value = calculatePlayerValue(p);
+
+        if (p.age > 30 && Math.max(p.attack, p.defense) < 60) {
+            retiredList.push(p);
+        }
+
+    });
+
+    squad = squad.filter(p => !retiredList.includes(p));
+
+    teamRoles = normalizeTeamRoles(teamRoles);
+
+    const retiredHTML = retiredList.length > 0
+        ? `<p style="color:var(--accent-red); margin-top:8px;">⚠️ <strong>Aposentadorias (${retiredList.length}):</strong> ${retiredList.map(p => p.name).join(', ')} encerraram a carreira pelo declínio técnico.</p>`
+        : `<p style="color:var(--accent-green); margin-top:8px;">✓ Nenhum atleta ativou a cláusula de aposentadoria compulsória neste ciclo.</p>`;
+
+    const html = `
+        <h2 style="color:var(--accent-blue); text-align:center; border:none; padding:0;">
+            BALANÇO GERAL DA TEMPORADA ${currentSeason}
+        </h2>
+
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-glass); padding:20px; border-radius:12px; margin-top:20px; font-size:14px; line-height:1.6;">
+
+            <p style="font-size:18px; margin-bottom:6px;">
+                <strong>${myPos}º lugar — Série ${String.fromCharCode(64 + myDiv)}</strong>
+            </p>
+
+            <p>${sportingMessage}</p>
+
+            <p style="margin-top:10px;">${financialMessage}</p>
+
+            <hr style="border-color:var(--border-glass); margin:14px 0;">
+
+            <h4>Auditoria Biológica do Plantel</h4>
+
+            <p style="color:var(--text-muted); font-size:12px;">
+                Todos os atletas envelheceram um ano. Jovens evoluíram enquanto veteranos sofreram declínio natural.
+            </p>
+
+            ${retiredHTML}
+
+            <p style="margin-top:12px;">
+                Divisão da próxima temporada:
+                <strong>Série ${String.fromCharCode(64 + nextDiv)}</strong>
+            </p>
+
+        </div>
+
+        <button
+            class="btn btn-success"
+            style="width:100%; margin-top:25px; padding:16px; font-size:15px;"
+            onclick="executeSeasonTransition(${nextDiv})">
+
+            Garantir Transição de Temporada ➔
+
+        </button>
+    `;
+
+    queueModal(html);
+}
 
         function executeSeasonTransition(nextDiv) {
             currentSeason++;
@@ -2278,7 +2498,7 @@ teams.forEach(t => {
                 }
             }
             lineupSlots = bestLineup || Array(11).fill(null);
-            teamRoles = normalizeTeamRoles(teamRoles);
+            autoAssignTeamRoles();
             updateTacticalAnalysisModal();
             saveGame();
             renderTacticalField();
@@ -2602,12 +2822,14 @@ teams.forEach(t => {
                         <div style="background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border:1px solid var(--border-glass); display:flex; justify-content:space-between; align-items:center;">
                             <div>
                                 <strong>${p.name}</strong> ${statusBadge} (${p.age} anos) - <span style="color:var(--accent-blue)">${p.position}</span><br>
-                                <span style="font-size:11px; color:var(--text-muted)">ATK: ${p.attack} | DEF: ${p.defense} | Energia: ${p.stamina}%</span>
+                                <span style="font-size:11px; color:var(--text-muted)">ATK: ${p.attack} | DEF: ${p.defense} | BP: ${p.setPieces} | Energia: ${p.stamina}%</span>
                             </div>
                             <div style="display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end;">
                                 <button class="btn" style="padding:4px 8px; font-size:11px; background:rgba(0,210,255,0.2);" onclick="assignPlayerToTraining(${p.id}, ${slotIndex}, 'ofensivo')">Ofensivo</button>
                                 <button class="btn" style="padding:4px 8px; font-size:11px; background:rgba(0,255,136,0.2);" onclick="assignPlayerToTraining(${p.id}, ${slotIndex}, 'defensivo')">Defensivo</button>
                                 <button class="btn" style="padding:4px 8px; font-size:11px; background:rgba(255,183,3,0.2);" onclick="assignPlayerToTraining(${p.id}, ${slotIndex}, 'misto')">Misto</button>
+                                <button class="btn" style="padding:4px 8px; font-size:11px; background:rgba(20,20,20,20);" onclick="assignPlayerToTraining(${p.id}, ${slotIndex}, 'bola parada')">Bola Parada</button>
+                            </div>
                             </div>
                         </div>`}).join('')}
                     ${sortedPlayers.length === 0 ? '<p style="font-size:12px; color:var(--text-muted);">Nenhum atleta elegível com os filtros aplicados.</p>' : ''}
@@ -2676,17 +2898,54 @@ teams.forEach(t => {
                 let successChance = Math.min(1.0, baseChance * multiplier); 
                 let atkUp = 0; let defUp = 0;
 
-                if (slot.type === 'ofensivo') {
-                    p.stamina = Math.max(0, p.stamina - 30);
-                    if(Math.random() < successChance) atkUp = Math.floor(Math.random() * 2) + 1;
-                } else if (slot.type === 'defensivo') {
-                    p.stamina = Math.max(0, p.stamina - 30);
-                    if(Math.random() < successChance) defUp = Math.floor(Math.random() * 2) + 1;
-                } else {
-                    p.stamina = Math.max(0, p.stamina - 20);
-                    if(Math.random() < successChance * 0.7) atkUp = 1;
-                    if(Math.random() < successChance * 0.7) defUp = 1;
-                }
+               if (slot.type === 'ofensivo') {
+
+    p.stamina = Math.max(0, p.stamina - 30);
+
+    if (Math.random() < successChance)
+        atkUp = Math.floor(Math.random() * 2) + 1;
+
+}
+else if (slot.type === 'defensivo') {
+
+    p.stamina = Math.max(0, p.stamina - 30);
+
+    if (Math.random() < successChance)
+        defUp = Math.floor(Math.random() * 2) + 1;
+
+}
+else if (slot.type === 'bola parada') {
+
+    p.stamina = Math.max(0, p.stamina - 10);
+
+    if (Math.random() < successChance) {
+
+        const gain = Math.floor(Math.random() * 5) + 1;
+
+        p.setPieces = Math.min(100, p.setPieces + gain);
+
+        reportText += `✓ <strong>${p.name}</strong> refinou cobranças de bola parada! (+${gain} BP)<br>`;
+    }
+    else {
+
+        reportText += `✕ <strong>${p.name}</strong> treinou bolas paradas, mas não apresentou evolução técnica.<br>`;
+    }
+
+    p.value = calculatePlayerValue(p);
+
+    return;
+}
+else {
+
+    p.stamina = Math.max(0, p.stamina - 20);
+
+    if (Math.random() < successChance * 0.7)
+        atkUp = 1;
+
+    if (Math.random() < successChance * 0.7)
+        defUp = 1;
+
+}
 
                 p.attack = Math.min(99, p.attack + atkUp);
                 p.defense = Math.min(99, p.defense + defUp);
