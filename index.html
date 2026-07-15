@@ -1401,7 +1401,9 @@
                 location.reload();
             }
         }
-        
+
+        const CLUBS_PER_DIVISION = 8;
+
         function generateSeasonFixtures() {
             fixtures = [];
             for (let div = 1; div <= 5; div++) {
@@ -1442,6 +1444,83 @@
                 }
             }
         }
+
+function getDivisionStandings(division) {
+    return teams
+        .filter(t => t.division === division)
+        .sort((a, b) =>
+            b.points - a.points ||
+            b.gd - a.gd ||
+            b.gf - a.gf
+        );
+}
+
+function validateLeagueIntegrity() {
+
+    let valid = true;
+
+    for (let div = 1; div <= 5; div++) {
+
+        const clubs = teams.filter(t => t.division === div);
+
+        if (clubs.length !== CLUBS_PER_DIVISION) {
+
+            console.error(
+                `Divisão ${div} possui ${clubs.length} clubes.`
+            );
+
+            valid = false;
+        }
+    }
+
+    return valid;
+}
+
+function processLeagueMovements() {
+
+    const movements = [];
+
+    for (let div = 1; div <= 5; div++) {
+
+        const table = getDivisionStandings(div);
+
+        if (table.length !== CLUBS_PER_DIVISION) {
+            throw new Error(
+                `Divisão ${div} possui ${table.length} clubes durante a transição.`
+            );
+        }
+
+        if (div > 1) {
+            movements.push({
+                teamId: table[0].id,
+                targetDivision: div - 1
+            });
+
+            movements.push({
+                teamId: table[1].id,
+                targetDivision: div - 1
+            });
+        }
+
+        if (div < 5) {
+            movements.push({
+                teamId: table[6].id,
+                targetDivision: div + 1
+            });
+
+            movements.push({
+                teamId: table[7].id,
+                targetDivision: div + 1
+            });
+        }
+    }
+
+    movements.forEach(move => {
+        const team = teams.find(t => t.id === move.teamId);
+        team.division = move.targetDivision;
+    });
+
+}
 
         function normalizeMarketRefreshState() {
             if (!Number.isFinite(marketRefreshes)) marketRefreshes = 3;
@@ -2057,8 +2136,6 @@
                 message = `⚖️ <strong>MANUTENÇÃO DE DIRETRIZ.</strong> Permanência estável na Série ${String.fromCharCode(64 + myDiv)}. Ajuste o orçamento para o novo ano comercial.`;
             }
 
-            teams.find(t => t.id === userTeamId).division = nextDiv;
-
             let retiredList = [];
             squad.forEach(p => {
                 p.age++;
@@ -2107,18 +2184,28 @@
             currentRound = 1;
             marketRefreshes = 3;
             
-            teams.forEach(t => {
-                t.points = 0; t.wins = 0; t.draws = 0; t.losses = 0; t.gf = 0; t.ga = 0; t.gd = 0;
-                if(t.id !== userTeamId) {
-                    t.division = Math.floor(Math.random() * 5) + 1;
-                }
-            });
+            processLeagueMovements();
 
-            let siblingIAs = teams.filter(t => t.id !== userTeamId);
-            siblingIAs.forEach((t, i) => {
-                if(i < 7) t.division = nextDiv;
-                else if(t.division === nextDiv) t.division = (nextDiv % 5) + 1;
-            });
+if (!validateLeagueIntegrity()) {
+
+    alert(
+        "Falha estrutural detectada nas divisões. A temporada foi interrompida para evitar corrupção do calendário."
+    );
+
+    return;
+}
+
+teams.forEach(t => {
+
+    t.points = 0;
+    t.wins = 0;
+    t.draws = 0;
+    t.losses = 0;
+    t.gf = 0;
+    t.ga = 0;
+    t.gd = 0;
+
+});
 
             generateSeasonFixtures();
             generateMarket();
