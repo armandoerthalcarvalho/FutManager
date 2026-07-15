@@ -1504,6 +1504,16 @@ function autoAssignTeamRoles() {
             }
         }
 
+function shuffle(array) {
+    const result = [...array];
+
+    for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+    }
+
+    return result;
+}
         const CLUBS_PER_DIVISION = 8;
 
         function generateSeasonFixtures() {
@@ -1515,7 +1525,7 @@ function autoAssignTeamRoles() {
 
                 const roundsPerTurn = n - 1;
                 const totalRounds = roundsPerTurn * 2;
-                let rotation = [...divTeams];
+                let rotation = shuffle([...divTeams]);
                 const firstTurn = [];
 
                 for (let round = 0; round < roundsPerTurn; round++) {
@@ -1544,8 +1554,112 @@ function autoAssignTeamRoles() {
                         fixtures.push({ division: div, round: round + 1, homeId, awayId, played: false, homeScore: 0, awayScore: 0 });
                     });
                 }
+                balanceFixtureHomeAway(fixtures, div);
             }
         }
+
+function balanceFixtureHomeAway(fixtures, division) {
+
+    const divFixtures = fixtures.filter(f => f.division === division);
+
+    function calculateGlobalScore() {
+
+        const schedules = new Map();
+
+        divFixtures.forEach(match => {
+
+            if (!schedules.has(match.homeId)) schedules.set(match.homeId, []);
+            if (!schedules.has(match.awayId)) schedules.set(match.awayId, []);
+
+            schedules.get(match.homeId).push({
+                round: match.round,
+                home: true
+            });
+
+            schedules.get(match.awayId).push({
+                round: match.round,
+                home: false
+            });
+
+        });
+
+        let score = 0;
+
+        schedules.forEach(list => {
+
+            list.sort((a, b) => a.round - b.round);
+
+            let run = 1;
+
+            for (let i = 1; i < list.length; i++) {
+
+                if (list[i].home === list[i - 1].home) {
+                    run++;
+                } else {
+                    score += sequencePenalty(run);
+                    run = 1;
+                }
+
+            }
+
+            score += sequencePenalty(run);
+
+        });
+
+        return score;
+    }
+
+    function sequencePenalty(run) {
+
+        if (run >= 5) return 50000;
+        if (run === 4) return 10000;
+        if (run === 3) return 1000;
+        if (run === 2) return 20;
+
+        return 0;
+    }
+
+    let currentScore = calculateGlobalScore();
+
+    let improved = true;
+    let pass = 0;
+
+    while (improved && pass < 100) {
+        console.log(`Balanceamento divisão ${division} | passagem ${pass} | score = ${currentScore}`);
+        pass++;
+        improved = false;
+
+        const shuffledMatches = shuffle(divFixtures);
+
+        for (const match of shuffledMatches) {
+
+            [match.homeId, match.awayId] = [match.awayId, match.homeId];
+
+            const newScore = calculateGlobalScore();
+
+            if (newScore < currentScore) {
+
+                currentScore = newScore;
+                improved = true;
+
+            } else {
+
+                [match.homeId, match.awayId] = [match.awayId, match.homeId];
+
+            }
+
+        }
+
+        console.log(
+            `Balanceamento divisão ${division} | passagem ${pass} | score = ${currentScore}`
+        );
+    }
+
+    console.log(
+        `Balanceamento da divisão ${division} concluído. Score final: ${currentScore}`
+    );
+
+}
 
 function getDivisionStandings(division) {
     return teams
