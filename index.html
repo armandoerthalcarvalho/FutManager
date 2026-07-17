@@ -502,6 +502,7 @@
     <div class="main-container">
         <nav id="main-navigation" style="display: none;">
             <button class="nav-btn active" onclick="switchView('dashboard', this)">Painel Executivo</button>
+            <button class="nav-btn" onclick="switchView('trophies', this)">Galeria de Troféus</button>
             <button class="nav-btn" onclick="switchView('tactics', this)">Gestão Tática</button>
             <button class="nav-btn" onclick="switchView('squad', this)">Elenco Completo</button>
             <button class="nav-btn" onclick="switchView('training', this)">Centro de Treino</button>
@@ -638,6 +639,27 @@
                 </div>
                 <div class="console-box" id="game-console">Sistema operacional corporativo inicializado...</div>
             </div>
+
+    <div id="view-trophies" class="view-panel">
+
+    <h2>
+
+Galeria de Troféus
+(<span id="trophy-count">0</span>)
+
+</h2>
+
+    <p style="
+        font-size:13px;
+        color:var(--text-muted);
+        margin-bottom:20px;
+    ">
+        Registro permanente das principais campanhas da história do clube.
+    </p>
+
+    <div id="trophy-gallery-container" class="player-card-grid"></div>
+
+</div>
 
             <div id="view-tactics" class="view-panel">
                 <h2>Escalação Tática</h2>
@@ -785,6 +807,7 @@
         let staff = { coach: false, fitness: false, commercial: false, specialist: false, scout: false };
         let marketRefreshes = 3;
         let squad = [];
+        let trophyCabinet = [];
         let userFormHistory = [];
         
         let currentFormation = '4-4-2 Em linha';
@@ -1041,6 +1064,14 @@
             return k - 1;
         }
 
+function getAgeMultiplier(age){
+
+    const expected = (625 - (age * age)) / 100;
+
+    return Math.exp(expected * 0.35);
+
+}
+
         function calculatePlayerValue(p) {
             const player = ensurePlayerSubattributes({ ...p });
             let baseVal = 0;
@@ -1054,9 +1085,7 @@
 
             const baseFactor = 44000; 
             const capabilityExponent = Math.pow(baseVal / 40, 8) * baseFactor;
-            const expected = (625 - (player.age * player.age)) / 100;
-            let ageMultiplier = 1.0;
-            ageMultiplier = Math.exp(expected * 0.35); 
+            const ageMultiplier = getAgeMultiplier(player.age);
             
             const leadershipMultiplier = getSubattributeMultiplier(player.leadership);
             return Math.round(Math.max(1000, capabilityExponent * ageMultiplier * leadershipMultiplier));
@@ -1065,10 +1094,16 @@
 function calculatePayroll() {
     const baseOperational = 10000;
 
-    const squadPayroll = squad.reduce(
-        (acc, p) => acc + calculatePlayerValue(p) / 100,
-        0
-    );
+    const squadPayroll = squad.reduce((acc,p)=>{
+
+    const ageMultiplier = getAgeMultiplier(p.age);
+
+    return acc +
+        calculatePlayerValue(p) /
+        ageMultiplier /
+        100;
+
+},0);
 
     let staffCost = 0;
     if (staff.coach) staffCost += 3000;
@@ -1231,6 +1266,7 @@ function calculatePayroll() {
                     staff = parsed.staff || { coach: false, fitness: false, commercial: false, specialist: false, scout: false };
                     marketRefreshes = parsed.marketRefreshes !== undefined ? parsed.marketRefreshes : 3;
                     squad = parsed.squad;
+                    trophyCabinet = parsed.trophyCabinet || [];
                     clubIdentity = parsed.clubIdentity || createDefaultClubIdentity();
                     
                     currentFormation = parsed.currentFormation || '4-4-2 Em linha';
@@ -1275,6 +1311,7 @@ function calculatePayroll() {
             
             finances.stadiumCapacity = 10000;
             userFormHistory = [];
+            trophyCabinet = [];
             currentSeason = 1;
             currentRound = 1;
             staff = { coach: false, fitness: false, commercial: false, specialist: false, scout: false };
@@ -1496,7 +1533,7 @@ function autoAssignTeamRoles() {
         function saveGame() {
             const data = {
                 teams, fixtures, marketPlayers, userTeamId, currentSeason, currentRound, finances, staff,
-                squad, currentFormation, lineupSlots, teamRoles, userFormHistory, hasTrainedThisRound,
+                squad, currentFormation, lineupSlots, teamRoles, trophyCabinet, userFormHistory, hasTrainedThisRound,
                 trainingSlots, marketRefreshes, clubIdentity
             };
             localStorage.setItem('FMPRO_SAVE_V3', JSON.stringify(data));
@@ -2376,7 +2413,35 @@ function getDivisionRewardMultiplier(division) {
     return 2 ** (5 - division);
 }
 
-        function triggerEndOfSeasonModal() {
+function registerSeasonAchievement(position, division, reward){
+
+    if(position>2)
+        return;
+
+    if(
+        trophyCabinet.some(t=>
+
+            t.season===currentSeason &&
+            t.division===division &&
+            t.position===position
+
+        )
+    ){
+        return;
+    }
+
+    trophyCabinet.push({
+
+        season:currentSeason,
+        division,
+        position,
+        reward
+
+    });
+
+}
+
+function triggerEndOfSeasonModal() {
     const myTeam = teams.find(t => t.id === userTeamId);
     const myDiv = myTeam.division;
 
@@ -2398,6 +2463,11 @@ function getDivisionRewardMultiplier(division) {
     // Premiação financeira
     const baseReward = SEASON_POSITION_REWARDS[myPos - 1];
     const seasonReward = baseReward * getDivisionRewardMultiplier(myDiv);
+    registerSeasonAchievement(
+    myPos,
+    myDiv,
+    seasonReward
+);
 
     finances.cash = Math.max(0, finances.cash + seasonReward);
 
@@ -3141,6 +3211,194 @@ else {
             saveGame(); renderAll();
         }
 
+function renderTrophyGallery() {
+    const counter =
+document.getElementById("trophy-count");
+
+if(counter)
+    counter.innerText=trophyCabinet.length;
+
+    const container = document.getElementById("trophy-gallery-container");
+
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    if (trophyCabinet.length === 0) {
+
+        container.innerHTML = `
+            <div class="dashboard-card" style="grid-column:1/-1; text-align:center;">
+
+                <div style="font-size:64px;">🏛️</div>
+
+                <h3 style="margin-top:15px;">
+                    A história ainda está sendo escrita
+                </h3>
+
+                <p style="
+                    margin-top:12px;
+                    color:var(--text-muted);
+                    line-height:1.6;
+                    max-width:600px;
+                    margin-left:auto;
+                    margin-right:auto;
+                ">
+                    Seu clube ainda não conquistou títulos ou acessos históricos.
+                    Grandes campanhas permanecerão registradas permanentemente nesta galeria.
+                </p>
+
+            </div>
+        `;
+
+        return;
+
+    }
+
+    const trophies = [...trophyCabinet].sort((a,b)=>{
+
+        if(a.season !== b.season)
+            return b.season-a.season;
+
+        if(a.position !== b.position)
+            return a.position-b.position;
+
+        return a.division-b.division;
+
+    });
+
+    trophies.forEach(t=>{
+
+        const divisionLetter =
+            String.fromCharCode(64+t.division);
+
+        const champion =
+            t.position===1;
+
+        let title="";
+        let emoji="";
+        let border="";
+
+        if(champion){
+
+            if(t.division===1){
+
+                title="Campeão Nacional";
+                emoji="👑";
+                border="border:2px solid gold; box-shadow:0 0 20px rgba(255,215,0,.25);";
+
+            }else{
+
+                title=`Campeão da Série ${divisionLetter}`;
+                emoji="🏆";
+
+            }
+
+        }else{
+
+            if(t.division===1){
+
+                title="Vice-campeão Nacional";
+                emoji="🥈";
+
+            }else{
+
+                title=`Vice da Série ${divisionLetter}`;
+                emoji="🥈";
+
+            }
+
+        }
+
+        container.innerHTML+=`
+
+        <div class="player-card" style="${border}">
+
+            <div style="
+                font-size:52px;
+                text-align:center;
+                margin-top:5px;
+                margin-bottom:10px;
+            ">
+
+                ${emoji}
+
+            </div>
+
+            <div style="
+                text-align:center;
+                font-size:18px;
+                font-weight:700;
+            ">
+
+                ${title}
+
+            </div>
+
+            <div style="
+                text-align:center;
+                color:var(--text-muted);
+                font-size:13px;
+                margin-top:6px;
+            ">
+
+                Temporada ${t.season}
+
+            </div>
+
+            <hr style="
+                margin:18px 0;
+                border-color:rgba(255,255,255,.08);
+            ">
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                font-size:13px;
+            ">
+
+                <span>Série</span>
+
+                <strong>${divisionLetter}</strong>
+
+            </div>
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                margin-top:10px;
+                font-size:13px;
+            ">
+
+                <span>Premiação</span>
+
+                <strong>
+
+                    $ ${t.reward.toLocaleString("pt-BR")}
+
+                </strong>
+
+            </div>
+
+            <div style="
+                margin-top:18px;
+                font-size:11px;
+                color:var(--text-muted);
+                text-align:center;
+                line-height:1.5;
+            ">
+
+                Registro permanente da história do clube.
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+}
+
 function renderMarket() {
     const container = document.getElementById('market-container');
     container.innerHTML = "";
@@ -3309,6 +3567,7 @@ if (finances.cash > 0) {
             renderTacticalField();
             renderBenchAndRoster();
             renderTrainingView();
+            renderTrophyGallery();
             renderMarket();
             initFormationUI();
         }
