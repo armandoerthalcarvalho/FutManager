@@ -619,6 +619,7 @@
             <div id="view-dashboard" class="view-panel">
                 <h2>Painel do Comandante</h2>
                 <div id="club-vibe-banner" class="dashboard-card" style="margin-bottom:20px; border-left: 4px solid var(--accent-blue);"></div>
+                <div id="fan-dashboard-card" class="dashboard-card" style="margin-bottom:20px; border-left:4px solid var(--accent-green);"></div>
                 <div class="grid-2">
                     <div class="dashboard-card">
                         <h3>Próximo Compromisso</h3>
@@ -803,7 +804,7 @@ Galeria de Troféus
         let userTeamId = 1;
         let currentSeason = 1;
         let currentRound = 1;
-        let finances = { cash: 4500000, stadiumCapacity: 10000 };
+        let finances = { cash: 4500000, stadiumCapacity: 10000, fans: 5500 };
         let staff = { coach: false, fitness: false, commercial: false, specialist: false, scout: false };
         let marketRefreshes = 3;
         let squad = [];
@@ -1092,7 +1093,8 @@ function getAgeMultiplier(age){
         }
 
 function calculatePayroll() {
-    const baseOperational = 10000;
+    const baseOperational =
+    5000 + finances.stadiumCapacity;
 
     const squadPayroll = squad.reduce((acc,p)=>{
 
@@ -1252,7 +1254,10 @@ function calculatePayroll() {
         }
 
         function initGame() {
-            const save = localStorage.getItem('FMPRO_SAVE_V3');
+            localStorage.removeItem('FMPRO_SAVE_V1');
+            localStorage.removeItem('FMPRO_SAVE_V2');
+            localStorage.removeItem('FMPRO_SAVE_V3');
+            const save = localStorage.getItem('FMPRO_SAVE_V4');
             if (save) {
                 try {
                     const parsed = JSON.parse(save);
@@ -1309,7 +1314,14 @@ function calculatePayroll() {
             if (tier === 'intermediario') { finances.cash = 4500000; startingDiv = 3; }
             if (tier === 'elite') { finances.cash = 9000000; startingDiv = 1; }
             
-            finances.stadiumCapacity = 10000;
+const startingInfrastructure = {
+    1: { fans: 8500, stadium: 15000 },
+    3: { fans: 5500, stadium: 10000 },
+    5: { fans: 2500, stadium: 5000 }
+}[startingDiv];
+
+finances.fans = startingInfrastructure.fans;
+finances.stadiumCapacity = startingInfrastructure.stadium;
             userFormHistory = [];
             trophyCabinet = [];
             currentSeason = 1;
@@ -1536,12 +1548,12 @@ function autoAssignTeamRoles() {
                 squad, currentFormation, lineupSlots, teamRoles, trophyCabinet, userFormHistory, hasTrainedThisRound,
                 trainingSlots, marketRefreshes, clubIdentity
             };
-            localStorage.setItem('FMPRO_SAVE_V3', JSON.stringify(data));
+            localStorage.setItem('FMPRO_SAVE_V4', JSON.stringify(data));
         }
 
         function resetGame() {
             if(confirm("Deseja deletar permanentemente o save atual e voltar ao onboarding de seleção?")) {
-                localStorage.removeItem('FMPRO_SAVE_V3');
+                localStorage.removeItem('FMPRO_SAVE_V4');
                 location.reload();
             }
         }
@@ -1982,32 +1994,22 @@ function processLeagueMovements() {
         function closeTacticalAnalysis() {
             document.getElementById("tactical-analysis-modal").classList.remove("active");
         }
-function calculateAttendance(capacity, occupancy) {
 
-    let attendance = 0;
-    let remaining = capacity;
+function calculateAttendance(
+    activeFans,
+    stadiumCapacity,
+    formMultiplier,
+    extraMultiplier = 1
+){
 
-    let block = 0;
-
-    while (remaining > 0) {
-
-        const seats = Math.min(5000, remaining);
-
-        let blockMultiplier;
-
-        if (block < 2) {
-            blockMultiplier = 1.0;
-        } else {
-            blockMultiplier = Math.max(0.05, 1 - (block - 1) * 0.10);
-        }
-
-        attendance += seats * occupancy * blockMultiplier;
-
-        remaining -= seats;
-        block++;
-    }
-
-    return Math.round(attendance);
+    return Math.round(
+        Math.min(
+            stadiumCapacity,
+            activeFans *
+            formMultiplier *
+            extraMultiplier
+        )
+    );
 
 }
         
@@ -2104,20 +2106,32 @@ function calculateAttendance(capacity, occupancy) {
             let ticketRevenue = 0;
             let attendance = 0;
             if (userHome) {
-                // Impacto do Uniforme Clássico (+5% ocupação base)
-                let classicKitBonus = (clubIdentity.uniformStyle === 'classic') ? 0.05 : 0;
-                let divOccupancyBase = { 1: 0.85, 2: 0.70, 3: 0.55, 4: 0.40, 5: 0.25 }[myTeam.division] + classicKitBonus;
-                let formModifier = 0;
-                previousFormHistory.forEach(f => {
-                    if (f === 'W') formModifier += 0.10;
-                    if (f === 'D') formModifier += 0.02;
-                    if (f === 'L') formModifier -= 0.10;
-                });
-                let finalOccupancy = Math.max(0.15, Math.min(1.0, divOccupancyBase + formModifier));
-                attendance = calculateAttendance(
-                        finances.stadiumCapacity,
-                        finalOccupancy
-                        );
+let formMultiplier = 1;
+
+previousFormHistory.forEach(f=>{
+
+    if(f==="W") formMultiplier+=0.10;
+    if(f==="D") formMultiplier+=0.02;
+    if(f==="L") formMultiplier-=0.10;
+
+});
+
+const classicKitBonus =
+clubIdentity.uniformStyle==="classic"
+?1.05
+:1;
+
+attendance = calculateAttendance(
+
+    finances.fans,
+
+    finances.stadiumCapacity,
+
+    formMultiplier,
+
+    classicKitBonus
+
+);
                 
                 let baseTicketPrice = { 1: 90, 2: 70, 3: 50, 4: 35, 5: 20 }[myTeam.division];
                 if (staff.commercial) baseTicketPrice = Math.round(baseTicketPrice * 1.15);
@@ -2128,9 +2142,49 @@ function calculateAttendance(capacity, occupancy) {
                 finances.cash += ticketRevenue;
             }
 
-            if (userG > oppG) userFormHistory.push('W');
-            else if (userG === oppG) userFormHistory.push('D');
-            else userFormHistory.push('L');
+           const randomOffset =
+    Math.round((Math.random() + Math.random() - 1) * 100) / 10000;
+
+const randomFactor = 1 + randomOffset;
+
+const previousFans = finances.fans;
+
+if (userG > oppG) {
+
+    userFormHistory.push('W');
+
+    finances.fans = Math.round(
+        finances.fans / (0.98 * randomFactor)
+    );
+
+} else if (userG === oppG) {
+
+    userFormHistory.push('D');
+
+    finances.fans = Math.round(
+        finances.fans * randomFactor
+    );
+
+} else {
+
+    userFormHistory.push('L');
+
+    finances.fans = Math.round(
+        finances.fans * (0.98 * randomFactor)
+    );
+
+}
+
+if (userFormHistory.length > 3)
+    userFormHistory.shift();
+
+finances.fans = Math.max(
+    500,
+    Math.min(100000, finances.fans)
+);
+
+const fanDelta = finances.fans - previousFans;
+
             if (userFormHistory.length > 3) userFormHistory.shift();
 
             if (currentRound % 5 === 0) {
@@ -2143,7 +2197,7 @@ function calculateAttendance(capacity, occupancy) {
                 logConsole("Oscilações Táticas Naturais: Times rivais ajustaram suas estratégias, com possíveis oscilações positivas ou negativas.");
             }
 
-            triggerMatchAnimation(userMatch, attendance, ticketRevenue);
+            triggerMatchAnimation(userMatch, attendance, ticketRevenue, fanDelta);
             
             hasTrainedThisRound = false;
             trainingSlots = Array(3).fill(null);
@@ -2228,7 +2282,7 @@ function calculateAttendance(capacity, occupancy) {
             return events;
         }
 
-        function triggerMatchAnimation(match, att, cashGained) {
+        function triggerMatchAnimation(match, att, cashGained, fanDelta) {
             let userHome = match.homeId === userTeamId;
             let myScoreFinal = userHome ? match.homeScore : match.awayScore;
             let oppScoreFinal = userHome ? match.awayScore : match.homeScore;
@@ -2247,7 +2301,7 @@ function calculateAttendance(capacity, occupancy) {
                     <div id="timeline-container" style="background:rgba(0,0,0,0.3); padding:20px; border-radius:10px; border:1px solid var(--border-glass); font-size:13px; line-height:1.6; height: 350px; overflow-y:auto; display:flex; flex-direction:column;">
                         <div class="timeline-event"><div class="timeline-minute">0'</div><div class="timeline-desc">⏱️ <strong>Rola a bola!</strong> Início de partida no ${userHome ? identity.stadiumName : 'estádio adversário'}.</div></div>
                     </div>
-                    <button id="btn-finish-match" class="btn btn-success" style="width:100%; margin-top:20px; padding:14px; opacity:0; pointer-events:none; transition:opacity 0.4s ease;" onclick="showPostMatchSummary(${userHome}, ${myScoreFinal}, ${oppScoreFinal}, '${oppName}', ${att}, ${cashGained})">Fim de Jogo. Analisar Impactos ➔</button>
+                    <button id="btn-finish-match" class="btn btn-success" style="width:100%; margin-top:20px; padding:14px; opacity:0; pointer-events:none; transition:opacity 0.4s ease;" onclick="showPostMatchSummary(${userHome}, ${myScoreFinal}, ${oppScoreFinal}, '${oppName}', ${att}, ${cashGained}, ${fanDelta})">Fim de Jogo. Analisar Impactos ➔</button>
                     <button id="btn-skip-anim" class="btn" style="width:100%; margin-top:8px; font-size:11px; padding:6px; background:transparent;" onclick="skipMatchAnimation()">Pular Animação (Ir para o Resultado)</button>
                 `;
                 showModalContent(initialHtml);
@@ -2301,9 +2355,20 @@ function calculateAttendance(capacity, occupancy) {
             if (btnSkip) btnSkip.style.display = 'none';
         }
 
-        function showPostMatchSummary(userHome, myScore, oppScore, oppName, att, cashGained) {
+        function showPostMatchSummary(userHome, myScore, oppScore, oppName, att, cashGained, fanDelta) {
             closeModal();
             const identity = getClubIdentity();
+            const fanColor =
+    fanDelta > 0
+        ? 'var(--accent-green)'
+        : fanDelta < 0
+            ? 'var(--accent-red)'
+            : 'var(--text-muted)';
+
+const fanDeltaText =
+    fanDelta > 0
+        ? `+${fanDelta.toLocaleString()}`
+        : fanDelta.toLocaleString();
             
             let isWin = myScore > oppScore; let isDraw = myScore === oppScore;
             let statusColor = isWin ? 'var(--accent-green)' : (isDraw ? 'var(--accent-warn)' : 'var(--accent-red)');
@@ -2379,11 +2444,26 @@ function calculateAttendance(capacity, occupancy) {
                     <h2 style="margin-top:15px; border:none; padding:0; font-size:32px; color:${statusColor}">${myScore} - ${oppScore}</h2>
                 </div>
                 <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:10px; border:1px solid var(--border-glass); font-size:13px; line-height:1.6;">
-                    <p>📢 <strong>Voz Oficial dos "${identity.nickname}":</strong> "${fanSay}"</p>
+                    <p>📢 <strong>Voz Oficial "${identity.nickname}":</strong> "${fanSay}"</p>
                     <hr style="border-color:var(--border-glass); margin:10px 0;">
                     ${revenueHTML}
-                    <p style="margin-top:6px; color:var(--accent-red);">📉 <strong>Despesa Contábil Operacional:</strong> -$ ${calculatePayroll().toLocaleString()}</p>
-                </div>
+
+<p style="margin-top:6px;">
+👥 <strong>Torcedores Ativos:</strong>
+${finances.fans.toLocaleString()}
+<span
+style="
+color:${fanColor};
+font-weight:700;
+">
+(${fanDeltaText})
+</span>
+</p>
+
+<p style="margin-top:6px; color:var(--accent-red);">
+📉 <strong>Despesa Contábil Operacional:</strong>
+-$ ${calculatePayroll().toLocaleString()}
+</p>
                 
                 <h3 style="margin-top:20px; font-size:15px;">Atualização: Tabela Série ${String.fromCharCode(64 + myDiv)}</h3>
                 <table style="width:100%; font-size:12px; margin-top:10px;">
@@ -2441,6 +2521,40 @@ function registerSeasonAchievement(position, division, reward){
 
 }
 
+function applySeasonFanVariation(position) {
+
+    const previousFans = finances.fans;
+
+    const multipliers = {
+        1: 2.00,
+        2: 1.80,
+        3: 1.20,
+        4: 1.05,
+        5: 1.00,
+        6: 0.95,
+        7: 0.60,
+        8: 0.50
+    };
+
+    const multiplier = multipliers[position] ?? 1;
+
+    finances.fans = Math.max(
+        500,
+        Math.min(
+            100000,
+            Math.round(previousFans * multiplier)
+        )
+    );
+
+    return {
+        previous: previousFans,
+        current: finances.fans,
+        variation: finances.fans - previousFans,
+        multiplier
+    };
+
+}
+
 function triggerEndOfSeasonModal() {
     const myTeam = teams.find(t => t.id === userTeamId);
     const myDiv = myTeam.division;
@@ -2450,6 +2564,7 @@ function triggerEndOfSeasonModal() {
         .sort((a, b) => b.points - a.points || b.wins - a.wins || b.gd - a.gd || b.gf - a.gf);
 
     const myPos = sortedTeams.findIndex(t => t.id === userTeamId) + 1;
+    const fanReport = applySeasonFanVariation(myPos);
 
     let nextDiv = myDiv;
 
@@ -2530,6 +2645,52 @@ function triggerEndOfSeasonModal() {
             `💼 Nenhuma bonificação financeira foi aplicada nesta temporada.`;
     }
 
+    let fanMessage;
+
+switch(myPos){
+
+case 1:
+fanMessage =
+"A conquista do título multiplicou o interesse da torcida.";
+break;
+
+case 2:
+fanMessage =
+"O acesso gerou enorme crescimento da base de torcedores.";
+break;
+
+case 3:
+fanMessage =
+"A boa campanha fortaleceu a imagem do clube.";
+break;
+
+case 4:
+fanMessage =
+"A temporada trouxe um pequeno aumento no interesse.";
+break;
+
+case 5:
+fanMessage =
+"A torcida manteve seu tamanho praticamente estável.";
+break;
+
+case 6:
+fanMessage =
+"A campanha reduziu discretamente o entusiasmo.";
+break;
+
+case 7:
+fanMessage =
+"O rebaixamento afastou uma parcela significativa da torcida.";
+break;
+
+case 8:
+fanMessage =
+"A péssima campanha provocou forte perda de torcedores.";
+break;
+
+}
+
     // Evolução dos jogadores
     let retiredList = [];
 
@@ -2580,6 +2741,49 @@ squad.forEach(p => {
             <p>${sportingMessage}</p>
 
             <p style="margin-top:10px;">${financialMessage}</p>
+
+            <hr style="border-color:var(--border-glass); margin:14px 0;">
+
+<h4>Evolução da Torcida</h4>
+
+<p>
+Torcedores ativos anteriores:
+<strong>
+${fanReport.previous.toLocaleString()}
+</strong>
+</p>
+
+<p>
+Impacto da temporada:
+
+<strong
+style="color:${
+fanReport.variation >= 0
+? 'var(--accent-green)'
+: 'var(--accent-red)'
+}">
+${fanReport.variation >= 0 ? '+' : ''}
+${fanReport.variation.toLocaleString()}
+</strong>
+</p>
+
+<p>
+
+Torcedores para a próxima temporada:
+
+<strong>
+${fanReport.current.toLocaleString()}
+</strong>
+
+<p
+style="
+margin-top:8px;
+color:var(--text-muted);
+font-size:12px;">
+${fanMessage}
+</p>
+
+</p>
 
             <hr style="border-color:var(--border-glass); margin:14px 0;">
 
@@ -3463,6 +3667,75 @@ function renderMarket() {
             logConsole(`Aquisição Concluída: ${p.name} integrado ao elenco.`);
             saveGame(); renderAll();
         }
+        function renderFanDashboard(){
+
+    const el=document.getElementById(
+        "fan-dashboard-card"
+    );
+
+    if(!el)return;
+
+    const occupancy=Math.round(
+
+        Math.min(
+            finances.fans,
+            finances.stadiumCapacity
+        )/
+        finances.stadiumCapacity
+        *100
+
+    );
+
+    el.innerHTML=`
+
+<h3>Torcida</h3>
+
+<div style="
+display:flex;
+justify-content:space-between;
+margin-top:18px;
+">
+
+<div>
+
+<div style="font-size:12px;color:var(--text-muted)">
+Torcedores ativos
+</div>
+
+<div style="font-size:28px;font-weight:800;color:var(--accent-green)">
+${finances.fans.toLocaleString("pt-BR")}
+</div>
+
+</div>
+
+<div>
+
+<div style="font-size:12px;color:var(--text-muted)">
+Capacidade
+</div>
+
+<div style="font-size:22px;font-weight:700">
+${finances.stadiumCapacity.toLocaleString("pt-BR")}
+</div>
+
+</div>
+
+<div>
+
+<div style="font-size:12px;color:var(--text-muted)">
+Lotação máxima
+</div>
+
+<div style="font-size:22px;font-weight:700">
+${occupancy}%
+</div>
+
+</div>
+
+</div>
+`;
+
+}
 
         function renderAll() {
             let myTeam = teams.find(t => t.id === userTeamId);
@@ -3567,6 +3840,7 @@ if (finances.cash > 0) {
             renderTacticalField();
             renderBenchAndRoster();
             renderTrainingView();
+            renderFanDashboard();
             renderTrophyGallery();
             renderMarket();
             initFormationUI();
