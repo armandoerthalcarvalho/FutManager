@@ -1616,14 +1616,46 @@ function balanceFixtureHomeAway(fixtures, division) {
 
     const divFixtures = fixtures.filter(f => f.division === division);
 
+    // Agrupa os dois confrontos (turno e returno) de cada par de clubes
+    const mirrorMap = new Map();
+
+    divFixtures.forEach(match => {
+
+        const key = [
+            Math.min(match.homeId, match.awayId),
+            Math.max(match.homeId, match.awayId)
+        ].join("-");
+
+        if (!mirrorMap.has(key))
+            mirrorMap.set(key, []);
+
+        mirrorMap.get(key).push(match);
+
+    });
+
+    function sequencePenalty(run) {
+
+
+        if (run >= 5) return 10000000000;
+        if (run === 4) return 100000;
+        if (run === 3) return 1000;
+        if (run === 2) return 10;
+
+        return 0;
+
+    }
+
     function calculateGlobalScore() {
 
         const schedules = new Map();
 
         divFixtures.forEach(match => {
 
-            if (!schedules.has(match.homeId)) schedules.set(match.homeId, []);
-            if (!schedules.has(match.awayId)) schedules.set(match.awayId, []);
+            if (!schedules.has(match.homeId))
+                schedules.set(match.homeId, []);
+
+            if (!schedules.has(match.awayId))
+                schedules.set(match.awayId, []);
 
             schedules.get(match.homeId).push({
                 round: match.round,
@@ -1648,10 +1680,14 @@ function balanceFixtureHomeAway(fixtures, division) {
             for (let i = 1; i < list.length; i++) {
 
                 if (list[i].home === list[i - 1].home) {
+
                     run++;
+
                 } else {
+
                     score += sequencePenalty(run);
                     run = 1;
+
                 }
 
             }
@@ -1661,16 +1697,7 @@ function balanceFixtureHomeAway(fixtures, division) {
         });
 
         return score;
-    }
 
-    function sequencePenalty(run) {
-
-        if (run >= 5) return 50000;
-        if (run === 4) return 10000;
-        if (run === 3) return 1000;
-        if (run === 2) return 20;
-
-        return 0;
     }
 
     let currentScore = calculateGlobalScore();
@@ -1679,15 +1706,35 @@ function balanceFixtureHomeAway(fixtures, division) {
     let pass = 0;
 
     while (improved && pass < 100) {
-        console.log(`Balanceamento divisão ${division} | passagem ${pass} | score = ${currentScore}`);
+
         pass++;
         improved = false;
 
-        const shuffledMatches = shuffle(divFixtures);
+        console.log(
+            `Balanceamento divisão ${division} | passagem ${pass} | score = ${currentScore}`
+        );
 
-        for (const match of shuffledMatches) {
+        const shuffledPairs = shuffle([...mirrorMap.keys()]);
+        const processed = new Set();
 
-            [match.homeId, match.awayId] = [match.awayId, match.homeId];
+        for (const key of shuffledPairs) {
+
+            if (processed.has(key))
+                continue;
+
+            processed.add(key);
+
+            const pair = mirrorMap.get(key);
+
+            if (!pair || pair.length !== 2)
+                continue;
+
+            const first = pair[0];
+            const second = pair[1];
+
+            // Inverte turno e returno simultaneamente
+            [first.homeId, first.awayId] = [first.awayId, first.homeId];
+            [second.homeId, second.awayId] = [second.awayId, second.homeId];
 
             const newScore = calculateGlobalScore();
 
@@ -1698,15 +1745,14 @@ function balanceFixtureHomeAway(fixtures, division) {
 
             } else {
 
-                [match.homeId, match.awayId] = [match.awayId, match.homeId];
+                // desfaz ambas as inversões
+                [first.homeId, first.awayId] = [first.awayId, first.homeId];
+                [second.homeId, second.awayId] = [second.awayId, second.homeId];
 
             }
 
         }
 
-        console.log(
-            `Balanceamento divisão ${division} | passagem ${pass} | score = ${currentScore}`
-        );
     }
 
     console.log(
